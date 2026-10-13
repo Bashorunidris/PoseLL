@@ -642,8 +642,8 @@ async function showLogin(){const a=firebase.auth();
  try{await a.signInAnonymously()}catch(e){try{await a.setPersistence(firebase.auth.Auth.Persistence.NONE);await a.signInAnonymously()}catch(x){toast('Sign-in failed: '+(x.code||x.message))}}
  if(a.currentUser)setUser(a.currentUser)}
 function setUser(u){S.uid=(S.live&&S.p&&S.p.id)||u.uid;S.fb=true;ev('login')}
-// PASTE THIS at the very bottom of your script in index.html, just above </script></body></html>
-// It replaces the old claim(): the check now happens on your Vercel server (api/claim.js).
+
+
 async function claim(p){if(!S.fb){(S.pend=S.pend||[]).push(p);return}
  const srv=async step=>{const{session}=await Vatar.session();
   const r=await fetch('/api/claim',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session,purchaseId:p.purchaseId,step})});
@@ -652,5 +652,4 @@ async function claim(p){if(!S.fb){(S.pend=S.pend||[]).push(p);return}
   S.coins=(await api('claim',{purchaseId:p.purchaseId,productId:v.productId||p.productId})).coins;upd();
   await srv('deliver');hist('Bought coins',0);toast('Coins added')}
  catch(e){toast('Could not add coins. Reopen the game.')}}
-
 </script></body></html>
