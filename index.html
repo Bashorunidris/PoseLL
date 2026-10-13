@@ -643,14 +643,14 @@ async function showLogin(){const a=firebase.auth();
  if(a.currentUser)setUser(a.currentUser)}
 function setUser(u){S.uid=(S.live&&S.p&&S.p.id)||u.uid;S.fb=true;ev('login')}
 
-
-
 async function claim(p){if(!S.fb){(S.pend=S.pend||[]).push(p);return}
  const srv=async step=>{const{session}=await Vatar.session();
   const r=await fetch('/api/claim',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session,purchaseId:p.purchaseId,step})});
   const j=await r.json().catch(()=>({}));if(!r.ok)throw Error('server '+r.status+' '+(j.error||'')+' '+JSON.stringify(j.detail||'').slice(0,90));return j};
+ toast('Checking your purchase...');
  try{const v=await srv('verify');
   S.coins=(await api('claim',{purchaseId:p.purchaseId,productId:v.productId||p.productId})).coins;upd();
   await srv('deliver');hist('Bought coins',0);toast('Coins added')}
  catch(e){toast('Could not add coins: '+e.message)}}
+
 </script></body></html>
