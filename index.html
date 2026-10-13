@@ -3,215 +3,644 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Pose</title>
 <script src="https://lagoslife.app/sdk/vatar-games-v1.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,600&family=Bebas+Neue&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#000;--card:#1a1a1a;--p:#6D28D9;--p2:#a855f7;--deep:#4C1D95;--g:#fbbf24;--m:#999;--acc:#FF0050}
+:root{--p:#6D28D9;--p2:#a855f7;--deep:#4C1D95;--g:#fbbf24;--m:#999;--acc:#FF0050;--c:#1a1a1a}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:#fff;font:500 15px 'DM Sans',system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;background:#000;color:#fff;font:500 15px 'DM Sans',system-ui,sans-serif;overflow:hidden}
+h1,h2,h3{font-family:Syne,sans-serif}.m{color:var(--m)}
 #app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
-header{display:flex;align-items:center;gap:10px;padding:10px 12px;z-index:5}
+header{display:flex;align-items:center;gap:10px;padding:10px 12px}
 .av{width:38px;height:38px;border-radius:50%;border:2px solid var(--p);background:#1d1233 center/cover;flex:none}
-.tabs{display:flex;gap:18px;flex:1;justify-content:center}
-.tabs b{font-weight:600;color:#cfcfd6;padding-bottom:4px;border-bottom:2px solid transparent}
-.tabs b.on{color:#fff;border-color:#fff}
-main{flex:1;overflow-y:auto;position:relative}
-main.snap{scroll-snap-type:y mandatory}
-.post{height:100%;scroll-snap-align:start;position:relative;overflow:hidden}
-.post video,.post img,.post .bg{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-.bg{display:grid;place-items:center;padding:30px;text-align:center}
-.bg h2{font-size:26px;line-height:1.2}
-.rail{position:absolute;right:10px;bottom:90px;display:flex;flex-direction:column;gap:6px;align-items:center;z-index:2}
-.rail button{width:48px;height:48px;border-radius:50%;border:0;background:#0009;color:#fff;font-size:20px}
-.rail small{font-size:12px;margin-bottom:8px}
-.meta{position:absolute;left:12px;bottom:90px;right:80px;z-index:2;text-shadow:0 1px 4px #000}
-.list{padding:12px;display:grid;gap:10px}
-.card{background:var(--card);border-radius:16px;padding:14px;display:grid;gap:8px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
-.tile{border-radius:14px;aspect-ratio:16/10;padding:10px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
-.hero{padding:18px 14px 4px}.hero h2{color:var(--p2);letter-spacing:.08em}.hero p,.m{color:var(--m)}
-.msg{height:100%;display:grid;place-content:center;text-align:center;gap:8px;padding:30px}
-.msg span{font-size:44px}
+.tabs{display:flex;gap:18px;flex:1;justify-content:center;font-size:17px}
+.tabs b{font-weight:600;color:#cfcfd6;padding-bottom:4px;border-bottom:2px solid transparent}.tabs b.on{color:#fff;border-color:#fff}
+.srch{width:42px;height:42px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;flex:none;font-size:17px}
+main{flex:1;overflow-y:auto;position:relative}main.snap{scroll-snap-type:y mandatory}
+.full header,.full footer{display:none}
 footer{display:flex;justify-content:space-around;align-items:center;padding:8px 4px calc(8px + env(safe-area-inset-bottom));background:#000;border-top:1px solid #1c1c22}
 footer button{background:none;border:0;color:var(--m);font:inherit;font-size:12px;display:grid;gap:2px;justify-items:center;padding:6px 10px;border-radius:14px}
-footer button.on{color:var(--p2);background:#ffffff0d}
-footer .plus{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;padding:8px 22px;font-size:20px}
-.mini,.btn{border:0;border-radius:99px;background:var(--p);color:#fff;font:inherit;padding:10px 18px}
-.mini{padding:6px 12px;justify-self:start;background:#2a1a4d}
-#sh{position:fixed;inset:0;background:#000a;display:none;align-items:flex-end;z-index:20}
-#sh.on{display:flex}
-#sh>div{background:var(--card);width:100%;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:80%;overflow:auto;display:grid;gap:12px}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px}
-.row button{background:#22222a;border:0;color:#fff;font:inherit;border-radius:14px;padding:14px 6px}
+footer button.on{color:var(--p2);background:#ffffff0d}footer i{font-size:20px}
+footer .plus{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;padding:8px 22px}
+.post{height:100%;scroll-snap-align:start;position:relative;overflow:hidden}
+.post video,.post img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.bg{position:absolute;inset:0;display:grid;place-items:center;padding:30px;text-align:center}.bg h2{font-size:26px;line-height:1.2}
+.rail{position:absolute;right:10px;bottom:190px;display:flex;flex-direction:column;align-items:center;gap:4px;z-index:2}
+.rail button{width:54px;height:54px;border-radius:50%;border:0;background:#1c1c1ccc;color:#fff;font-size:20px}.rail button.lk{background:#1e4d36}
+.rail small{font-size:15px;margin-bottom:10px}
+.who{position:absolute;left:12px;bottom:190px;z-index:2;display:flex;align-items:center;gap:12px;text-shadow:0 1px 4px #000}
+.wa{width:58px;height:58px;border-radius:50%;background:#2a2a2a;border:2px solid #444;display:grid;place-items:center;font-size:22px}.who b{font-size:19px}
+.fol{border:1px solid #fff;background:none;color:#fff;border-radius:99px;padding:5px 14px;font:inherit;margin-top:4px}
+.cap{position:absolute;left:12px;right:80px;bottom:150px;z-index:2;text-shadow:0 1px 4px #000}
+.bar{position:absolute;left:12px;right:12px;bottom:10px;height:5px;border-radius:9px;background:#333;z-index:3}.bar i{display:block;width:12%;height:100%;border-radius:9px;background:#ef233c}
+.disc2{position:absolute;left:14px;bottom:36px;width:290px;height:150px;border-radius:14px;background:#4ecdc4;color:#0a3a36;display:grid;place-items:center;font-weight:600;z-index:4;box-shadow:0 8px 0 #fff}
+.disc2 .x{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;background:#2d6e69;color:#fff;display:grid;place-items:center}
+.msg{height:100%;display:grid;place-content:center;justify-items:center;text-align:center;gap:10px;padding:30px}.msg>span{font-size:44px}
+.btn,.mini{border:0;border-radius:99px;background:var(--p);color:#fff;font:inherit;padding:10px 18px}.mini{padding:6px 12px;background:#2a1a4d}
+.btn2{border:0;border-radius:99px;background:#fff;color:var(--deep);font:700 14px inherit;padding:9px 16px}
+.bz{padding:16px;border-bottom:8px solid #0a0a0a;display:grid;gap:12px}.bh{display:flex;gap:12px;align-items:center}.ba{width:52px;height:52px;border-radius:50%;background:#2a1a4d;border:2px solid var(--p);flex:none}.bh>div:nth-child(2){flex:1}
+.cnt{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:10px 14px}.coral{height:160px;width:48%;border-radius:16px;background:linear-gradient(160deg,#ff6b6b,#ff8e72);display:grid;place-content:center;text-align:center}
+.bf{display:flex;gap:30px;border-top:1px solid #222;padding-top:12px;text-align:center}.bf span{font-size:14px}
+.ph{display:flex;align-items:center;gap:12px;padding:6px 16px;font-size:22px;letter-spacing:.2em}.ph span{color:var(--deep)}.bl{margin-left:auto;font-size:16px;letter-spacing:0}
+.hr{height:320px;position:relative;background:linear-gradient(160deg,#4a4a4a,#111);margin-top:6px}
+.top{position:absolute;top:18px;left:16px;background:var(--deep);padding:6px 12px;border-radius:6px;font-weight:700;font-size:13px}
+.hb{position:absolute;bottom:14px;left:14px;display:flex;gap:10px}.wb,.gb{border:0;border-radius:8px;padding:12px 14px;font:600 14px inherit}.wb{background:#fff;color:#000}.gb{background:#3a3a3a;color:#fff}
+.cats,.chips,.fl{display:flex;gap:10px;overflow-x:auto;padding:10px 14px}.cats{gap:22px;color:var(--m);font-size:14px}.cats b.on{background:var(--deep);color:#fff;padding:8px 18px;border-radius:99px}
+.chips b,.fl b{background:var(--c);border-radius:99px;padding:9px 18px;white-space:nowrap;color:#cfcfd6}.chips b.on,.fl b.on{background:var(--p);color:#fff}
+.prem{display:flex;align-items:center;gap:12px;padding:20px 14px;background:linear-gradient(90deg,#4C1D95,#7c3aed)}.prem b{flex:1}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:6px 14px 20px}
+.mp{aspect-ratio:16/10;border-radius:12px;position:relative}.mb{position:absolute;top:10px;left:10px;background:#e11d1d;border-radius:6px;padding:4px 10px;font-weight:700;font-size:13px}
+.mr{display:flex;gap:10px;margin-top:10px}.mc{width:40px;height:40px;border-radius:50%;background:#2a2a2a;display:grid;place-items:center;flex:none}
+.th{padding:14px 16px;font-size:20px}.ts{padding:6px 14px 14px}.ts em{font-style:normal;font-size:12px;border:1px solid var(--p);color:var(--p2);border-radius:99px;padding:3px 10px;margin-left:6px}
+.tr{display:flex;gap:10px;overflow-x:auto;margin-top:10px}.tc{width:120px;height:190px;border-radius:10px;flex:none;position:relative;overflow:hidden;background:#22222a}.tc video,.tc img{width:100%;height:100%;object-fit:cover}
+.tc span{position:absolute;right:8px;bottom:8px;background:#000a;border-radius:99px;padding:3px 9px;font-size:13px}
+.ah{display:flex;align-items:center;justify-content:space-between;padding:16px}.ah h2{font-size:24px}
+.rb{width:46px;height:46px;border-radius:50%;background:#2a1a4d;display:grid;place-items:center;color:var(--p2)}
+.ai{display:flex;align-items:center;gap:16px;padding:16px;border-top:1px solid #1c1c22}.ap{width:56px;height:56px;border-radius:50%;background:#2a2a2a;display:grid;place-items:center;flex:none}
+.lh{text-align:center;padding:26px 24px 16px}.lh>i{width:96px;height:96px;border-radius:50%;background:var(--p);display:grid;place-items:center;font-size:34px;margin:0 auto 16px;box-shadow:0 0 40px #6d28d980}
+.lc{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px}.lc div{border-radius:18px;padding:16px;display:grid;gap:8px;align-content:start}
+.lc .w{background:#1c1608;border:1px solid #5c4a14}.lc .n{background:#150d2b;border:1px solid #3b2a6b}
+.lv{height:100%;display:flex;flex-direction:column;gap:10px;padding:12px}.chat{flex:1;overflow:auto;display:grid;align-content:start;gap:6px}.lvb{display:flex;gap:8px}.tag{background:var(--acc);border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700}
+.mus{padding:12px;display:grid;gap:14px}.feat{display:flex;gap:16px;align-items:center;background:linear-gradient(135deg,#4C1D95,#1a1a1a);border-radius:20px;padding:16px}
+.disc{width:110px;height:110px;border-radius:50%;flex:none;border:3px solid #2a2a2a;box-shadow:0 0 28px #6d28d980;background:radial-gradient(circle,#000 0 4%,#fbbf24 5% 9%,#4C1D95 10% 27%,transparent 28%),repeating-radial-gradient(#0a0a0a 0 2px,#222 3px 4px)}
+.spin{animation:s 3s linear infinite}.song{display:flex;align-items:center;gap:12px;background:var(--c);border-radius:14px;padding:10px}.song>div:nth-child(2){flex:1}
+.cover{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--p),var(--deep));display:grid;place-items:center}
+.pf{min-height:100%;background:#0a0a0a}.gold{display:flex;justify-content:space-between;align-items:center;padding:calc(18px + env(safe-area-inset-top)) 16px 18px;background:linear-gradient(135deg,#d4b82e,#a3891b);font-size:20px}
+.pid{display:flex;gap:16px;padding:20px 16px}.pa{width:96px;height:96px;border-radius:24px;border:4px solid var(--p2);background:var(--c) center/cover;flex:none}.pid h1{font-size:24px}
+.stats{display:flex;margin:0 16px;background:#141414;border:1px solid #2a2a2a;border-radius:20px;padding:16px 0}.stats div{flex:1;text-align:center}.stats b{display:block;font-size:24px}.stats small{color:var(--m);font-size:12px}
+.mc2{display:flex;gap:12px;padding:20px 16px}.coral2{flex:1;border:0;border-radius:16px;background:#ff7b7b;color:#fff;font:700 17px inherit;padding:16px}.wal{width:60px;border:0;border-radius:16px;background:#141414;color:#fff;font-size:20px}
+.pg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;padding:3px}.pcard{aspect-ratio:3/4;background:#000;padding:10px;display:flex;flex-direction:column;justify-content:space-between;font-size:12px}
+#sh{position:fixed;inset:0;background:#000a;display:none;align-items:flex-end;z-index:20}#sh.on{display:flex}
+#sh>div{background:var(--c);width:100%;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:80%;overflow:auto;display:grid;gap:12px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;text-align:center}.row button{background:#22222a;border:0;color:#fff;font:inherit;border-radius:14px;padding:14px 6px}
 .coins{background:#2b2108;border:1px solid #6b5210;color:var(--g);border-radius:14px;padding:12px;font-size:20px;font-weight:700}
 textarea,input[type=text]{width:100%;background:#22222a;border:0;border-radius:12px;color:#fff;padding:12px;font:inherit}
-#toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:9px 16px;border-radius:99px;z-index:60;display:none}
-#boot{position:fixed;inset:0;background:var(--bg);display:grid;place-content:center;justify-items:center;gap:16px;z-index:50;transition:opacity .4s}
-#boot i{width:72px;height:72px;border-radius:50%;border:4px solid #2a1a4d;border-top-color:var(--p2);animation:s 1s linear infinite}
-#boot b{letter-spacing:.4em;color:var(--p2);font-size:22px}
-@keyframes s{to{transform:rotate(1turn)}}
-@media(prefers-reduced-motion:reduce){#boot i{animation:none}}
-h2,h3,.hero h2{font-family:'Syne',sans-serif}
-.tabs b{font-size:17px}.srch{width:42px;height:42px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;flex:none;font-size:17px}
-.rail{bottom:190px}.meta{bottom:190px}.rail button i,footer button i{font-size:20px}.rail button{font-size:20px}
-.ad{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));height:96px;border-radius:16px;background:linear-gradient(135deg,#6D28D9,#4C1D95);display:flex;align-items:center;gap:12px;padding:14px;z-index:6;box-shadow:0 10px 25px #0008}
-.ad div{flex:1}.ad p{font-size:12px;opacity:.85;margin-top:2px}.btn2{border:0;border-radius:99px;background:#fff;color:#4C1D95;font:700 14px inherit;padding:9px 16px}
-.ad .x{position:absolute;top:8px;right:10px;font-size:13px;opacity:.8}
-.mus{padding:12px;display:grid;gap:14px}.chips{display:flex;gap:8px;overflow-x:auto}.chips b{background:#1a1a1a;border-radius:99px;padding:8px 16px;white-space:nowrap;color:#cfcfd6}.chips b.on{background:var(--p);color:#fff}
-.feat{display:flex;gap:16px;align-items:center;background:linear-gradient(135deg,#4C1D95,#1a1a1a);border-radius:20px;padding:16px}
-.disc{width:120px;height:120px;border-radius:50%;flex:none;border:3px solid #2a2a2a;box-shadow:0 0 28px #6d28d980;background:radial-gradient(circle,#000 0 4%,#fbbf24 5% 9%,#4C1D95 10% 27%,transparent 28%),repeating-radial-gradient(#0a0a0a 0 2px,#222 3px 4px)}
-.spin{animation:s 3s linear infinite}.acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.sec{margin-top:4px}
-.song{display:flex;align-items:center;gap:12px;background:#1a1a1a;border-radius:14px;padding:10px}.song>div:nth-child(2){flex:1}
-.cover{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,#6D28D9,#4C1D95);display:grid;place-items:center}
-.lv{height:100%;display:flex;flex-direction:column;gap:10px;padding:12px}.lvh{display:flex;gap:10px;align-items:center;font-size:20px}
-.tag{background:var(--acc);border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700}.chat{flex:1;overflow:auto;display:grid;align-content:start;gap:6px}
-.lvb{display:flex;gap:8px}
-.full header,.full footer{display:none}
-.ph{display:flex;align-items:center;gap:12px;padding:6px 16px;font-size:22px;letter-spacing:.2em}.logo span{color:var(--deep)}.bl{margin-left:auto;font-size:16px;letter-spacing:0}.wl{padding:8px 16px;font-size:17px}.wl i{color:var(--p)}
-.hr{height:340px;position:relative;background:linear-gradient(160deg,#4a4a4a,#111);margin-top:6px}.top{position:absolute;top:18px;left:16px;background:var(--deep);padding:6px 12px;border-radius:6px;font-weight:700;font-size:13px}
-.chn{position:absolute;top:14px;right:14px;background:#1f1f1f;border-radius:99px;padding:10px 16px}.hb{position:absolute;bottom:14px;left:14px;display:flex;gap:10px}
-.wb,.gb{border:0;border-radius:8px;padding:12px 16px;font:600 15px inherit}.wb{background:#fff;color:#000}.gb{background:#3a3a3a;color:#fff}
-.strip{display:flex;gap:8px;padding:8px;overflow-x:auto}.strip i{width:104px;height:64px;border-radius:6px;flex:none}.cats{display:flex;gap:22px;padding:10px 16px;overflow-x:auto;font-size:14px;color:var(--m)}.cats b.on{background:var(--deep);color:#fff;padding:8px 18px;border-radius:99px}
-.prem{display:flex;align-items:center;gap:12px;padding:20px 14px;background:linear-gradient(90deg,#4C1D95,#7c3aed)}.prem b{flex:1}.prem i{color:var(--g);font-size:22px;background:#ffffff26;padding:12px;border-radius:12px}
-.pc2{padding:14px}.chips b.wh{background:#fff;color:#000}.mg{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 14px 20px}
-.mp{aspect-ratio:16/10;border-radius:12px;position:relative}.mb{position:absolute;top:10px;left:10px;background:#e11d1d;border-radius:6px;padding:4px 10px;font-weight:700;font-size:13px}.mr{display:flex;gap:10px;margin-top:10px}
-.mc{width:40px;height:40px;border-radius:50%;background:#2a2a2a;display:grid;place-items:center;flex:none}
-.bz{padding:16px;border-bottom:8px solid #0a0a0a;display:grid;gap:12px}.bh{display:flex;gap:12px;align-items:center}.ba{width:52px;height:52px;border-radius:50%;background:#2a1a4d;border:2px solid var(--p)}.bh>div:nth-child(2){flex:1}
-.cnt{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:10px 14px}.bt{font-size:17px}.coral{height:200px;width:48%;border-radius:16px;background:linear-gradient(160deg,#ff6b6b,#ff8e72);display:grid;place-content:center;text-align:center}
-.bf{display:flex;gap:30px;border-top:1px solid #222;padding-top:12px;text-align:center}
-.th{padding:14px 16px;font-size:20px;font-family:Syne}.ts{padding:6px 14px 14px}.ts em{font-style:normal;font-size:12px;border:1px solid var(--p);color:var(--p2);border-radius:99px;padding:3px 10px;margin-left:6px}
-.tr{display:flex;gap:10px;overflow-x:auto;margin-top:10px}.tc{width:130px;height:200px;border-radius:10px;flex:none;position:relative;overflow:hidden}.tc video,.tc img{width:100%;height:100%;object-fit:cover}.tc span{position:absolute;right:8px;bottom:8px;background:#000a;border-radius:99px;padding:3px 9px;font-size:13px}
-.pf{min-height:100%;background:#0a0a0a}.gold{display:flex;justify-content:space-between;align-items:center;padding:calc(18px + env(safe-area-inset-top)) 16px 18px;background:linear-gradient(135deg,#d4b82e,#a3891b);font-size:20px}.gold span{display:flex;gap:12px;align-items:center}.dr{background:#ffffff30;border-radius:99px;padding:10px 16px;font-size:16px}
-.pid{display:flex;gap:16px;padding:20px 16px}.pa{width:104px;height:104px;border-radius:26px;border:4px solid #a855f7;background:#1a1a1a center/cover;flex:none}.pid h1{font:800 26px Syne}.hl{color:var(--p2);font-size:18px}
-.stats{display:flex;margin:0 16px;background:#141414;border:1px solid #2a2a2a;border-radius:20px;padding:16px 0}.stats div{flex:1;text-align:center}.stats b{display:block;font-size:26px}.stats small{color:var(--m);letter-spacing:.06em;font-size:12px}
-.mc2{display:flex;gap:12px;padding:20px 16px}.coral2{flex:1;border:0;border-radius:16px;background:#ff7b7b;color:#fff;font:700 18px inherit;padding:16px}.wal{width:60px;border:0;border-radius:16px;background:#141414;color:#fff;font-size:20px}
-.ptabs{display:flex;overflow-x:auto;border-bottom:1px solid #222}.ptabs span{flex:none;text-align:center;padding:12px 18px;color:var(--m)}.ptabs span.on{color:#fff;border-bottom:3px solid var(--p2)}
-.pg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;padding:3px}.pcard{aspect-ratio:3/4;background:#000;padding:10px;display:flex;flex-direction:column;justify-content:space-between;font-size:12px}.pcard>i{font-size:30px}
+#toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:9px 16px;border-radius:99px;z-index:60;display:none;max-width:90%}
+#boot{position:fixed;inset:0;background:#0a0a0c;display:grid;place-content:center;justify-items:center;gap:26px;z-index:50;transition:opacity .4s}
+.ring{width:150px;height:150px;border-radius:50%;background:#0d0d10;display:grid;place-items:center;position:relative;box-shadow:0 0 40px #6d28d955}
+.ring:before{content:"";position:absolute;inset:0;border-radius:50%;border:3px solid transparent;border-top-color:var(--p2);border-right-color:var(--p2);animation:s 1.2s linear infinite}
+.ring span{width:72px;height:72px;border-radius:20px;background:#5b21f5;display:grid;place-items:center;font-size:32px}
+#boot b{font:800 32px Syne;letter-spacing:.35em;color:var(--p2)}
+.mus2{min-height:100%;display:flex;flex-direction:column;background:#0a0a0a}
+.mh{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;background:#0a0a0a;border-bottom:1px solid #1c1c22}
+.mh>i{font-size:22px}.lg{width:34px;height:34px;border-radius:10px;background:#5b21f5;display:grid;place-items:center;flex:none}
+.mh input{flex:1;min-width:0;border-radius:99px;background:#141414;border:1px solid #2a2a2a;padding:11px 14px}
+.mb2{border:1px solid #2a2a2a;background:#141414;color:#fff;border-radius:99px;padding:11px 14px;font:700 12px inherit;letter-spacing:.1em}
+.mbody{flex:1;padding:12px 14px 20px;display:grid;gap:12px;align-content:start}.sl2{color:var(--m);letter-spacing:.1em;font-size:13px}
+select{width:fit-content;max-width:100%;background:var(--c);color:#fff;border:1px solid #2a2a2a;border-radius:99px;padding:12px 18px;font:inherit}
+.feat2{border-radius:20px;padding:22px 18px;background:linear-gradient(135deg,#6d28d9aa,#1a1a1a);display:grid;gap:8px}.feat2 h1{font-size:30px}
+.ft{background:#2a1a4d;border:1px solid #5b3fb0;border-radius:99px;padding:8px 14px;width:fit-content;font-weight:700;font-size:13px}.acts{display:flex;gap:8px;flex-wrap:wrap}
+.sl{display:flex;align-items:center;gap:8px;font-size:22px}.sl:before{content:"";width:4px;height:26px;border-radius:4px;background:var(--deep)}
+.mp2{position:sticky;bottom:0;display:flex;align-items:center;gap:12px;background:#0a0a0c;border-top:1px solid #1c1c22;padding:12px 14px calc(12px + env(safe-area-inset-bottom));z-index:5;flex-wrap:wrap}
+.mp2 .pt{flex:1;min-width:0}.mp2 i{font-size:20px}.mp2 .pp{font-size:28px}.pr{flex-basis:100%;height:4px;background:#2a2a2a;border-radius:4px}.pr i{display:block;height:100%;width:0;background:var(--p);border-radius:4px}
+.drb{position:fixed;inset:0;background:#000a;z-index:30;display:flex;justify-content:flex-end}.dr{width:76%;background:#000;padding:16px;display:grid;gap:12px;align-content:start;overflow:auto}
+.dh{display:flex;align-items:center;gap:10px;font-size:20px}.dh .lg{border-radius:50%;width:44px;height:44px}.dh b{flex:1}
+.da{background:#141414;border-radius:12px;padding:14px;display:grid;gap:6px}.vc{background:#2a1a4d;border-radius:99px;padding:5px 12px;width:fit-content;font-size:13px}
+.dr p{display:flex;gap:14px;align-items:center;font-size:18px;padding:8px 0}.dr p i{color:var(--p)}
+.bn{background:#0a1f33;border:1px solid #17405f;border-radius:20px;padding:18px;display:grid;gap:10px}.bn span{background:#1a1a4d;padding:5px 10px;border-radius:6px;width:fit-content;font-size:12px;font-weight:700;letter-spacing:.1em}
+.pcd{background:var(--c);border-radius:20px;padding:16px;display:grid;gap:10px}.pcd label{color:#bbb;font-weight:700}.pcd input,.pcd select,.pcd textarea{width:100%;background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:13px;color:#fff;font:inherit}
+.stc{background:#1f1f1f;border-radius:16px;padding:16px;display:grid;gap:8px;position:relative}.stc small{color:#777;font-weight:700;letter-spacing:.08em}.stc b{font-size:30px}.stc i{position:absolute;right:16px;top:16px;color:var(--p)}
+.ph2{display:flex;gap:14px;align-items:center}.ci{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#6d28d9,#4c1d95);display:grid;place-items:center;font-size:30px}
+.dz{border:2px dashed #3a3a3a;border-radius:16px;padding:30px 10px;text-align:center;display:grid;gap:6px;justify-items:center;color:#aaa}.dz>i{font-size:40px;color:#555}
+.vt{font-size:22px;display:flex;gap:10px;align-items:center}.tg3{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tg3 div{background:#262626;border-radius:12px;padding:10px;text-align:center}.tg3 small{color:#777}
+.dng{background:#3a1212;color:#f87171}.chip2{background:#2a1a4d;border-radius:99px;padding:6px 12px;width:fit-content}.lk2{position:absolute;right:10px;top:10px}
+.lvh2{display:flex;gap:10px;align-items:center}.lvh2 b{flex:1;font-size:18px}
+#lg{position:fixed;inset:0;z-index:55;background:#0a0a0c;display:grid;place-items:center;padding:20px;overflow:auto}
+.lgc{width:100%;max-width:360px;display:grid;gap:12px;text-align:center;justify-items:center}.lgc input{width:100%;background:#22222a;border:0;border-radius:12px;color:#fff;padding:14px;font:inherit}
+.lgc .btn{width:100%;padding:14px}.lgc p{cursor:pointer}.lgl{width:72px;height:72px;border-radius:20px;background:#5b21f5;display:grid;place-items:center;font-size:32px}
+:root{--logo:url(data:image/png;base64,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);--violet:#8355FF;--gold:#E3B34D;--gold2:#F4D480}
+.ring span,.lgl{background:var(--logo) center/contain no-repeat!important}.ring span *,.lgl *{display:none}
+.lgo{background:var(--logo) center/contain no-repeat;border-radius:0}.lgo *{display:none}
+.sp{min-height:100%;background:#0B0710}
+.spn{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;background:#0B0710ee;border-bottom:1px solid #ffffff24}
+.spb{display:flex;gap:8px;align-items:center;background:#E3B34D1a;border:1px solid #E3B34D40;border-radius:99px;padding:7px 14px;color:var(--gold)}
+.mono2{font-family:'JetBrains Mono',monospace;font-weight:700}
+.sph{text-align:center;padding:30px 18px 10px;background:radial-gradient(ellipse 700px 400px at 50% -10%,#8355ff38,transparent 65%),radial-gradient(ellipse 500px 300px at 90% 10%,#e3b34d1a,transparent 60%)}
+.spbadge{display:inline-flex;gap:8px;align-items:center;background:#e3b34d1a;border:1px solid #e3b34d40;border-radius:99px;padding:6px 16px;font-size:10px;letter-spacing:2.5px;color:var(--gold2);font-weight:700}
+.ldot{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.sph h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(46px,16vw,76px);letter-spacing:5px;line-height:.95;margin:16px 0 10px}.sph h1 em,.spm h2 em{font-style:normal;color:var(--gold)}
+.spr{max-width:520px;margin:22px auto;background:#1C1430;border:1px solid #ffffff24;border-radius:22px;padding:20px 24px;text-align:left}
+.spr1{display:flex;justify-content:space-between;font-size:10px;letter-spacing:2px;color:#BDB4D6;font-weight:700}.spr1 .tg{background:#e3b34d26;color:var(--gold2);border-radius:99px;padding:4px 10px;font-size:9px}
+.spp{font-size:40px;margin:10px 0 4px}
+.spm{padding:20px 16px 60px;max-width:960px;margin:0 auto}.spl{color:var(--gold);letter-spacing:3px;font-size:11px;font-weight:700}
+.spm h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,8vw,44px);letter-spacing:3px;margin:6px 0 8px}
+.spk{display:flex;gap:14px;overflow-x:auto;padding:18px 4px;scrollbar-width:none}
+.pkc{flex:0 0 62vw;max-width:230px;background:#1C1430;border:1px solid #ffffff24;border-radius:20px;padding:18px 16px;position:relative}.pkc.pop{border-color:var(--gold);box-shadow:0 8px 28px #e3b34d1f}
+.pkc small{font-size:9px;letter-spacing:2.5px;color:#BDB4D6;font-weight:700}.pc{font-size:36px;color:var(--gold2);margin:6px 0 4px}.pc span{font-size:10px;font-family:'DM Sans';color:#BDB4D6;font-weight:500}
+.pb2{font-size:11px;color:#B79CFF;font-weight:600;margin-bottom:12px;min-height:16px}.pkc hr{border:0;height:1px;background:#ffffff24;margin:0 0 12px}.pr2{font-size:26px}.pfn{font-size:10px;color:#8A80A8;margin:4px 0 14px}
+.ptag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold2),#9C7420);color:#000;font-size:8px;font-weight:800;letter-spacing:1.5px;padding:4px 10px;border-radius:99px;white-space:nowrap}
+.pbtn{width:100%;padding:12px;border:0;border-radius:10px;font:700 10px 'DM Sans';letter-spacing:1.5px;background:#ffffff10;color:#fff;text-transform:uppercase}.pkc.pop .pbtn{background:linear-gradient(135deg,var(--gold2),#9C7420);color:#000}
+.wg{display:grid;grid-template-columns:1fr 1fr;gap:18px;background:#150F22;border:1px solid #ffffff24;border-radius:22px;padding:24px 18px;margin:10px 0 24px}.wg h3{font-size:12.5px;margin:8px 0 4px}.wg p{font-size:11.5px;color:#BDB4D6;line-height:1.7}.wg i{font-size:22px;color:var(--violet)}
+.hw{display:grid;gap:2px;border-radius:18px;overflow:hidden;margin-bottom:24px}.hw div{background:#1C1430;padding:20px}.hw b{font:700 30px 'JetBrains Mono';color:#8355ff40}.hw h3{font-size:13px}.hw p{font-size:11.5px;color:#BDB4D6}
+.cd{min-height:100%;background:#fff;color:#1a1033}.cd h2,.cd h3{color:#1a1033}
+.cdh{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;overflow-x:auto;border-bottom:1px solid #eee;background:#fff}
+.cdh .lgo{width:34px;height:34px;flex:none}.cdt{font:italic 600 24px 'Playfair Display',serif;color:#6D28D9;line-height:1.05;flex:none}
+.cdb{display:flex;gap:8px;align-items:center;border:1px solid #d9d9e0;background:#fff;border-radius:14px;padding:12px 18px;font-weight:600;color:#1a1033;white-space:nowrap;flex:none}.cdb.pr3{background:#6D28D9;color:#fff;border-color:#6D28D9}
+.cdn{display:flex;overflow-x:auto;border-bottom:1px solid #eee;background:#fff}.cdn span{padding:18px 20px;color:#555;font-size:17px;white-space:nowrap;display:flex;gap:8px;align-items:center}.cdn span.on{color:#6D28D9;border-bottom:3px solid #6D28D9}
+.bn2{height:290px;background:linear-gradient(135deg,#0b2a4a,#4C1D95) center/cover;position:relative}.eb{position:absolute;right:20px;bottom:20px;color:#fff;display:flex;gap:8px;align-items:center;font-size:16px;text-shadow:0 1px 4px #000}
+.av2{width:170px;height:170px;border-radius:50%;border:6px solid #fff;background:#e9e5f5 center/cover;margin:-85px auto 0;position:relative;display:grid;place-items:center;color:#a78bfa;font-size:56px}
+.av2 .cam{position:absolute;right:4px;bottom:4px;width:46px;height:46px;border-radius:50%;background:#6D28D9;color:#fff;display:grid;place-items:center;font-size:20px;border:3px solid #fff}
+.cdn2{font:700 38px 'Playfair Display',serif;text-align:center;margin:14px 10px 4px;color:#1a1033}.cds{text-align:center;color:#666;font-size:17px}
+.vp{display:flex;width:fit-content;margin:14px auto;background:#ede9fe;color:#4C1D95;border-radius:99px;padding:9px 18px;font-weight:600;gap:8px;align-items:center}
+.cst{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #e5e5ea;border-bottom:1px solid #e5e5ea;margin-top:18px}.cst div{padding:18px 4px;text-align:center;border-right:1px solid #e5e5ea}.cst div:last-child{border:0}.cst i{font-size:32px}
+.cst b{display:block;font:700 32px 'Playfair Display',serif;color:#2d1b69;margin:8px 0 2px}.cst small{color:#666;letter-spacing:.08em;font-size:11px}
+.rq{margin:14px;background:#fef3c7;border:1px solid #fcd34d;border-radius:20px;padding:20px;color:#92400e;display:flex;gap:16px;align-items:center}.rq b{font-size:20px}.rq p{font-size:15px;line-height:1.5;margin-top:4px}.shd{width:56px;height:56px;border-radius:50%;background:#f59e0b;display:grid;place-items:center;color:#fff;font-size:26px;flex:none}
+.cbt{display:flex;gap:14px;padding:20px 16px 40px}.cbt button{flex:1;padding:18px 8px;border-radius:16px;font:600 17px 'DM Sans';display:flex;gap:10px;align-items:center;justify-content:center}.cbt .a{background:#6D28D9;color:#fff;border:0;box-shadow:0 8px 20px #6d28d940}.cbt .b{background:#fff;color:#6D28D9;border:2px solid #6D28D9}
+.cdl{padding:14px;display:grid;gap:12px}.cdc{border:1px solid #e5e5ea;border-radius:16px;padding:14px;display:grid;gap:8px;color:#1a1033}.cdc small{color:#777}.cdc .tg3 div{background:#f5f3ff}.cdc .tg3 b{color:#2d1b69}
+.cd .stc{background:#f5f3ff}.cd .stc b{color:#2d1b69}.cd .m{color:#666}
+.cd input,.cd select,.cd textarea{width:100%;border:1px solid #d9d9e0;border-radius:12px;padding:13px;font:inherit;background:#fff;color:#1a1033}.cd label{font-weight:700}
+.el p{display:flex;gap:12px;align-items:flex-start;padding:10px 0;font-size:16px;color:#1a1033}.el i{color:#6D28D9;margin-top:3px}
+@keyframes s{to{transform:rotate(1turn)}}@media(prefers-reduced-motion:reduce){.ring:before,.spin{animation:none}}
 </style></head><body>
-<div id="boot"><i></i><b>POSE</b></div>
+<div id="boot"><div class="ring"><span><i class="fa-solid fa-camera"></i></span></div><b>POSE</b></div>
 <div id="app">
-<header><div class="av" id="me" data-a="profile"></div>
-<div class="tabs"><b data-p="foryou">For You</b><b data-p="buzz">Buzz</b><b data-p="pose">Pose</b><b data-p="trend">Trend</b></div><div class="srch" data-a="search"><i class="fa-solid fa-magnifying-glass"></i></div></header>
+<header><div class="av" data-a="profile" id="me"></div>
+<div class="tabs"><b data-p="foryou">For You</b><b data-p="buzz">Buzz</b><b data-p="pose">Pose</b><b data-p="trend">Trend</b></div>
+<div class="srch" data-a="search"><i class="fa-solid fa-magnifying-glass"></i></div></header>
 <main></main>
 <footer>
-<button data-t="home" data-p="foryou"><i class="fa-solid fa-house"></i><span>Home</span></button>
-<button data-t="alert" data-p="alert"><i class="fa-solid fa-bell"></i><span>Alert</span></button>
+<button data-t="home" data-p="foryou"><i class="fa-solid fa-house"></i>Home</button>
+<button data-t="alert" data-p="alert"><i class="fa-solid fa-bell"></i>Alert</button>
 <button class="plus" data-a="create"><i class="fa-solid fa-plus"></i></button>
-<button data-t="live" data-p="live"><i class="fa-solid fa-tower-broadcast"></i><span>Live</span></button>
-<button data-t="music" data-p="music"><i class="fa-solid fa-music"></i><span>Music</span></button>
+<button data-t="live" data-p="live"><i class="fa-solid fa-tower-broadcast"></i>Live</button>
+<button data-t="music" data-p="music"><i class="fa-solid fa-music"></i>Music</button>
 </footer></div>
-<div id="sh"><div></div></div><div id="toast"></div>
-<input type="file" id="f" hidden>
+<div id="sh"><div></div></div><div id="toast"></div><input type="file" id="f" hidden>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// Inline SVG icons (no external font needed). Any <i class="fa-solid fa-NAME"> becomes an SVG.
+const IC={camera:'M9 4L7.500 6H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2.500L15 4H9zm3 4.500a4.500 4.500 0 1 1 0 9 4.500 4.500 0 0 1 0-9zm0 2a2.500 2.500 0 1 0 0 5 2.500 2.500 0 0 0 0-5z',
+'magnifying-glass':'M10.500 3a7.500 7.500 0 0 1 5.900 12.100l4.300 4.300-1.400 1.400-4.300-4.300A7.500 7.500 0 1 1 10.500 3zm0 2a5.500 5.500 0 1 0 0 11 5.500 5.500 0 0 0 0-11z',
+house:'M12 3l9 8h-2.500v9h-5v-6h-3v6h-5v-9H3l9-8z',bell:'M12 2a6 6 0 0 0-6 6v4l-2 3v1h16v-1l-2-3V8a6 6 0 0 0-6-6zm-2 17a2 2 0 0 0 4 0h-4z',
+plus:'M10.500 4h3v6.500H20v3h-6.500V20h-3v-6.500H4v-3h6.500V4z',
+'tower-broadcast':'M12 10a2 2 0 0 1 1 3.700V21h-2v-7.300A2 2 0 0 1 12 10zM7.800 6.800l1.400 1.400a4.500 4.500 0 0 0 0 6.400l-1.400 1.400a6.500 6.500 0 0 1 0-9.200zm8.400 0a6.500 6.500 0 0 1 0 9.200l-1.400-1.400a4.500 4.500 0 0 0 0-6.400l1.400-1.400zM5 4l1.400 1.400a8.500 8.500 0 0 0 0 12L5 18.800A10.500 10.500 0 0 1 5 4zm14 0a10.500 10.500 0 0 1 0 14.800l-1.400-1.400a8.500 8.500 0 0 0 0-12L19 4z',
+music:'M9 4l11-2v13.300a3.500 3.500 0 1 1-2-3.200V6.200l-7 1.300v10.800a3.500 3.500 0 1 1-2-3.200V4z',
+heart:'M12 21l-1.400-1.300C5.400 15 2 12 2 8.400A5 5 0 0 1 7 3.500c1.700 0 3.400.8 5 2.500 1.600-1.700 3.300-2.500 5-2.500a5 5 0 0 1 5 4.900c0 3.600-3.400 6.600-8.600 11.300L12 21z',
+comment:'M4 3h16a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-7l-5 4v-4H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z',
+gift:'M3 8h8v4H3zm10 0h8v4h-8zM4 13h7v8H4zm9 0h7v8h-7zM12 7C9 7 7 6 7 4.500S9 2 10.500 3.500L12 5l1.500-1.500C15 2 17 3 17 4.500S15 7 12 7z',
+flag:'M5 2h2v20H5zM8 3h12l-3 5 3 5H8z',user:'M12 3a4.500 4.500 0 1 1 0 9 4.500 4.500 0 0 1 0-9zM4 21c0-4.400 3.600-7 8-7s8 2.600 8 7H4z',
+'wand-sparkles':'M12 2l2.200 6.800L21 11l-6.800 2.200L12 20l-2.200-6.800L3 11l6.800-2.200L12 2z',
+xmark:'M5.600 4.200L12 10.600l6.400-6.400 1.400 1.400-6.400 6.400 6.400 6.400-1.400 1.400-6.400-6.400-6.400 6.400-1.400-1.400 6.400-6.400-6.400-6.400z',
+clapperboard:'M3 9h18v11H3zM3 4l17-2 .8 4.500L4 8.800z',fire:'M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-2 1-3.500 2-4.500 0 2 1 3 2 3 0-4-1-7 2-10.500z',
+bars:'M3 5h18v2.500H3zm0 5.800h18v2.500H3zm0 5.800h18v2.500H3z',bookmark:'M6 2h12v20l-6-4.500L6 22V2z',play:'M7 3l14 9-14 9V3z',pause:'M6 4h4v16H6zm8 0h4v16h-4z',
+'circle-info':'M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-1 8v7h2v-7h-2zm0-3.500v2h2v-2h-2z',star:'M12 2l3 6.300 7 1-5 4.900 1.200 6.800L12 17.600 5.800 21l1.200-6.800-5-4.900 7-1L12 2z',
+coins:'M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18zm0 3a6 6 0 1 0 0 12 6 6 0 0 0 0-12z',
+'chart-line':'M3 3h2v16h16v2H3V3zm4 11l4-5 3 3 5-6 1.500 1.200-6.300 7.500-3-3-3.200 4L7 14z','chart-simple':'M4 12h4v8H4zm6-8h4v16h-4zm6 5h4v11h-4z',
+'face-laugh':'M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zM8.500 9a1.300 1.300 0 1 0 0 2.600 1.300 1.300 0 0 0 0-2.600zm7 0a1.300 1.300 0 1 0 0 2.600 1.300 1.300 0 0 0 0-2.600zM6.500 13.500a5.500 5.500 0 0 0 11 0h-11z',
+'arrow-left':'M11 5l1.400 1.400L7.800 11H20v2H7.800l4.600 4.600L11 19l-7-7 7-7z',
+water:'M2 8c2.500-2 4.500-2 7 0s4.500 2 7 0 4.500-2 6 0v3c-1.500-1.500-3.500-1.500-6 0s-4.500 2-7 0-4.500-2-7 0V8zm0 6c2.500-2 4.500-2 7 0s4.500 2 7 0 4.500-2 6 0v3c-1.500-1.500-3.500-1.500-6 0s-4.500 2-7 0-4.500-2-7 0v-3z',
+signal:'M3 17h3v4H3zm5-5h3v9H8zm5-5h3v14h-3zm5-4h3v18h-3z','paper-plane':'M2 3l20 9-20 9 2.500-9L2 3z',
+seedling:'M11 21v-8C6 13 3 10 3 5c5 0 8 3 8 7v9zm2 0v-6c0-4 3-7 8-7 0 5-3 8-8 8z',crown:'M3 8l4.500 4L12 4l4.500 8L21 8l-2 11H5L3 8z',
+rocket:'M12 2c4 2 6 6 6 10l-2 3H8l-2-3c0-4 2-8 6-10zm0 5a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM8 17h8l-1 5-3-2-3 2-1-5z',
+video:'M2 6h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2V6zm15 4l5-3v10l-5-3v-4z',
+image:'M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm3 3a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-3 11h16v-3l-4-5-4 5-2-2-6 5z',
+pen:'M16.500 3l4.500 4.500L8 20.500 3 21l.500-5L16.500 3z',wallet:'M3 6a2 2 0 0 1 2-2h13v3H5v2h15a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6zm14 8a1.500 1.500 0 1 0 0 3 1.500 1.500 0 0 0 0-3z'};
+IC.comments=IC.comment;
+function svgI(){$$('i[class*="fa-"]:not([data-s])').forEach(e=>{const n=[...e.classList].find(c=>c.startsWith('fa-')&&c!=='fa-solid'&&c!=='fa-regular'),d=n&&IC[n.slice(3)];if(!d)return;const r=e.classList.contains('fa-regular');e.dataset.s=1;e.style.fontStyle='normal';
+ e.innerHTML=`<svg viewBox="0 0 24 24" width="1em" height="1em" fill="${r?'none':'currentColor'}" fill-rule="evenodd" stroke="${r?'currentColor':'none'}" stroke-width="2" stroke-linejoin="round" style="vertical-align:-.125em;display:inline-block">${'<path d="'+d+'"/>'}</svg>`})}
+const ls={g(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const GIFTS=[['fa-seedling','Rose',5],['fa-fire','Fire',10],['fa-crown','Crown',50],['fa-rocket','Rocket',100]];
 const PACKS=[['coins_20','20 coins','₦500'],['coins_50','55 coins','₦1,200'],['coins_120','135 coins','₦2,800'],['coins_300','350 coins','₦6,500']];
-const S={p:{name:'Guest',avatar:null},coins:0,live:false,page:'foryou',ad:true,unlocked:new Set(),liked:new Set(),
-posts:[{id:1,u:'Tolu',bg:'linear-gradient(160deg,#4c1d95,#0a0a0c)',cap:'Strike a Pose. Lagos creators, this is your stage.',l:12},
-{id:2,u:'Amaka',bg:'linear-gradient(160deg,#9d174d,#0a0a0c)',cap:'Day 1 as a creator. Follow for more!',l:7},
-{id:3,u:'Kunle',bg:'linear-gradient(160deg,#065f46,#0a0a0c)',cap:'Afrobeats dance challenge 💃🏾',l:21}],
-buzz:[{u:'Pose',t:'Welcome to Pose in Lagos Life. Post a video, a photo or a Buzz.'}],
-blink:[{id:'b1',t:'Lagos Nights',p:20,c:'#7c2d12'},{id:'b2',t:'Owambe Diaries',p:0,c:'#1e3a8a'},{id:'b3',t:'The Last Danfo',p:30,c:'#14532d'},{id:'b4',t:'Eko Stories',p:15,c:'#581c87'}]};
-let tt;const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(tt);tt=setTimeout(()=>e.style.display='none',2200)};
-const sheet=h=>{$('#sh>div').innerHTML=h;$('#sh').classList.add('on')},closeSheet=()=>$('#sh').classList.remove('on');
+const SONGS=[['Plutomania','Oluwaseun','Hip Hop'],['Lagos Sunrise','Tolu','Afrobeats'],['Danfo Groove','Amaka','Amapiano'],['Owambe Night','Kunle','Highlife']];
+const S={p:{name:ls.g('nm','Guest'+(100+Math.floor(Math.random()*900))),avatar:null},uid:null,coins:0,live:false,fb:false,page:'foryou',disc:1,posts:[],last:null,more:true,busy:0,
+ unlocked:new Set(ls.g('unl',[])),liked:new Set(ls.g('lk',[])),fol:new Set(ls.g('fol',[])),
+ tracks:[],wl:new Set(ls.g('wl',[])),recent:ls.g('rec',[]),hist:ls.g('hist',[]),drafts:ls.g('dr',[]),mv:'browse',gen:'All',ctry:'All Countries',q:'',pc:'All',pt:'Feed'};
+const db=()=>firebase.firestore(),FV=()=>firebase.firestore.FieldValue;
+const ev=(n,p)=>{try{S.an&&S.an.logEvent(n,p)}catch(e){}};
+let tt;const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(tt);tt=setTimeout(()=>e.style.display='none',2400)};
+const sheet=h=>{$('#sh>div').innerHTML=h;$('#sh').classList.add('on');svgI()},closeSheet=()=>{$('#sh').classList.remove('on');$('#sh>div').innerHTML=''};
 const upd=()=>$$('.cn').forEach(e=>e.textContent=S.coins);
+const bgOf=id=>`linear-gradient(160deg,hsl(${[...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0)%360} 55% 28%),#0a0a0c)`;
+const mp=(id,d)=>({id,uid:d.userId,u:d.name||'Player',k:d.type,src:d.url,cap:d.caption||'',l:d.likes||0,c:d.comments||0,price:d.price||0,snd:d.soundName||'',sid:d.soundId||'',bg:bgOf(id)});
+const mine=p=>p.uid&&p.uid===S.uid;
 
-// Server calls. In Lagos Life they carry a fresh session; outside it a local demo wallet is used.
+// Lagos Life server (wallet, Firebase token, purchase checks). Outside Lagos Life a local demo wallet is used.
+const PACKS_N={coins_starter:4,coins_basic:20,coins_popular:63,coins_value:126,coins_mega:504};
+const WL=()=>db().collection('lagoslife_wallets').doc(S.uid);
+// Coin wallet lives in Firestore (no server file). NOTE: purchases are trusted from the Vatar checkout result on the device.
 async function api(path,b){
- if(!S.live){if(path==='spend'){if(b.amount>S.coins)throw Error('low');S.coins-=b.amount}
-  if(path==='claim')S.coins+=({coins_20:20,coins_50:55,coins_120:135,coins_300:350})[b.productId]||0;return{coins:S.coins}}
- const{session}=await Vatar.session();
- const r=await fetch('/api/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...b,session})});
- const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.error||r.status);return j}
-async function spend(n,why){try{S.coins=(await api('spend',{amount:n,why})).coins;upd();return true}
- catch(e){if(e.message==='low'){toast('Not enough coins');shop()}else toast('Something went wrong. Try again.');return false}}
-async function claim(p){try{S.coins=(await api('claim',{purchaseId:p.purchaseId,productId:p.productId})).coins;upd();toast('Coins added')}catch(e){toast('Could not add coins. Reopen the game.')}}
-async function buy(id){try{await claim(S.live?await Vatar.purchase(id):{purchaseId:'demo',productId:id})}catch(e){if(e.code!=='cancelled')toast('Payment not completed')}}
+ if(!S.fb)throw Error('offline');
+ if(path==='wallet'){const d=await WL().get();return{coins:d.exists?d.data().coins||0:0}}
+ if(path==='spend'){const a=Math.floor(+b.amount);if(!(a>0))throw Error('low');
+  return{coins:await db().runTransaction(async t=>{const d=await t.get(WL()),c=d.exists?d.data().coins||0:0;if(c<a)throw Error('low');t.set(WL(),{coins:c-a,uid:S.uid},{merge:true});return c-a})}}
+ if(path==='claim'){const n=PACKS_N[b.productId];if(!n)throw Error('unknown_product');
+  return{coins:await db().runTransaction(async t=>{const pr=db().collection('lagoslife_purchases').doc(String(b.purchaseId)),ps=await t.get(pr),d=await t.get(WL()),c=d.exists?d.data().coins||0:0;if(ps.exists)return c;
+   t.set(pr,{uid:S.uid,productId:b.productId,coins:n,timestamp:Date.now()});t.set(WL(),{coins:c+n,uid:S.uid,lastPurchase:String(b.purchaseId)},{merge:true});return c+n})}}
+ throw Error('not_found')}
+async function spend(n,why){try{S.coins=(await api('spend',{amount:n,why})).coins;upd();hist(why||'Spent',-n);return true}catch(e){if(e.message==='low'){toast('Not enough coins');A.shop()}else toast(e.message==='offline'?'Coins work inside Lagos Life only.':'Something went wrong. Try again.');return false}}
+async function claim(p){if(!S.fb){(S.pend=S.pend||[]).push(p);return}try{S.coins=(await api('claim',{purchaseId:p.purchaseId||p.id,productId:p.productId})).coins;upd();hist('Bought '+p.productId,0);ev('purchase',{item_id:p.productId});toast('Coins added')}catch(e){toast('Could not add coins. Reopen the game.')}}
+async function buy(id){try{if(!S.live)return toast('Buying coins works inside Lagos Life only.');{const r=await Vatar.purchase(id);await claim({purchaseId:(r&&(r.purchaseId||r.id||(r.purchase&&r.purchase.id)))||('p'+Date.now()+Math.random().toString(36).slice(2,7)),productId:id})}}catch(e){if(e.code!=='cancelled')toast('Payment not completed')}}
+
+// Cloudflare R2 upload through /api/r2-presign
+function upload(file){
+ return new Promise((res,rej)=>{
+  if(!S.fb)return rej({code:'not-signed-in'});
+  const ref=firebase.storage().ref('lagoslife/'+S.uid+'/'+Date.now()+'_'+file.name.replace(/[^\w.\-]/g,'_'));
+  const t=ref.put(file,{contentType:file.type});
+  t.on('state_changed',s=>toast('Uploading '+Math.round(100*s.bytesTransferred/s.totalBytes)+'%'),rej,()=>ref.getDownloadURL().then(res,rej))})}
+
+// Firestore: load everyone's posts, newest first, 15 at a time
+async function load(more){
+ if(S.busy||(more&&!S.more))return;S.busy=1;
+ try{let q=db().collection('lagoslife_posts').orderBy('timestamp','desc').limit(15);if(more&&S.last)q=q.startAfter(S.last);
+  const r=await q.get();r.forEach(d=>{if(d.data().status!=='removed')S.posts.push(mp(d.id,d.data()))});S.last=r.docs[r.docs.length-1]||S.last;S.more=r.size===15}catch(e){S.more=false}
+ S.busy=0;render()}
 
 // Pages
-const msg=(i,t,s)=>`<div class="msg"><span><i class="fa-solid ${i}"></i></span><b>${t}</b><p class="m">${s}</p></div>`;
-const feed=()=>S.posts.map(p=>`<section class="post" data-id="${p.id}">${p.src?(p.k==='photo'?`<img src="${p.src}">`:`<video src="${p.src}" muted loop playsinline></video>`):`<div class="bg" style="background:${p.bg}"><h2>${esc(p.cap)}</h2></div>`}
-<div class="rail"><button data-a="like"><i class="fa-${S.liked.has(String(p.id))?'solid':'regular'} fa-heart" ${S.liked.has(String(p.id))?'style="color:var(--acc)"':''}></i></button><small>${p.l+(S.liked.has(String(p.id))?1:0)}</small><button data-a="cmt"><i class="fa-solid fa-comment"></i></button><small>0</small><button data-a="rep"><i class="fa-solid fa-retweet"></i></button><small>0</small><button data-a="gift"><i class="fa-solid fa-gift"></i></button></div>
-<div class="meta"><b>@${esc(p.u)}</b><p>${esc(p.cap)}</p></div></section>`).join('')+(S.ad?`<div class="ad"><div><b>Advertise on Pose</b><p>Put your brand in front of Lagos Life players</p></div><button class="btn2" data-a="shop">Promote</button><i class="fa-solid fa-xmark x" data-a="adx"></i></div>`:'');
-const T=a=>`<div class="mv" data-a="open" data-id="${a.id}"><div class="mp" style="background:${a.c}"><span class="mb">MOVIE</span></div><div class="mr"><div class="mc"><i class="fa-solid fa-user"></i></div><div><b>${a.t}</b><p class="m">Pose Studios</p><p class="m">${a.p&&!S.unlocked.has(a.id)?'<i class="fa-solid fa-coins"></i> '+a.p+' coins':'Free'} · New</p></div></div></div>`;
-const pose=()=>`<div class="ph"><b class="logo">POSE<span>CHANNELS</span></b><i class="fa-solid fa-bars"></i><b class="bl"><i class="fa-solid fa-fire"></i> BLINK</b></div><div class="wl"><i class="fa-solid fa-bookmark"></i> Watch Later</div>
-<div class="hr"><span class="top">TOP 1</span><span class="chn">Pose Studios <i class="fa-solid fa-circle-user"></i></span><div class="hb"><button class="wb"><i class="fa-solid fa-play"></i> Play</button><button class="gb"><i class="fa-solid fa-circle-info"></i> More Info</button><button class="gb"><i class="fa-solid fa-plus"></i> Watch Later</button></div></div>
-<div class="strip">${S.blink.map(b=>`<i style="background:${b.c}"></i>`).join('')}</div>
-<div class="cats">${['ALL','DANCE','COMEDY','MUSIC','TUTORIAL','TRENDING'].map((c,i)=>`<b class="${i?'':'on'}">${c}</b>`).join('')}</div>
-<div class="prem"><i class="fa-solid fa-star"></i><b>POSE Premium is Here</b><button class="btn2">Learn More</button></div>
-<div class="chips pc2">${['All','Recent','Music','Movies','Series'].map((c,i)=>`<b class="${i?'':'wh'}">${c}</b>`).join('')}</div><div class="mg">${S.blink.map(T).join('')}</div>`;
-const buzz=()=>S.buzz.map(b=>`<div class="bz"><div class="bh"><div class="ba"></div><div><b>${esc(b.u).toUpperCase()}</b><p class="m">@${esc(b.u)} • now</p></div><div class="cnt"><i class="fa-solid fa-fire" style="color:var(--acc)"></i> 0 | <i class="fa-solid fa-forward" style="color:var(--p2)"></i> 0</div></div><p class="bt">${esc(b.t)}</p><div class="coral"><b>BUZZ ADS</b><small>Advertise here</small></div><div class="bf"><span><i class="fa-solid fa-heart" style="color:var(--acc)"></i><br>0</span><span><i class="fa-solid fa-comment"></i><br>0</span><span><i class="fa-solid fa-retweet"></i><br>0</span><span data-a="gift"><i class="fa-solid fa-gift"></i><br>Tip</span></div></div>`).join('');
-const trend=()=>`<div class="th"><b><i class="fa-solid fa-chart-line" style="color:#22c55e"></i> Trending Now</b></div>`+[['fa-fire','Trending Today','HOT'],['fa-chart-simple','This Week','RISING'],['fa-calendar','This Month','TOP'],['fa-face-laugh','Funniest','LAUGH']].map(x=>`<div class="ts"><b><i class="fa-solid ${x[0]}"></i> ${x[1]} <em>${x[2]}</em></b><div class="tr">${[...S.posts].sort((a,b)=>b.l-a.l).slice(0,8).map(p=>`<div class="tc" style="background:${p.bg||'#22222a'}">${p.src&&p.k!=='photo'?`<video src="${p.src}" muted playsinline preload="metadata"></video>`:p.src?`<img src="${p.src}">`:''}<span><i class="fa-solid fa-heart"></i> ${p.l}</span></div>`).join('')}</div></div>`).join('');
-const profilePg=()=>{const m=S.posts.filter(p=>p.u===S.p.name);return `<div class="pf"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="foryou"></i><span><i class="fa-solid fa-gear" data-a="soon"></i><b class="dr" data-a="soon"><i class="fa-solid fa-bookmark"></i> Drafts</b></span></div>
-<div class="pid"><div class="pa" style="${S.p.avatar?`background-image:url(${S.p.avatar})`:''}"></div><div><h1>${esc(S.p.name).toUpperCase()}</h1><p class="hl">@${esc(S.p.name)}</p><p class="m">Creator on Pose</p></div></div>
-<div class="stats"><div><b>0</b><small>FOLLOWERS</small></div><div><b>0</b><small>FOLLOWING</small></div><div><b>${m.reduce((a,p)=>a+p.l,0)}</b><small>LIKES</small></div><div><b>0</b><small>VIEWS</small></div></div>
+const msg=(i,t,s,b)=>`<div class="msg"><span><i class="fa-solid ${i}"></i></span><h3>${t}</h3><p class="m">${s}</p>${b||''}</div>`;
+const fy=()=>{const v=S.posts.filter(p=>p.k!=='buzz'&&(!p.price||S.unlocked.has(String(p.id))||mine(p)));
+ if(!v.length)return msg('fa-clapperboard','No posts yet','Be the first to post a video or photo.','<button class="btn" data-a="create">Create</button>');
+ return v.map(p=>{const lk=S.liked.has(String(p.id));
+ return `<section class="post" data-id="${p.id}">${p.src?(p.k==='photo'?`<img src="${esc(p.src)}" loading="lazy">`:`<video src="${esc(p.src)}" muted loop playsinline preload="metadata"></video>`):`<div class="bg" style="background:${p.bg}"><h2>${esc(p.cap)}</h2></div>`}
+<div class="rail"><button data-a="like" class="${lk?'lk':''}"><i class="fa-${lk?'solid':'regular'} fa-heart" ${lk?'style="color:#ff1e56"':''}></i></button><small>${p.l}</small>
+<button data-a="cmt"><i class="fa-solid fa-comment"></i></button><small>${p.c}</small>
+<button data-a="gift"><i class="fa-solid fa-gift"></i></button><small>Gift</small>
+<button data-a="report"><i class="fa-solid fa-flag"></i></button></div>
+<div class="who"><div class="wa"><i class="fa-solid fa-user"></i></div><div><b>${esc(p.u)}</b>${mine(p)||!p.uid?'':`<br><button class="fol" data-a="follow" data-uid="${esc(p.uid)}">${S.fol.has(p.uid)?'Following':'Follow'}</button>`}</div></div>
+<p class="cap">${p.src?esc(p.cap):''}${p.snd?`<br><span data-a="psnd" data-id="${esc(p.sid)}"><i class="fa-solid fa-music"></i> ${esc(p.snd)}</span>`:''}</p><div class="bar"><i></i></div></section>`}).join('')
+ +(S.disc?'<div class="disc2"><span class="x" data-a="dis"><i class="fa-solid fa-xmark"></i></span><span data-a="search"><i class="fa-solid fa-wand-sparkles"></i> Discover</span></div>':'')};
+const buzz=()=>{const b=S.posts.filter(p=>p.k==='buzz');if(!b.length)return msg('fa-comments','No Buzz yet','Share what is on your mind.','<button class="btn" data-a="pick" data-k="buzz">New Buzz</button>');
+ return b.map(p=>`<div class="bz" data-id="${p.id}"><div class="bh"><div class="ba"></div><div><b>${esc(p.u).toUpperCase()}</b><p class="m">@${esc(p.u)}</p></div><div class="cnt"><i class="fa-solid fa-fire" style="color:var(--acc)"></i> ${p.l}</div></div><p style="font-size:17px">${esc(p.cap)}</p><div class="coral"><b>BUZZ ADS</b><small>Advertise here</small></div>
+<div class="bf"><span data-a="like"><i class="fa-${S.liked.has(String(p.id))?'solid':'regular'} fa-heart" style="color:var(--acc)"></i><br>${p.l}</span><span data-a="cmt"><i class="fa-solid fa-comment"></i><br>${p.c}</span><span data-a="gift"><i class="fa-solid fa-gift"></i><br>Tip</span><span data-a="report"><i class="fa-solid fa-flag"></i><br>Report</span></div></div>`).join('')};
+const T=a=>`<div data-a="open" data-id="${a.id}"><div class="mp" style="background:${a.c}"><span class="mb">MOVIE</span></div><div class="mr"><div class="mc"><i class="fa-solid fa-user"></i></div><div><b>${a.t}</b><p class="m">Pose Studios</p><p class="m">${a.p&&!S.unlocked.has(a.id)?'<i class="fa-solid fa-coins"></i> '+a.p+' coins':'Free'}</p></div></div></div>`;
+const pose=()=>`<div class="ph"><b>POSE<span>CHANNELS</span></b><i class="fa-solid fa-bars"></i><b class="bl"><i class="fa-solid fa-fire"></i> BLINK</b></div><div style="padding:8px 16px;font-size:17px"><i class="fa-solid fa-bookmark" style="color:var(--p)"></i> Watch Later</div>
+<div class="hr"><span class="top">TOP 1</span><div class="hb"><button class="wb"><i class="fa-solid fa-play"></i> Play</button><button class="gb"><i class="fa-solid fa-circle-info"></i> More Info</button><button class="gb"><i class="fa-solid fa-plus"></i> Watch Later</button></div></div>
+<div class="cats">${['ALL','DANCE','COMEDY','MUSIC','TUTORIAL'].map((c,i)=>`<b class="${i?'':'on'}">${c}</b>`).join('')}</div>
+<div class="prem"><i class="fa-solid fa-star" style="color:var(--g);font-size:22px"></i><b>POSE Premium is Here</b><button class="btn2">Learn More</button></div>
+<div class="chips">${['All','Recent','Music','Movies','Series'].map((c,i)=>`<b class="${i?'':'on'}">${c}</b>`).join('')}</div><div class="mg">${S.blink.map(T).join('')}</div>`;
+const tile=p=>`<div class="tc" style="background:${p.bg}">${p.src?(p.k==='photo'?`<img src="${esc(p.src)}" loading="lazy">`:`<video src="${esc(p.src)}" muted playsinline preload="metadata"></video>`):''}<span><i class="fa-solid fa-heart"></i> ${p.l}</span></div>`;
+const trend=()=>{const t=[...S.posts].sort((a,b)=>b.l-a.l).slice(0,10);return `<div class="th"><b><i class="fa-solid fa-chart-line" style="color:#22c55e"></i> Trending Now</b></div>`+(t.length?[['fa-fire','Trending Today','HOT'],['fa-chart-simple','This Week','RISING'],['fa-face-laugh','Funniest','LAUGH']].map(x=>`<div class="ts"><b><i class="fa-solid ${x[0]}"></i> ${x[1]} <em>${x[2]}</em></b><div class="tr">${t.map(tile).join('')}</div></div>`).join(''):msg('fa-chart-line','Nothing trending yet','Posts with the most likes show up here.'))};
+const alertPg=()=>{const a=S.posts.filter(mine).filter(p=>p.l||p.c);return `<div class="ah"><i class="fa-solid fa-arrow-left rb" data-p="foryou"></i><h2>Activity</h2><i class="rb"></i></div>`+(a.length?a.map(p=>`<div class="ai"><div class="ap"><i class="fa-solid fa-heart" style="color:var(--acc)"></i></div><div><b>${esc((p.cap||'Your post').slice(0,40))}</b><p class="m">${p.l} likes · ${p.c} comments</p></div></div>`).join(''):msg('fa-bell','No alerts yet','Likes and comments on your posts show up here.'))};
+const liveIdle=()=>`<div class="lh"><i class="fa-solid fa-tower-broadcast"></i><h2>Go live</h2><p class="m" style="margin-top:8px">Connect with fans in real time.</p></div>
+<div class="lc"><div class="w"><b><i class="fa-solid fa-water"></i> Wave</b><p class="m">Pay-to-join rooms. Coming soon.</p></div><div class="n"><b><i class="fa-solid fa-signal"></i> Normal Live</b><p class="m">Free live chat. First 10 minutes free.</p><button class="btn" data-a="lstart">Start chat</button></div></div>`;
+const livePg=()=>S.lv?`<div class="lv"><div style="display:flex;gap:10px;align-items:center;font-size:20px"><span class="tag">LIVE</span><b id="lt"></b></div><div class="chat">${S.lv.msgs.map(m=>`<p><b>${esc(m[0])}</b> ${esc(m[1])}</p>`).join('')}</div><div class="lvb"><input type="text" id="lm" placeholder="Say something"><button class="btn" data-a="lsend"><i class="fa-solid fa-paper-plane"></i></button></div><button class="mini" data-a="lend">End live</button></div>`:liveIdle();
+const musicPg=()=>{const c=S.cur||0,pl=i=>S.playing===i?'pause':'play';return `<div class="chips" style="padding:0">${['All','Pop','Hip Hop','Rock','Electronic'].map((x,i)=>`<b class="${i?'':'on'}">${x}</b>`).join('')}</div>
+<div class="mus" style="padding:0"><div class="feat"><div class="disc ${S.playing===c?'spin':''}"></div><div><small class="m">Featured today</small><h2>${SONGS[c][0]}</h2><p class="m">${SONGS[c][1]} · ${SONGS[c][2]}</p><div style="display:flex;gap:8px;margin-top:10px"><button class="btn" data-a="play" data-i="${c}"><i class="fa-solid fa-${pl(c)}"></i></button><button class="mini" data-a="usesound">Use sound</button></div></div></div>
+<h3>Trending now</h3>${SONGS.map((s,i)=>`<div class="song" data-a="play" data-i="${i}"><div class="cover"><i class="fa-solid fa-music"></i></div><div><b>${s[0]}</b><p class="m">${s[1]}</p></div><i class="fa-solid fa-${pl(i)}"></i></div>`).join('')}</div>`};
+const profilePg=()=>{const m=S.posts.filter(mine);return `<div class="pf"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="foryou"></i><span class="coins" style="padding:6px 14px;font-size:16px"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span></span></div>
+<div class="pid"><div class="pa" style="${S.p.avatar?`background-image:url(${esc(S.p.avatar)})`:''}"></div><div><h1>${esc(S.p.name).toUpperCase()}</h1><p style="color:var(--p2);font-size:17px">@${esc(S.p.name)}</p><p class="m">Creator on Pose</p></div></div>
+<div class="stats"><div><b>${m.length}</b><small>POSTS</small></div><div><b>${S.fol.size}</b><small>FOLLOWING</small></div><div><b>${m.reduce((a,p)=>a+p.l,0)}</b><small>LIKES</small></div></div>
 <div class="mc2"><button class="coral2"><i class="fa-solid fa-clapperboard"></i> My Channel</button><button class="wal" data-a="shop"><i class="fa-solid fa-wallet"></i></button></div>
-<div class="ptabs">${[['circle-play','Feed'],['images','Photos'],['comments','Buzz'],['heart','Liked'],['book','Stories'],['gift','Gifts']].map((t,i)=>`<span class="${i?'':'on'}"><i class="fa-solid fa-${t[0]}"></i><br>${t[1]}</span>`).join('')}</div>
-<div class="pg">${m.length?m.map(p=>`<div class="pcard"><i class="fa-solid fa-play"></i><small>${esc(p.cap).slice(0,22)}</small><div><i class="fa-solid fa-eye"></i> 0 <i class="fa-solid fa-heart" style="color:var(--acc)"></i> ${p.l} <i class="fa-solid fa-comments"></i> 0</div></div>`).join(''):'<p class="m" style="padding:20px">No posts yet. Tap + to create one.</p>'}</div></div>`};
-const fbSave=d=>S.fb?firebase.firestore().collection('lagoslife_posts').add({...d,userId:S.uid,name:S.p.name,likes:0,status:'live',timestamp:Date.now(),createdAt:firebase.firestore.FieldValue.serverTimestamp()}):0;
-async function loadPosts(){try{const q=await firebase.firestore().collection('lagoslife_posts').orderBy('timestamp','desc').limit(30).get(),v=[],z=[];
- q.forEach(d=>{const x=d.data();x.type==='buzz'?z.push({u:x.name,t:x.caption}):v.push({id:d.id,u:x.name,k:x.type,src:x.url,cap:x.caption||'',l:x.likes||0})});if(v.length)S.posts=v;if(z.length)S.buzz=z}catch(e){}}
-const SONGS=[['Plutomania','Oluwaseun','Hip Hop'],['Lagos Sunrise','Tolu','Afrobeats'],['Danfo Groove','Amaka','Amapiano'],['Owambe Night','Kunle','Highlife']];
-const musicPg=()=>{const c=S.cur||0,pl=i=>S.playing===i?'pause':'play';return `<div class="mus"><div class="chips">${['All','Afrobeats','Hip Hop','Amapiano','Gospel'].map((x,i)=>`<b class="${i?'':'on'}">${x}</b>`).join('')}</div>
-<div class="feat"><div class="disc ${S.playing===c?'spin':''}"></div><div><small class="m">Featured today</small><h2>${SONGS[c][0]}</h2><p class="m">${SONGS[c][1]} · ${SONGS[c][2]}</p><div class="acts"><button class="btn" data-a="play" data-i="${c}"><i class="fa-solid fa-${pl(c)}"></i> ${S.playing===c?'Pause':'Play'}</button><button class="mini" data-a="usesound"><i class="fa-solid fa-sliders"></i> Use sound</button></div></div></div>
-<h3 class="sec">Trending now</h3>${SONGS.map((s,i)=>`<div class="song" data-a="play" data-i="${i}"><div class="cover"><i class="fa-solid fa-music"></i></div><div><b>${s[0]}</b><p class="m">${s[1]}</p></div><i class="fa-solid fa-${pl(i)}"></i></div>`).join('')}</div>`};
-const livePg=()=>S.lv?`<div class="lv"><div class="lvh"><span class="tag">LIVE</span><b id="lt"></b></div><div class="chat">${S.lv.msgs.map(m=>`<p><b>${esc(m[0])}</b> ${esc(m[1])}</p>`).join('')}</div><div class="lvb"><input type="text" id="lm" placeholder="Say something"><button class="btn" data-a="lsend"><i class="fa-solid fa-paper-plane"></i></button></div><button class="mini" data-a="lend">End live</button></div>`
-:`<div class="msg"><span><i class="fa-solid fa-tower-broadcast"></i></span><b>Go live</b><p class="m">Your first 10 minutes are free. Add more time with coins.</p><button class="btn" data-a="lstart">Start live chat</button></div>`;
-const PAGES={profile:profilePg,foryou:feed,buzz,pose,trend,
- alert:()=>msg('fa-bell','No alerts yet','Likes, follows and gifts will show up here.'),
- live:livePg,
- music:musicPg};
-function render(){const m=$('main'),y=m.scrollTop;$('#app').classList.toggle('full',S.page==='profile');m.className=S.page==='foryou'?'snap':'';m.innerHTML=PAGES[S.page]();m.scrollTop=y;
+<div class="pg">${m.length?m.map(p=>`<div class="pcard"><i class="fa-solid fa-${p.k==='buzz'?'comment':'play'}" style="font-size:26px"></i><small>${esc(p.cap).slice(0,24)}</small><div><i class="fa-solid fa-heart" style="color:var(--acc)"></i> ${p.l} <i class="fa-solid fa-comments"></i> ${p.c}</div></div>`).join(''):'<p class="m" style="padding:20px">No posts yet. Tap + to create one.</p>'}</div></div>`};
+const PAGES={profile:profilePg,foryou:fy,buzz,pose,trend,alert:alertPg,live:livePg,music:()=>`<div class="mus">${musicPg()}</div>`};
+function render(){const m=$('main'),y=m.scrollTop;$('#app').classList.toggle('full',['profile','music','shop','chan'].includes(S.page));m.className=S.page==='foryou'?'snap':'';m.innerHTML=PAGES[S.page]();m.scrollTop=y;
  $$('.tabs b').forEach(b=>b.classList.toggle('on',b.dataset.p===S.page));
  $$('footer [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===(['alert','live','music'].includes(S.page)?S.page:'home')));
- $('#me').style.backgroundImage=S.p.avatar?`url(${S.p.avatar})`:'';watch()}
-let io;function watch(){io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>{const v=e.target;if(e.intersectionRatio>.6&&!S.paused)v.play().catch(()=>{});else v.pause()}),{threshold:[0,.6]});$$('video').forEach(v=>{v.muted=!S.sound;io.observe(v)})}
+ $('#me').style.backgroundImage=S.p.avatar?`url(${S.p.avatar})`:'';watch();svgI()}
+svgI();
+let io;function watch(){io&&io.disconnect();const ps=$$('.post'),last=ps[ps.length-1];
+ io=new IntersectionObserver(es=>es.forEach(e=>{const v=e.target.querySelector('video');
+  if(e.intersectionRatio>.6){if(v&&!S.paused)v.play().catch(()=>{});if(e.target===last)load(true)}else if(v)v.pause()}),{threshold:[0,.6]});
+ $$('video').forEach(v=>v.muted=!S.sound);ps.forEach(p=>io.observe(p))}
 
 // Sheets
 const shop=()=>sheet(`<h3>Buy coins</h3><div class="coins"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span> coins</div><div class="row">${PACKS.map(p=>`<button data-a="buy" data-id="${p[0]}"><b>${p[1]}</b><br><small>${p[2]}</small></button>`).join('')}</div><p class="m">Coins unlock paid videos and send gifts. They cannot be cashed out.</p>`);
 const gifts=()=>sheet(`<h3>Send a gift</h3><div class="coins"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span></div><div class="row">${GIFTS.map((g,i)=>`<button data-a="sendgift" data-i="${i}"><i class="fa-solid ${g[0]}"></i><br><small>${g[1]} · ${g[2]}</small></button>`).join('')}</div>`);
-const create=()=>sheet(`<h3>Create</h3><div class="row"><button data-a="pick" data-k="video"><i class="fa-solid fa-video"></i><br>Video</button><button data-a="pick" data-k="photo"><i class="fa-solid fa-image"></i><br>Photo</button><button data-a="pick" data-k="buzz"><i class="fa-solid fa-pen"></i><br>Buzz</button></div><p class="m">No explicit content. Posts are screened, and posts that break the rules are removed.</p>`);
-const profile=()=>sheet(`<h3>${esc(S.p.name)}</h3><div class="row"><div>${S.posts.filter(p=>p.u===S.p.name).length}<br><small class="m">Posts</small></div><div>0<br><small class="m">Followers</small></div><div>0<br><small class="m">Likes</small></div></div><div class="coins"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span> coins</div><button class="btn" data-a="shop">Buy coins</button>`);
-function composer(k,f){sheet(`<h3>${k==='buzz'?'New Buzz':'Add a caption'}</h3>${f?`<p class="m">${esc(f.name)}</p>`:''}<textarea id="cap" rows="3" maxlength="300" placeholder="${k==='buzz'?'What is on your mind?':'Caption'}"></textarea><button class="btn" data-a="post" data-k="${k}">Post</button>`);S.file=f}
+const create=()=>sheet(`<h3>Create</h3><div class="row"><button data-a="pick" data-k="video"><i class="fa-solid fa-video"></i><br>Video</button><button data-a="pick" data-k="photo"><i class="fa-solid fa-image"></i><br>Photo</button><button data-a="pick" data-k="buzz"><i class="fa-solid fa-pen"></i><br>Buzz</button></div><p class="m">No explicit content. Posts that break the rules are removed.</p>`);
+const composer=(k,f)=>{S.file=f;sheet(`<h3>${k==='buzz'?'New Buzz':'Add a caption'}</h3>${f?`<p class="m">${esc(f.name)}</p>`:''}<textarea id="cap" rows="3" maxlength="300" placeholder="${k==='buzz'?'What is on your mind?':'Caption'}"></textarea><button class="btn" data-a="post" data-k="${k}">Post</button>`)};
+const pid=el=>String(el.closest('[data-id]').dataset.id),pf=id=>S.posts.find(x=>String(x.id)===id);
+async function openCmt(id){S.cp=id;sheet('<h3>Comments</h3><div id="cl" class="m">Loading…</div><input type="text" id="ci" placeholder="Add a comment" maxlength="200"><button class="btn" data-a="csend">Send</button>');
+ try{const r=await db().collection('lagoslife_posts').doc(id).collection('comments').orderBy('timestamp').limit(50).get();$('#cl').innerHTML=r.size?r.docs.map(d=>{const x=d.data();return `<p style="color:#fff"><b>${esc(x.name)}</b> ${esc(x.text)}</p>`}).join(''):'No comments yet.'}catch(e){$('#cl').textContent='Comments unavailable.'}}
 
-// Actions
 const A={
- profile(){S.page='profile';render()},soon(){toast('Coming soon')},shop,create,gift:gifts,
- search(){toast('Search arrives with the Firebase connection')},usesound(){toast('Sound added to your next post')},
+ profile(){S.page='profile';render()},search(){toast('Search is coming soon')},usesound(){toast('Sound added to your next post')},shop,create,gift:gifts,
+ dis(){S.disc=0;render()},
  play(el){const i=+el.dataset.i;S.cur=i;S.playing=S.playing===i?null:i;render()},
  lstart(){S.lv={end:Date.now()+600000,msgs:[['Pose','Welcome to your live chat!']]};render()},
  lend(){S.lv=null;closeSheet();render()},
  lsend(){const v=$('#lm').value.trim();if(!v)return;S.lv.msgs.push([S.p.name,v]);render()},
  async lext(){if(await spend(20,'live')){S.lv.end=Date.now()+600000;S.lv.ask=0;closeSheet()}},
- adx(){S.ad=false;render()},
- like(el){const id=el.closest('.post').dataset.id;S.liked.has(id)?S.liked.delete(id):S.liked.add(id);render()},
- cmt(){toast('Comments arrive with the Firebase connection')},rep(){toast('Reposted')},
+ like(el){const id=pid(el),p=pf(id);if(!p)return;const on=!S.liked.has(id);on?S.liked.add(id):S.liked.delete(id);p.l=Math.max(0,p.l+(on?1:-1));ls.s('lk',[...S.liked]);
+  if(S.fb)db().collection('lagoslife_posts').doc(id).update({likes:FV().increment(on?1:-1)}).catch(()=>{});render()},
+ cmt(el){openCmt(pid(el))},
+ async csend(){const t=$('#ci').value.trim();if(!t||!S.fb)return toast('Sign-in is not ready yet');
+  try{const r=db().collection('lagoslife_posts').doc(S.cp);await r.collection('comments').add({text:t,name:S.p.name,userId:S.uid,timestamp:Date.now()});await r.update({comments:FV().increment(1)});const p=pf(S.cp);if(p)p.c++;openCmt(S.cp);render()}catch(e){toast('Could not comment')}},
+ async follow(el){const id=el.dataset.uid;if(!S.fb)return;const on=!S.fol.has(id),r=db().collection('lagoslife_follows').doc(S.uid+'_'+id);
+  try{on?await r.set({from:S.uid,to:id,timestamp:Date.now()}):await r.delete();on?S.fol.add(id):S.fol.delete(id);ls.s('fol',[...S.fol]);render()}catch(e){toast('Could not follow')}},
+ async report(el){if(!S.fb)return;try{await db().collection('lagoslife_reports').add({postId:pid(el),by:S.uid,timestamp:Date.now()});toast('Reported. Thank you.')}catch(e){toast('Could not report')}},
  buy:el=>buy(el.dataset.id),
  async sendgift(el){const g=GIFTS[el.dataset.i];if(await spend(g[2],'gift:'+g[1])){closeSheet();toast('Sent '+g[1])}},
- async open(el){const b=S.blink.find(x=>x.id===el.dataset.id);
-  if(b.p&&!S.unlocked.has(b.id)){if(!await spend(b.p,'unlock:'+b.id))return;S.unlocked.add(b.id);render()}toast('Playing '+b.t)},
+ async open(el){const b=S.blink.find(x=>x.id===el.dataset.id);if(b.p&&!S.unlocked.has(b.id)){if(!await spend(b.p,'unlock:'+b.id))return;S.unlocked.add(b.id);ls.s('unl',[...S.unlocked]);render()}toast('Playing '+b.t)},
  pick(el){const k=el.dataset.k;if(k==='buzz')return composer(k);const f=$('#f');f.accept=k+'/*';f.onchange=()=>f.files[0]&&composer(k,f.files[0]);f.value='';f.click()},
- post(el){const k=el.dataset.k,cap=$('#cap').value.trim();
-  if(k==='buzz'){if(!cap)return;S.buzz.unshift({u:S.p.name,t:cap});S.page='buzz'}
-  else{if(!S.file)return;S.posts.unshift({id:Date.now(),u:S.p.name,k,src:URL.createObjectURL(S.file),cap,l:0});S.page='foryou'}
-  closeSheet();render();toast('Posted. It will be screened before others see it.')}};
+ async post(el){const k=el.dataset.k,cap=$('#cap').value.trim(),f=S.file;
+  if(k==='buzz'?!cap:!f)return;if(f&&f.size>5e7)return toast('File is too big. Maximum is 50 MB.');
+  closeSheet();toast(f?'Uploading…':'Posting…');let url=null;
+  if(f)try{url=await upload(f)}catch(e){return toast('Upload failed: '+(e.code||e.message||'unknown'))}
+  const d={type:k,caption:cap,url,userId:S.uid,name:S.p.name,likes:0,comments:0,status:'live',timestamp:Date.now()};let id='l'+Date.now();
+  if(S.fb)try{id=(await db().collection('lagoslife_posts').add(d)).id}catch(e){return toast('Could not save your post')}
+  S.posts.unshift(mp(id,d));S.page=k==='buzz'?'buzz':'foryou';render();toast('Posted')}};
 document.addEventListener('click',e=>{
  if(e.target.id==='sh')return closeSheet();
  if(!S.sound){S.sound=true;$$('video').forEach(v=>v.muted=false)}
  const el=e.target.closest('[data-a],[data-p]');if(!el)return;
- if(el.dataset.a)return A[el.dataset.a]?.(el);
- S.page=el.dataset.p;render()});
-
+ if(el.dataset.a)return A[el.dataset.a]?.(el);S.page=el.dataset.p;render()});
 setInterval(()=>{const l=S.lv;if(!l||S.paused)return;const r=Math.max(0,l.end-Date.now()),e=$('#lt');if(e)e.textContent=Math.floor(r/60000)+':'+String(Math.floor(r/1000)%60).padStart(2,'0');
  if(!r&&!l.ask){l.ask=1;sheet('<h3>Time is up</h3><p class="m">Add 10 more minutes for 20 coins.</p><button class="btn" data-a="lext">Add 10 min · 20 coins</button><button class="mini" data-a="lend">End live</button>')}},1000);
+
+// ===== Music, Pose channel, Live chat, Search, Profile, Settings, Drafts =====
+Object.assign(IC,{sliders:'M4 6h9v2H4zm11-2h2v6h-2zm2 2h3v2h-3zM4 16h3v2H4zm5-2h2v6H9zm2 2h9v2h-9z',upload:'M12 3l6 6h-4v6h-4V9H6l6-6zM4 18h16v3H4z',folder:'M3 5h7l2 2h9v12H3V5z',trash:'M9 3h6l1 2h4v2H4V5h4l1-2zM6 9h12l-1 12H7L6 9z',
+'backward-step':'M6 4h2v16H6zm14 0v16L9 12l11-8z','forward-step':'M16 4h2v16h-2zM4 4l11 8-11 8V4z',globe:'M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 2c-1.500 2-2.500 4.500-2.500 8s1 6 2.500 8c1.500-2 2.500-4.500 2.500-8s-1-6-2.500-8z',
+gear:'M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM10 2h4l.5 3 2 1 2.700-1.500 2 3.500-2.200 2v2l2.200 2-2 3.500-2.700-1.500-2 1-.5 3h-4l-.5-3-2-1-2.700 1.500-2-3.500 2.200-2v-2l-2.200-2 2-3.500L7.500 6l2-1L10 2z',
+eye:'M12 5c5 0 9 4.500 10 7-1 2.500-5 7-10 7S3 14.500 2 12c1-2.500 5-7 10-7zm0 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',check:'M9 16.200L4.800 12l-1.400 1.400L9 19 21 7l-1.400-1.400z',lock:'M7 10V7a5 5 0 0 1 10 0v3h2v11H5V10h2zm2 0h6V7a3 3 0 0 0-6 0v3z'});
+const AU=new Audio();AU.addEventListener('ended',()=>{S.playing=null;render()});AU.addEventListener('timeupdate',()=>{const b=$('#pb');if(b&&AU.duration)b.style.width=100*AU.currentTime/AU.duration+'%'});
+const GENRES=['All','Pop','Hip Hop','Rock','Electronic','Afrobeats','R&B','Gospel'],COUNTRIES=['All Countries','Nigeria','Ghana','Kenya','South Africa','United Kingdom','United States'];
+const hist=(t,n)=>{S.hist.unshift([t,n,Date.now()]);S.hist=S.hist.slice(0,30);ls.s('hist',S.hist)};
+const tr=id=>S.tracks.find(t=>t.id===id),my=()=>S.tracks.filter(t=>t.uid===S.uid);
+const art=()=>S.art||(S.art=ls.g('art',{name:S.p.name,genre:'Afrobeats',country:'Nigeria',bio:''}));
+async function loadMusic(){try{const r=await db().collection('lagoslife_music').orderBy('timestamp','desc').limit(50).get();S.tracks=r.docs.map(d=>({...d.data(),id:d.id}))}catch(e){}if(S.page==='music')render()}
+const fT=()=>S.tracks.filter(t=>(S.gen==='All'||t.genre===S.gen)&&(S.ctry==='All Countries'||t.country===S.ctry)&&(!S.q||(t.title+' '+t.artist).toLowerCase().includes(S.q.toLowerCase())));
+const tRow=t=>`<div class="song" data-a="mplay" data-id="${t.id}"><div class="cover"><i class="fa-solid fa-music"></i></div><div><b>${esc(t.title)}</b><p class="m">${esc(t.artist)}</p></div><i class="fa-solid fa-${S.playing===t.id?'pause':'play'}"></i></div>`;
+const tList=()=>fT().map(tRow).join('')||'<p class="m">No sounds yet. Upload the first one from the menu.</p>';
+const stat=(l,v,i)=>`<div class="stc"><small>${l}</small><b>${v}</b><i class="fa-solid fa-${i}"></i></div>`;
+const sums=m=>[m.reduce((a,t)=>a+(t.streams||0),0),m.reduce((a,t)=>a+(t.uses||0),0)];
+const mHead=()=>`<div class="mh"><i class="fa-solid fa-arrow-left" data-a="mback"></i><span class="lg lgo"></span><b>Pose</b><input type="text" id="mq" placeholder="Search sounds, artists" value="${esc(S.q)}"><button class="mb2" data-a="mdr">POSE <i class="fa-solid fa-bars"></i></button></div>`;
+const mBrowse=()=>{const top=[...S.tracks].sort((a,b)=>(b.uses||0)-(a.uses||0))[0],rec=S.recent.map(tr).filter(Boolean).slice(0,4);
+ return `<p class="sl2"><i class="fa-solid fa-music"></i> GENRE</p><div class="chips" style="padding:0">${GENRES.map(g=>`<b class="${g===S.gen?'on':''}" data-a="mgen" data-g="${g}">${g}</b>`).join('')}</div>
+<p class="sl2"><i class="fa-solid fa-globe"></i> COUNTRY</p><select id="mc">${COUNTRIES.map(c=>`<option ${c===S.ctry?'selected':''}>${c}</option>`).join('')}</select>`
++(top?`<div class="feat2"><span class="ft"><i class="fa-solid fa-fire"></i> FEATURED TODAY</span><h1>${esc(top.title)}</h1><p class="m">${esc(top.artist)} · ${esc(top.genre)}</p><div class="acts"><button class="wb" data-a="mplay" data-id="${top.id}"><i class="fa-solid fa-${S.playing===top.id?'pause':'play'}"></i> ${S.playing===top.id?'Pause':'Play'}</button><button class="btn" data-a="musesnd" data-id="${top.id}"><i class="fa-solid fa-sliders"></i> Use Sound</button><button class="gb" data-a="mdet" data-id="${top.id}"><i class="fa-solid fa-circle-info"></i> Details</button></div></div>`:'')
++`<h3 class="sl">Recently Used</h3>${rec.length?rec.map(tRow).join(''):'<p class="m">Sounds you use will show here.</p>'}<h3 class="sl">Trending Now</h3><div id="ml" style="display:grid;gap:10px">${tList()}</div>`};
+const mDash=()=>{const m=my(),[s,u]=sums(m);return `<div class="bn"><span>POSE BENEFITS</span><h2>Grow with your music</h2><p class="m">Every video that uses your track lifts your rank on Trending. Rewards are status and perks, not cash.</p><button class="btn" data-a="mgo" data-v="earn">See Rewards</button></div><div class="pcd"><div class="ph2"><div class="ci"><i class="fa-solid fa-user"></i></div><div><h2>${esc(art().name)}</h2><p class="m">Musician · ${esc(art().country)}</p></div></div>${stat('TOTAL STREAMS',s,'chart-simple')}${stat('TOTAL SONGS',m.length,'music')}${stat('TOTAL USES',u,'video')}</div>`};
+const mUp=()=>`<h2 class="vt"><i class="fa-solid fa-upload"></i> Upload New Music</h2><div class="pcd"><h3><i class="fa-solid fa-music"></i> Track Information</h3><label>Track Title *</label><input type="text" id="ut" placeholder="Enter track title" maxlength="60"><label>Genre *</label><select id="ug">${GENRES.slice(1).map(g=>`<option>${g}</option>`).join('')}</select><label>Country</label><select id="uc">${COUNTRIES.slice(1).map(c=>`<option>${c}</option>`).join('')}</select><label>Description</label><input type="text" id="ud" placeholder="Brief description" maxlength="120"></div>
+<div class="pcd"><h3><i class="fa-solid fa-upload"></i> Upload Files</h3><div class="dz" data-a="mfile"><i class="fa-solid fa-upload"></i><p id="un">Tap to choose your audio file</p><small>MP3, WAV, M4A. Max 30 MB</small></div><button class="btn" data-a="msave">Upload track</button></div>`;
+const mCat=()=>{const m=my(),[s,u]=sums(m);return `<h2 class="vt"><i class="fa-solid fa-folder"></i> My Catalogue</h2><div class="tg3"><div><small>TRACKS</small><b>${m.length}</b></div><div><small>STREAMS</small><b>${s}</b></div><div><small>USES</small><b>${u}</b></div></div>`+(m.length?m.map(t=>`<div class="pcd"><b style="font-size:20px">${esc(t.title)}</b><p class="m">${esc(t.genre)} · Solo track</p><div class="tg3"><div><small>STREAMS</small><b>${t.streams||0}</b></div><div><small>VIDEOS</small><b>${t.uses||0}</b></div></div><div class="acts"><button class="mini" data-a="mplay" data-id="${t.id}"><i class="fa-solid fa-play"></i> Play</button><button class="mini" data-a="musesnd" data-id="${t.id}"><i class="fa-solid fa-sliders"></i> Use</button><button class="mini dng" data-a="mdel" data-id="${t.id}"><i class="fa-solid fa-trash"></i></button></div></div>`).join(''):msg('fa-folder','No tracks yet','Upload your first track.','<button class="btn" data-a="mgo" data-v="upload">Upload music</button>'))};
+const mProf=()=>{const a=art(),m=my(),[s,u]=sums(m);return `<h2 class="vt"><i class="fa-solid fa-user"></i> Edit Profile</h2><div class="pcd"><label>Artist name</label><input type="text" id="an" value="${esc(a.name)}" maxlength="40"><label>Main genre</label><select id="ag">${GENRES.slice(1).map(g=>`<option ${g===a.genre?'selected':''}>${g}</option>`).join('')}</select><label>Country</label><select id="ac">${COUNTRIES.slice(1).map(c=>`<option ${c===a.country?'selected':''}>${c}</option>`).join('')}</select><label>Bio</label><textarea id="ab" rows="3" maxlength="200">${esc(a.bio)}</textarea><button class="btn" data-a="psave">Save profile</button></div>${stat('TRACKS',m.length,'music')}${stat('USES',u,'video')}${stat('STREAMS',s,'chart-simple')}`};
+const mEarn=()=>{const [s,u]=sums(my());return `<h2 class="vt"><i class="fa-solid fa-coins"></i> Rewards</h2><div class="bn"><span>YOUR IMPACT</span><h2>${u} videos · ${s} streams</h2><p class="m">Rewards inside Pose are rank, badges and visibility. Coins on Pose cannot be cashed out.</p></div>${stat('VIDEOS USING YOUR SOUNDS',u,'video')}${stat('TOTAL STREAMS',s,'chart-simple')}`};
+const MV={browse:mBrowse,dash:mDash,upload:mUp,cat:mCat,prof:mProf,earn:mEarn};
+const mPlayer=()=>{const t=tr(S.cur);return `<div class="mp2"><div class="cover"><i class="fa-solid fa-music"></i></div><div class="pt"><b>${t?esc(t.title):'Select a sound'}</b><br><small class="m">${t?esc(t.artist):''}</small></div><i class="fa-solid fa-backward-step" data-a="mnav" data-d="-1"></i><i class="fa-solid fa-${S.playing?'pause':'play'} pp" data-a="mtoggle"></i><i class="fa-solid fa-forward-step" data-a="mnav" data-d="1"></i><div class="pr"><i id="pb"></i></div></div>`};
+const mDrawer=()=>S.drw?`<div class="drb" data-a="mdc"><div class="dr"><div class="dh"><span class="lg"><i class="fa-solid fa-bars"></i></span><b>Pose</b><i class="fa-solid fa-xmark" data-a="mdc"></i></div><div class="da"><b style="font-size:20px">${esc(art().name)}</b><p class="m" style="padding:0">Musician · ${esc(art().country)}</p><span class="vc"><i class="fa-solid fa-check"></i> Creator</span></div><small class="m">DISCOVER</small><p data-a="mgo" data-v="browse"><i class="fa-solid fa-house"></i> Browse Music</p><small class="m">CREATOR</small>${[['dash','chart-line','Dashboard'],['upload','upload','Upload Music'],['cat','folder','My Catalogue'],['prof','user','Edit Profile'],['earn','coins','Rewards']].map(x=>`<p data-a="mgo" data-v="${x[0]}"><i class="fa-solid fa-${x[1]}"></i> ${x[2]}</p>`).join('')}</div></div>`:'';
+PAGES.music=()=>`<div class="mus2">${mHead()}<div class="mbody">${MV[S.mv]()}</div>${mPlayer()}${mDrawer()}</div>`;
+
+// Pose channel: real videos, paid ones unlock with coins
+const vids=()=>S.posts.filter(p=>p.k==='video'&&p.src);
+const mov=p=>{const un=S.unlocked.has(String(p.id))||mine(p)||!p.price;return `<div data-a="mopen" data-id="${p.id}"><div class="mp" style="background:${p.bg}"><span class="mb">MOVIE</span>${un?'':'<i class="fa-solid fa-lock lk2"></i>'}</div><div class="mr"><div class="mc"><i class="fa-solid fa-user"></i></div><div><b>${esc((p.cap||'Untitled').slice(0,40))}</b><p class="m">${esc(p.u)}</p><p class="m">${un?(p.price?'Unlocked':'Free'):'<i class="fa-solid fa-coins"></i> '+p.price+' coins'}</p></div></div></div>`};
+PAGES.pose=()=>{const v=vids(),top=[...v].sort((a,b)=>b.l-a.l)[0],f=v.filter(p=>S.pc==='All'||(S.pc==='Free'&&!p.price)||(S.pc==='Premium'&&p.price)||(S.pc==='Mine'&&mine(p)));
+ return `<div class="ph"><b>POSE<span>CHANNELS</span></b><i class="fa-solid fa-bars"></i><b class="bl"><i class="fa-solid fa-fire"></i> BLINK</b></div><div data-a="mwl" style="padding:8px 16px;font-size:17px"><i class="fa-solid fa-bookmark" style="color:var(--p)"></i> Watch Later (${S.wl.size})</div>`
+ +(top?`<div class="hr" style="background:${top.bg}"><span class="top">TOP 1</span><div class="hb"><button class="wb" data-a="mopen" data-id="${top.id}"><i class="fa-solid fa-play"></i> Play</button><button class="gb" data-a="minfo" data-id="${top.id}"><i class="fa-solid fa-circle-info"></i> More Info</button><button class="gb" data-a="mlater" data-id="${top.id}"><i class="fa-solid fa-plus"></i> Watch Later</button></div></div>`:msg('fa-clapperboard','No videos yet','Post a video and set a coin price to sell it here.','<button class="btn" data-a="create">Create</button>'))
+ +`<div class="chips">${['All','Free','Premium','Mine'].map(c=>`<b class="${c===S.pc?'on':''}" data-a="mpc" data-c="${c}">${c}</b>`).join('')}</div><div class="mg">${f.map(mov).join('')}</div>`};
+// Live: real-time chat rooms (Wave costs coins)
+const chatH=()=>(S.msgs||[]).map(m=>`<p><b>${esc(m.name)}</b> ${esc(m.text)}</p>`).join('')||'<p class="m">No messages yet. Say hi.</p>';
+PAGES.live=()=>S.rm?`<div class="lv"><div class="lvh2"><span class="tag">LIVE</span><b>${S.rm==='wave'?'Wave':'Normal Live'}</b><button class="mini" data-a="lend">Leave</button></div><div class="chat" id="ch">${chatH()}</div><div class="lvb"><input type="text" id="lm" placeholder="Say something" maxlength="200"><button class="btn" data-a="lsend"><i class="fa-solid fa-paper-plane"></i></button></div></div>`
+:`<div class="lh"><i class="fa-solid fa-tower-broadcast"></i><h2>Live</h2><p class="m" style="margin-top:8px">Chat with other players in real time.</p></div><div class="lc"><div class="w"><b><i class="fa-solid fa-water"></i> Wave</b><p class="m">Exclusive chat room. 20 coins to join for this visit.</p><button class="btn" data-a="ljoin" data-r="wave">Join · 20 coins</button></div><div class="n"><b><i class="fa-solid fa-signal"></i> Normal Live</b><p class="m">Free chat room for everyone.</p><button class="btn" data-a="ljoin" data-r="normal">Join free</button></div></div>`;
+// Profile
+PAGES.profile=()=>{const m=S.posts.filter(mine),L=S.pt==='Liked'?S.posts.filter(p=>S.liked.has(String(p.id))):m.filter(p=>S.pt==='Feed'?p.k==='video':S.pt==='Photos'?p.k==='photo':p.k==='buzz');
+ return `<div class="pf"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="foryou"></i><span style="display:flex;gap:12px;align-items:center"><i class="fa-solid fa-gear" data-a="settings"></i><b class="coins" style="padding:6px 14px;font-size:16px" data-a="drafts"><i class="fa-solid fa-bookmark"></i> Drafts</b></span></div>
+<div class="pid"><div class="pa" style="${S.p.avatar?`background-image:url(${esc(S.p.avatar)})`:''}"></div><div><h1>${esc(S.p.name).toUpperCase()}</h1><p style="color:var(--p2);font-size:17px">@${esc(S.p.name)}</p><p class="m">Creator on Pose</p></div></div>
+<div class="stats"><div><b>${m.length}</b><small>POSTS</small></div><div><b>${S.fol.size}</b><small>FOLLOWING</small></div><div><b>${m.reduce((a,p)=>a+p.l,0)}</b><small>LIKES</small></div></div>
+<div class="mc2"><button class="coral2" data-a="mychan"><i class="fa-solid fa-clapperboard"></i> My Channel</button><button class="wal" data-a="shop"><i class="fa-solid fa-wallet"></i></button></div>
+<div class="chips">${['Feed','Photos','Buzz','Liked'].map(c=>`<b class="${c===S.pt?'on':''}" data-a="ptab" data-c="${c}">${c}</b>`).join('')}</div>
+<div class="pg">${L.length?L.map(p=>`<div class="pcard" data-a="sgo" data-id="${p.id}"><i class="fa-solid fa-${p.k==='buzz'?'comment':p.k==='photo'?'image':'play'}" style="font-size:26px"></i><small>${esc(p.cap).slice(0,24)}</small><div><i class="fa-solid fa-heart" style="color:var(--acc)"></i> ${p.l} <i class="fa-solid fa-comments"></i> ${p.c}</div></div>`).join(''):'<p class="m" style="padding:20px">Nothing here yet.</p>'}</div></div>`};
+// Composer with price, sound and drafts
+const composer2=(k,f,txt)=>{S.file=f;sheet(`<h3>${k==='buzz'?'New Buzz':'Add a caption'}</h3>${f?`<p class="m">${esc(f.name)}</p>`:''}${S.snd&&k==='video'?`<p class="chip2"><i class="fa-solid fa-music"></i> ${esc(S.snd.title)} <span data-a="nosnd">remove</span></p>`:''}<textarea id="cap" rows="3" maxlength="300" placeholder="${k==='buzz'?'What is on your mind?':'Caption'}">${esc(txt||'')}</textarea>${k==='video'?'<input type="text" id="pr" inputmode="numeric" placeholder="Price in coins (0 = free)">':''}<div class="row"><button data-a="post" data-k="${k}">Post</button><button data-a="draft" data-k="${k}">Save draft</button></div>`)};
+const sres=q=>{q=q.trim().toLowerCase();const r=$('#sr');if(!r)return;if(!q){r.innerHTML='';return}
+ const ps=S.posts.filter(p=>(p.cap+' '+p.u).toLowerCase().includes(q)).slice(0,10),ms=S.tracks.filter(t=>(t.title+' '+t.artist).toLowerCase().includes(q)).slice(0,6);
+ r.innerHTML=(ps.map(p=>`<div class="song" data-a="sgo" data-id="${p.id}"><div class="cover"><i class="fa-solid fa-${p.k==='buzz'?'comment':'play'}"></i></div><div><b>${esc((p.cap||'Post').slice(0,40))}</b><p class="m">@${esc(p.u)}</p></div></div>`).join('')+ms.map(t=>`<div class="song" data-a="sgo" data-m="1" data-id="${t.id}"><div class="cover"><i class="fa-solid fa-music"></i></div><div><b>${esc(t.title)}</b><p class="m">${esc(t.artist)}</p></div></div>`).join(''))||'<p class="m">No results.</p>';svgI()};
+function mplay(id){const t=tr(id);if(!t)return;if(S.playing===id){AU.pause();S.playing=null}else{if(S.cur!==id||!AU.src){AU.src=t.url;t.streams=(t.streams||0)+1;if(S.fb)db().collection('lagoslife_music').doc(id).update({streams:FV().increment(1)}).catch(()=>{})}
+ S.cur=id;S.playing=id;ev('play_sound');AU.play().catch(()=>{toast('Could not play this sound');S.playing=null;render()})}render()}
+const rows=l=>l.length?l:'<p class="m">Nothing yet.</p>';
+Object.assign(A,{
+ mback(){S.page='foryou';render()},mdr(){S.drw=1;render()},mdc(el){if(el.classList.contains('drb')&&event.target!==el)return;S.drw=0;render()},
+ mgo(el){S.mv=el.dataset.v;S.drw=0;render()},mgen(el){S.gen=el.dataset.g;render()},
+ mplay(el){mplay(el.dataset.id)},psnd(el){S.page='music';S.mv='browse';mplay(el.dataset.id)},
+ mtoggle(){if(!S.cur)return toast('Pick a sound first');if(S.playing){AU.pause();S.playing=null}else{AU.play().catch(()=>{});S.playing=S.cur}render()},
+ mnav(el){const l=fT();if(!l.length)return;const i=l.findIndex(t=>t.id===S.cur);mplay(l[(i+ +el.dataset.d+l.length)%l.length].id)},
+ mdet(el){const t=tr(el.dataset.id);if(t)sheet(`<h3>${esc(t.title)}</h3><p class="m">${esc(t.artist)} · ${esc(t.genre)} · ${esc(t.country||'')}</p><p>${esc(t.desc||'No description.')}</p><div class="tg3"><div><small>STREAMS</small><b>${t.streams||0}</b></div><div><small>VIDEOS</small><b>${t.uses||0}</b></div></div>`)},
+ musesnd(el){const t=tr(el.dataset.id);if(!t)return;S.snd=t;S.recent=[t.id,...S.recent.filter(x=>x!==t.id)].slice(0,10);ls.s('rec',S.recent);toast('Sound added. Pick a video to post.');A.pick({dataset:{k:'video'}})},
+ usesound(){S.page='music';S.mv='browse';render()},nosnd(){S.snd=null;closeSheet()},
+ mfile(){const f=$('#f');f.accept='audio/*';f.onchange=()=>{S.afile=f.files[0];if(S.afile)$('#un').textContent=S.afile.name};f.value='';f.click()},
+ async msave(){const t=$('#ut').value.trim(),f=S.afile;if(!t||!f)return toast('Add a title and an audio file');if(f.size>3e7)return toast('File is too big. Maximum is 30 MB.');if(!S.fb)return toast('Sign-in is not ready. Try again.');
+  try{const ref=firebase.storage().ref('lagoslife/music/'+S.uid+'/'+Date.now()+'_'+f.name.replace(/[^\w.\-]/g,'_')),k=ref.put(f,{contentType:f.type||'audio/mpeg'});
+   await new Promise((ok,no)=>k.on('state_changed',s=>toast('Uploading '+Math.round(100*s.bytesTransferred/s.totalBytes)+'%'),no,ok));const url=await ref.getDownloadURL();
+   const d={title:t,artist:art().name,genre:$('#ug').value,country:$('#uc').value,desc:$('#ud').value.trim(),url,uid:S.uid,streams:0,uses:0,timestamp:Date.now()};
+   d.id=(await db().collection('lagoslife_music').add(d)).id;S.tracks.unshift(d);S.afile=null;S.mv='cat';toast('Track uploaded');render()}catch(e){toast('Upload failed: '+(e.code||e.message))}},
+ async mdel(el){const id=el.dataset.id;try{await db().collection('lagoslife_music').doc(id).delete();S.tracks=S.tracks.filter(t=>t.id!==id);if(S.cur===id){AU.pause();S.playing=null;S.cur=null}render();toast('Track deleted')}catch(e){toast('Could not delete')}},
+ psave(){const a={name:$('#an').value.trim()||S.p.name,genre:$('#ag').value,country:$('#ac').value,bio:$('#ab').value.trim()};S.art=a;ls.s('art',a);if(S.fb)db().collection('lagoslife_artists').doc(S.uid).set({...a,uid:S.uid}).catch(()=>{});toast('Profile saved')},
+ mpc(el){S.pc=el.dataset.c;render()},ptab(el){S.pt=el.dataset.c;render()},mychan(){S.pc='Mine';S.page='pose';render()},
+ async mopen(el){const id=String(el.dataset.id),p=pf(id);if(!p)return;if(p.price&&!S.unlocked.has(id)&&!mine(p)){if(!await spend(p.price,'Unlocked a video'))return;S.unlocked.add(id);ls.s('unl',[...S.unlocked]);render()}
+  sheet(`<h3>${esc(p.cap||'Video')}</h3><video src="${esc(p.src)}" controls playsinline autoplay style="width:100%;border-radius:12px;max-height:60vh"></video><p class="m">by ${esc(p.u)}</p>`)},
+ minfo(el){const p=pf(String(el.dataset.id));if(p)sheet(`<h3>${esc(p.cap||'Video')}</h3><p class="m">by ${esc(p.u)} · ${p.l} likes · ${p.c} comments</p><p>${p.price?p.price+' coins to unlock':'Free to watch'}</p>`)},
+ mlater(el){const id=String(el.dataset.id);S.wl.has(id)?S.wl.delete(id):S.wl.add(id);ls.s('wl',[...S.wl]);toast(S.wl.has(id)?'Added to Watch Later':'Removed from Watch Later');render()},
+ mwl(){const l=vids().filter(p=>S.wl.has(String(p.id)));sheet(`<h3>Watch Later</h3>${rows(l.map(p=>`<div class="song" data-a="mopen" data-id="${p.id}"><div class="cover"><i class="fa-solid fa-play"></i></div><div><b>${esc((p.cap||'Video').slice(0,40))}</b><p class="m">${esc(p.u)}</p></div></div>`).join('')||'')}`)},
+ async ljoin(el){const r=el.dataset.r;if(r==='wave'&&!S.waveOK){if(!await spend(20,'Joined Wave'))return;S.waveOK=true}
+  if(!S.fb)return toast('Sign-in is not ready. Try again.');S.rm=r;S.msgs=[];S.unsub&&S.unsub();
+  S.unsub=db().collection('lagoslife_live').doc(r).collection('messages').orderBy('timestamp','desc').limit(40).onSnapshot(s=>{S.msgs=s.docs.map(d=>d.data()).reverse();const c=$('#ch');if(c&&S.rm){c.innerHTML=chatH();c.scrollTop=c.scrollHeight}},()=>toast('Chat unavailable'));render()},
+ lend(){S.unsub&&S.unsub();S.unsub=null;S.rm=null;render()},
+ async lsend(){const i=$('#lm'),v=i.value.trim();if(!v||!S.rm)return;i.value='';try{await db().collection('lagoslife_live').doc(S.rm).collection('messages').add({name:S.p.name,text:v,uid:S.uid,timestamp:Date.now()})}catch(e){toast('Could not send')}},
+ search(){sheet('<h3>Search</h3><input type="text" id="sq" placeholder="Search posts, creators, sounds"><div id="sr" style="display:grid;gap:10px"></div>')},
+ sgo(el){const id=el.dataset.id;closeSheet();if(el.dataset.m){S.page='music';S.mv='browse';render();return mplay(id)}const p=pf(String(id));S.page=!p?'foryou':p.k==='buzz'?'buzz':'foryou';render();setTimeout(()=>{document.querySelector('[data-id="'+id+'"]')?.scrollIntoView()},50)},
+ shop(){sheet(`<h3>Buy coins</h3><div class="coins"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span> coins</div><div class="row">${PACKS.map(p=>`<button data-a="buy" data-id="${p[0]}"><b>${p[1]}</b><br><small>${p[2]}</small></button>`).join('')}</div><p class="m">Coins unlock paid videos, open Wave and send gifts. They cannot be cashed out.</p><h3>History</h3>${S.hist.slice(0,8).map(h=>`<p>${esc(h[0])} <b>${h[1]||''}</b> <small class="m">${new Date(h[2]).toLocaleDateString()}</small></p>`).join('')||'<p class="m">No activity yet.</p>'}`)},
+ settings(){sheet(`<h3>Settings</h3><label class="m">Display name</label><input type="text" id="sn" value="${esc(S.p.name)}" maxlength="30"><button class="btn" data-a="sname">Save name</button><h3>Community rules</h3><p class="m">No explicit content, hate, harassment or scams. Posts that break these rules are removed and repeat offenders lose access.</p><button class="mini" data-a="drafts">My drafts (${S.drafts.length})</button>${OWN_LOGIN?'<button class="mini dng" data-a="logout">Sign out</button>':''}`)},
+ sname(){const n=$('#sn').value.trim();if(!n)return;S.p.name=n;ls.s('nm2',n);ls.s('nm',n);closeSheet();render();toast('Name saved')},
+ draft(el){const c=$('#cap').value.trim();if(!c)return toast('Write a caption first');S.drafts.unshift({k:el.dataset.k,c});ls.s('dr',S.drafts);closeSheet();toast('Draft saved')},
+ drafts(){sheet(`<h3>Drafts</h3>${S.drafts.map((d,i)=>`<div class="song" data-a="dopen" data-i="${i}"><div class="cover"><i class="fa-solid fa-bookmark"></i></div><div><b>${esc(d.c.slice(0,40))}</b><p class="m">${d.k}</p></div><i class="fa-solid fa-trash" data-a="ddel" data-i="${i}"></i></div>`).join('')||'<p class="m">No drafts yet. Saved drafts appear here.</p>'}`)},
+ ddel(el){S.drafts.splice(+el.dataset.i,1);ls.s('dr',S.drafts);A.drafts()},
+ dopen(el){const d=S.drafts.splice(+el.dataset.i,1)[0];ls.s('dr',S.drafts);S.dtxt=d.c;A.pick({dataset:{k:d.k}})},
+ pick(el){const k=el.dataset.k,t=S.dtxt||'';S.dtxt='';if(k==='buzz')return composer2(k,null,t);const f=$('#f');f.accept=k+'/*';f.onchange=()=>f.files[0]&&composer2(k,f.files[0],t);f.value='';f.click()},
+ async post(el){const k=el.dataset.k,cap=$('#cap').value.trim(),f=S.file,pr=Math.max(0,Math.min(500,Math.floor(+($('#pr')&&$('#pr').value)||0)));
+  if(k==='buzz'?!cap:!f)return;if(f&&f.size>5e7)return toast('File is too big. Maximum is 50 MB.');
+  closeSheet();toast(f?'Uploading…':'Posting…');let url=null;
+  if(f)try{url=await upload(f)}catch(e){return toast('Upload failed: '+(e.code||e.message||'unknown'))}
+  const sn=k==='video'?S.snd:null,d={type:k,caption:cap,url,userId:S.uid,name:S.p.name,likes:0,comments:0,price:k==='video'?pr:0,soundId:sn?sn.id:'',soundName:sn?sn.title:'',status:'live',timestamp:Date.now()};let id='l'+Date.now();
+  if(S.fb)try{id=(await db().collection('lagoslife_posts').add(d)).id}catch(e){return toast('Could not save your post')}
+  if(sn&&S.fb){db().collection('lagoslife_music').doc(sn.id).update({uses:FV().increment(1)}).catch(()=>{});sn.uses=(sn.uses||0)+1}S.snd=null;
+  S.posts.unshift(mp(id,d));S.page=k==='buzz'?'buzz':'foryou';render();ev('post_created',{type:k});toast('Posted')}});
+document.addEventListener('input',e=>{const i=e.target.id;if(i==='mq'){S.q=e.target.value;const l=$('#ml');if(l){l.innerHTML=tList();svgI()}}if(i==='sq')sres(e.target.value)});
+document.addEventListener('change',e=>{if(e.target.id==='mc'){S.ctry=e.target.value;render()}});
+
+// ===== OWN SIGN-IN (for testing). Lagos Life already signs players in. =====
+// TO REMOVE: set OWN_LOGIN=false (players then get silent Firebase anonymous sign-in). Nothing else needs to change.
+const OWN_LOGIN=true;
+function setUser(u){S.uid=u.uid;S.fb=true;ev("login");if(u.displayName&&!ls.g('nm2',0))S.p.name=u.displayName}
+const AERR={'auth/invalid-email':'That email is not valid.','auth/weak-password':'Password needs 6 or more characters.','auth/email-already-in-use':'That email already has an account. Sign in instead.','auth/invalid-credential':'Wrong email or password.','auth/user-not-found':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/missing-password':'Enter your password.','auth/operation-not-allowed':'Turn on Email/Password in Firebase Authentication.','auth/network-request-failed':'No connection. Try again.'};
+const em=x=>AERR[x.code]||('Error: '+(x.code||x.message));
+A.logout=async()=>{try{await firebase.auth().signOut()}catch(e){}location.reload()};
+function showLogin(){return new Promise(res=>{const a=firebase.auth(),o=document.createElement('div');o.id='lg';let up=false;
+ const draw=()=>{o.innerHTML=`<div class="lgc"><span class="lgl"><i class="fa-solid fa-camera"></i></span><h1>${up?'Create account':'Sign in'}</h1>${up?'<input type="text" id="ln" placeholder="Display name" maxlength="30">':''}<input type="text" id="le" placeholder="Email" inputmode="email" autocapitalize="off"><input type="password" id="lp" placeholder="Password (6+ characters)"><p id="lr" class="m"></p><button class="btn" id="lgo">${up?'Create account':'Sign in'}</button><p class="m" id="lt2">${up?'Have an account? Sign in':'New here? Create account'}</p>${up?'':'<p class="m" id="lf">Forgot password?</p>'}</div>`;svgI()};
+ o.addEventListener('click',async e=>{const t=e.target.closest('[id]'),id=t&&t.id,r=()=>$('#lr');
+  if(id==='lt2'){up=!up;draw()}
+  if(id==='lf'){const m=$('#le').value.trim();if(!m)return r().textContent='Enter your email first.';try{await a.sendPasswordResetEmail(m);r().textContent='Reset link sent. Check your email.'}catch(x){r().textContent=em(x)}}
+  if(id==='lgo'){const m=$('#le').value.trim(),p=$('#lp').value;r().textContent='';
+   try{let c;if(up){const n=$('#ln').value.trim();if(!n)return r().textContent='Add a display name.';c=await a.createUserWithEmailAndPassword(m,p);await c.user.updateProfile({displayName:n})}else c=await a.signInWithEmailAndPassword(m,p);
+    setUser(c.user);o.remove();res()}catch(x){r().textContent=em(x)}}});
+ draw();document.body.appendChild(o)})}
+
+// ===== Coin shop (styled like Pose Shop). Real purchases only, through Vatar checkout. =====
+const PK=[{id:'coins_starter',n:'Starter',b:4},{id:'coins_basic',n:'Basic',b:20},{id:'coins_popular',n:'Popular',b:60,pop:1},{id:'coins_value',n:'Value',b:120},{id:'coins_mega',n:'Mega',b:480}];
+const pkc=p=>{const bo=Math.floor(p.b*(p.b<60?.02:.05));return{...p,bonus:bo,total:p.b+bo,fee:Math.round(p.b*25*.04),price:Math.round(p.b*25*1.04)}};
+const NG=n=>'\u20A6'+n.toLocaleString();
+PAGES.shop=()=>{const L=PK.map(pkc),po=L.find(x=>x.pop);
+ return `<div class="sp"><div class="spn"><i class="fa-solid fa-arrow-left rb" data-p="foryou"></i><span class="spb"><b class="mono2 cn">${S.coins}</b> <i class="fa-solid fa-coins"></i></span></div>
+<div class="sph"><span class="spbadge"><span class="ldot"></span> OFFICIAL COIN STORE</span><h1>POSE<br><em>COINS</em></h1><p class="m">Watch what you love. Support who you love.</p>
+<div class="spr"><div class="spr1"><span>POPULAR PACK, RIGHT NOW</span><span class="tg">NIGERIA</span></div><div class="spp mono2">${NG(po.price)}</div><div class="m">${po.total} coins total <b style="color:var(--gold)">(${po.b} + ${po.bonus} bonus)</b></div></div></div>
+<div class="spm"><p class="spl">POSE SHOP</p><h2>BUY <em>POSE COINS</em></h2><p class="m">Prices in Naira: \u20A625 per coin plus a 4% service fee. Coins never expire and cannot be cashed out.</p>
+<div class="spk">${L.map(x=>`<div class="pkc ${x.pop?'pop':''}" data-a="buy" data-id="${x.id}">${x.pop?'<span class="ptag">MOST POPULAR</span>':''}<small>${x.n.toUpperCase()}</small><div class="pc mono2">${x.total}<span> coins</span></div><div class="pb2">${x.bonus?'+'+x.bonus+' bonus coins':''}</div><hr><div class="pr2 mono2">${NG(x.price)}</div><div class="pfn">incl. ${NG(x.fee)} service fee</div><button class="pbtn">Buy Now</button></div>`).join('')}</div>
+<div class="wg"><div><i class="fa-solid fa-play"></i><h3>Unlock Premium Videos</h3><p>Exclusive videos from your favourite creators.</p></div><div><i class="fa-solid fa-coins"></i><h3>Coins Never Expire</h3><p>Buy today, spend whenever.</p></div><div><i class="fa-solid fa-heart"></i><h3>Support Creators</h3><p>Send gifts and tips to the people you love.</p></div><div><i class="fa-solid fa-star"></i><h3>Fair Pricing</h3><p>Bigger packs come with bonus coins.</p></div></div>
+<div class="hw"><div><b>01</b><h3>Choose a Pack</h3><p>See the total coins before you pay.</p></div><div><b>02</b><h3>Pay in Lagos Life</h3><p>Lagos Life's secure checkout handles the payment.</p></div><div><b>03</b><h3>Enjoy</h3><p>Coins land in your wallet as soon as payment confirms.</p></div></div>
+<h3>History</h3>${S.hist.slice(0,10).map(h=>`<p>${esc(h[0])} <b>${h[1]||''}</b> <small class="m">${new Date(h[2]).toLocaleDateString()}</small></p>`).join('')||'<p class="m">No activity yet.</p>'}</div></div>`};
+A.shop=()=>{S.page='shop';render()};
+
+// ===== R2 uploads (Cloudflare), 5-second post countdown, channels and movies =====
+const MB=1048576,CATS=['Movies','Series','Comedy','Music Video','Dance','Afrobeats','Gospel','Nollywood','Documentary','Tutorial'];
+// Uploads a file to Cloudflare R2 through /api/r2-presign. Returns {p:Promise<publicUrl>, abort()}.
+// Your live Pose site's existing Cloudflare presign endpoint (change this if your live site address is different)
+const R2_PRESIGN='https://www.poseweb.site/api/r2-presign';
+function r2(file,onp){let x;const p=(async()=>{
+ const body={filename:file.name,contentType:file.type||'application/octet-stream',folder:'lagoslife'};
+ const r=await fetch(R2_PRESIGN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+ if(!r.ok){const j=await r.json().catch(()=>({}));throw Error('upload setup failed ('+(j.error||r.status)+')')}
+ const j=await r.json();
+ await new Promise((ok,no)=>{x=new XMLHttpRequest();x.open('PUT',j.uploadUrl);x.setRequestHeader('Content-Type',body.contentType);
+  x.upload.onprogress=e=>{if(e.lengthComputable&&onp)onp(e.loaded/e.total)};x.onload=()=>x.status<300?ok():no(Error('upload failed ('+x.status+')'));
+  x.onerror=()=>no(Error('network error. Check R2 CORS'));x.onabort=()=>no(Error('cancelled'));x.send(file)});
+ return j.publicUrl})();return{p,abort:()=>x&&x.abort()}}
+Object.assign(S,{movies:[],chan:null,unl:new Set(),wl:new Set(ls.g('wl',[]))});
+async function loadPose(){
+ try{const r=await db().collection('lagoslife_movies').orderBy('timestamp','desc').limit(50).get();S.movies=r.docs.map(d=>({...d.data(),id:d.id}))}catch(e){}
+ if(S.uid){try{const c=await db().collection('lagoslife_channels').doc(S.uid).get();S.chan=c.exists?c.data():null}catch(e){}
+  try{const u=await db().collection('lagoslife_unlocks').where('uid','==',S.uid).get();u.forEach(d=>S.unl.add(d.data().movieId))}catch(e){}}
+ if(['pose','chan'].includes(S.page))render()}
+const unl=m=>!m.price||m.uid===S.uid||S.unl.has(m.id);
+const thumb=m=>m.thumbUrl?`url(${esc(m.thumbUrl)}) center/cover`:bgOf(m.id);
+const mvc=m=>`<div data-a="mopen" data-id="${m.id}"><div class="mp" style="background:${thumb(m)}"><span class="mb">${esc((m.cat||'Movie').toUpperCase())}</span>${unl(m)?'':'<i class="fa-solid fa-lock lk2"></i>'}</div><div class="mr"><div class="mc"><i class="fa-solid fa-user"></i></div><div><b>${esc(m.title).slice(0,40)}</b><p class="m">${esc(m.channel||'')}</p><p class="m">${unl(m)?(m.price?'Unlocked':'Free'):'<i class="fa-solid fa-coins"></i> '+m.price+' coins'} · ${m.views||0} views</p></div></div></div>`;
+PAGES.pose=()=>{const v=S.movies,top=[...v].sort((a,b)=>(b.views||0)-(a.views||0))[0],f=v.filter(m=>S.pc==='All'||(S.pc==='Free'&&!m.price)||(S.pc==='Premium'&&m.price)||(S.pc==='Mine'&&m.uid===S.uid)||m.cat===S.pc);
+ return `<div class="ph"><b>POSE<span>CHANNELS</span></b><i class="fa-solid fa-bars" data-a="mychan"></i><b class="bl" data-a="mychan"><i class="fa-solid fa-clapperboard"></i> MY CHANNEL</b></div><div data-a="mwl" style="padding:8px 16px;font-size:17px"><i class="fa-solid fa-bookmark" style="color:var(--p)"></i> Watch Later (${S.wl.size})</div>`
+ +(top?`<div class="hr" style="background:linear-gradient(#0005,#000b),${thumb(top)}"><span class="top">TOP 1</span><div class="hb"><button class="wb" data-a="mopen" data-id="${top.id}"><i class="fa-solid fa-play"></i> Play</button><button class="gb" data-a="minfo" data-id="${top.id}"><i class="fa-solid fa-circle-info"></i> More Info</button><button class="gb" data-a="mlater" data-id="${top.id}"><i class="fa-solid fa-plus"></i> Watch Later</button></div></div>`:msg('fa-clapperboard','No movies yet','Create a channel and upload the first movie.','<button class="btn" data-a="mychan">Create channel</button>'))
+ +`<div class="chips">${['All','Free','Premium','Mine',...CATS].map(c=>`<b class="${c===S.pc?'on':''}" data-a="mpc" data-c="${c}">${c}</b>`).join('')}</div><div class="mg">${f.map(mvc).join('')}</div>`};
+PAGES.chan=()=>{const c=S.chan,m=S.movies.filter(x=>x.uid===S.uid),vw=m.reduce((a,x)=>a+(x.views||0),0),un=m.reduce((a,x)=>a+(x.unlocks||0),0);
+ if(!c)return `<div class="pf"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="pose"></i><b>Create your channel</b><span></span></div><div class="mbody"><div class="pcd"><label>Channel name *</label><input type="text" id="chn" maxlength="40" placeholder="e.g. Lagos Cinema"><label>Category</label><select id="chc">${CATS.map(x=>`<option>${x}</option>`).join('')}</select><label>Description</label><textarea id="chd" rows="3" maxlength="200" placeholder="What is your channel about?"></textarea><button class="btn" data-a="chsave">Create channel</button></div><p class="m">Upload movies up to 250 MB. Set a coin price or make them free.</p></div></div>`;
+ return `<div class="pf"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="pose"></i><b>${esc(c.name)}</b><span class="vc">${esc(c.cat)}</span></div><div class="mbody">${stat('MOVIES',m.length,'video')}${stat('VIEWS',vw,'eye')}${stat('UNLOCKS',un,'coins')}<button class="btn" data-a="mvform"><i class="fa-solid fa-upload"></i> Upload movie</button>`
+ +m.map(x=>`<div class="pcd"><b style="font-size:18px">${esc(x.title)}</b><p class="m">${esc(x.cat)} · ${x.price?x.price+' coins':'Free'}</p><div class="tg3"><div><small>VIEWS</small><b>${x.views||0}</b></div><div><small>UNLOCKS</small><b>${x.unlocks||0}</b></div></div><div class="acts"><button class="mini" data-a="mopen" data-id="${x.id}"><i class="fa-solid fa-play"></i> Play</button><button class="mini dng" data-a="mvdel" data-id="${x.id}"><i class="fa-solid fa-trash"></i></button></div></div>`).join('')+`</div></div>`};
+const pickFile=(acc,max,label,cb)=>{const f=$('#f');f.accept=acc;f.onchange=()=>{const x=f.files[0];if(!x)return;if(x.size>max*MB)return toast('Maximum is '+max+' MB');cb(x)};f.value='';f.click()};
+Object.assign(A,{
+ create(){sheet(`<h3>Create</h3><div class="row"><button data-a="pick" data-k="video"><i class="fa-solid fa-video"></i><br>Video</button><button data-a="pick" data-k="photo"><i class="fa-solid fa-image"></i><br>Photo</button><button data-a="pick" data-k="buzz"><i class="fa-solid fa-pen"></i><br>Buzz</button><button data-a="mychan"><i class="fa-solid fa-clapperboard"></i><br>Movie</button></div><p class="m">No explicit content. Posts that break the rules are removed.</p>`)},
+ mychan(){closeSheet();S.page='chan';render()},
+ mpc(el){S.pc=el.dataset.c;render()},
+ async chsave(){const n=$('#chn').value.trim();if(!n)return toast('Add a channel name');if(!S.fb)return toast('Sign-in is not ready. Try again.');
+  const d={name:n,cat:$('#chc').value,desc:$('#chd').value.trim(),uid:S.uid,owner:S.p.name,timestamp:Date.now()};
+  try{await db().collection('lagoslife_channels').doc(S.uid).set(d);S.chan=d;render();toast('Channel created')}catch(e){toast('Could not create channel: '+(e.code||e.message))}},
+ mvform(){S.mvf=null;S.mvt=null;sheet(`<h3>Upload movie</h3><input type="text" id="mt" placeholder="Title *" maxlength="80"><textarea id="md" rows="2" maxlength="300" placeholder="Description"></textarea><select id="mc2">${CATS.map(x=>`<option>${x}</option>`).join('')}</select><input type="text" id="mpr" inputmode="numeric" placeholder="Price in coins (0 = free)"><div class="row"><button data-a="mvthumb"><i class="fa-solid fa-image"></i><br><span id="mtn">Thumbnail</span></button><button data-a="mvfile"><i class="fa-solid fa-video"></i><br><span id="mvn">Movie file</span></button></div><p class="m">Movie: up to 250 MB. Thumbnail: up to 5 MB.</p><button class="btn" data-a="mvsave">Publish</button>`)},
+ mvthumb(){pickFile('image/*',5,'',x=>{S.mvt=x;$('#mtn').textContent=x.name.slice(0,18)})},
+ mvfile(){pickFile('video/*',250,'',x=>{S.mvf=x;$('#mvn').textContent=x.name.slice(0,16)+' ('+Math.round(x.size/MB)+' MB)'})},
+ async mvsave(){const t=$('#mt').value.trim(),f=S.mvf;if(!t||!f)return toast('Add a title and a movie file');if(!S.fb||!S.chan)return toast('Create your channel first');
+  const meta={title:t,desc:$('#md').value.trim(),cat:$('#mc2').value,price:Math.max(0,Math.min(1000,Math.floor(+$('#mpr').value||0)))};
+  sheet('<h3>Publishing movie…</h3><p class="m" id="cdh">Uploading. Keep this screen open.</p><div class="pr"><i id="upb"></i></div><button class="btn" data-a="pcancel">Cancel</button>');
+  try{const a=S.mvt?r2(S.mvt):null,b=r2(f,v=>{const e=$('#upb');if(e)e.style.width=Math.round(v*100)+'%'});S.cdAbort=()=>{b.abort();a&&a.abort()};
+   const [tu,vu]=await Promise.all([a?a.p:'',b.p]);
+   const d={...meta,videoUrl:vu,thumbUrl:tu,uid:S.uid,channel:S.chan.name,views:0,unlocks:0,status:'live',timestamp:Date.now()};
+   d.id=(await db().collection('lagoslife_movies').add(d)).id;S.movies.unshift(d);closeSheet();render();toast('Movie published')}
+  catch(e){closeSheet();toast(e.message==='cancelled'?'Upload cancelled':'Upload failed: '+e.message)}},
+ async mvdel(el){const id=el.dataset.id;try{await db().collection('lagoslife_movies').doc(id).delete();S.movies=S.movies.filter(x=>x.id!==id);render();toast('Movie deleted')}catch(e){toast('Could not delete')}},
+ async mopen(el){const id=el.dataset.id,m=S.movies.find(x=>x.id===id);if(!m)return;
+  if(!unl(m)){if(!await spend(m.price,'Unlocked a movie'))return;S.unl.add(id);m.unlocks=(m.unlocks||0)+1;
+   if(S.fb){db().collection('lagoslife_unlocks').doc(S.uid+'_'+id).set({uid:S.uid,movieId:id,timestamp:Date.now()}).catch(()=>{});db().collection('lagoslife_movies').doc(id).update({unlocks:FV().increment(1)}).catch(()=>{})}render()}
+  if(S.fb)db().collection('lagoslife_movies').doc(id).update({views:FV().increment(1)}).catch(()=>{});m.views=(m.views||0)+1;
+  sheet(`<h3>${esc(m.title)}</h3><video src="${esc(m.videoUrl)}" ${m.thumbUrl?`poster="${esc(m.thumbUrl)}"`:''} controls playsinline autoplay style="width:100%;border-radius:12px;max-height:60vh"></video><p class="m">${esc(m.channel||'')} · ${esc(m.cat||'')}</p><p>${esc(m.desc||'')}</p>`)},
+ minfo(el){const m=S.movies.find(x=>x.id===el.dataset.id);if(m)sheet(`<h3>${esc(m.title)}</h3><p class="m">${esc(m.channel||'')} · ${esc(m.cat||'')} · ${m.views||0} views</p><p>${esc(m.desc||'')}</p><p>${m.price?m.price+' coins to unlock':'Free to watch'}</p>`)},
+ mlater(el){const id=el.dataset.id;S.wl.has(id)?S.wl.delete(id):S.wl.add(id);ls.s('wl',[...S.wl]);toast(S.wl.has(id)?'Added to Watch Later':'Removed from Watch Later');render()},
+ mwl(){const l=S.movies.filter(m=>S.wl.has(m.id));sheet(`<h3>Watch Later</h3>${l.map(m=>`<div class="song" data-a="mopen" data-id="${m.id}"><div class="cover"><i class="fa-solid fa-play"></i></div><div><b>${esc(m.title).slice(0,40)}</b><p class="m">${esc(m.channel||'')}</p></div></div>`).join('')||'<p class="m">Nothing saved yet.</p>'}`)},
+ // Music upload goes to R2 too
+ async msave(){const t=$('#ut').value.trim(),f=S.afile;if(!t||!f)return toast('Add a title and an audio file');if(f.size>30*MB)return toast('File is too big. Maximum is 30 MB.');if(!S.fb)return toast('Sign-in is not ready. Try again.');
+  try{const url=await r2(f,v=>toast('Uploading '+Math.round(v*100)+'%')).p;const d={title:t,artist:art().name,genre:$('#ug').value,country:$('#uc').value,desc:$('#ud').value.trim(),url,uid:S.uid,streams:0,uses:0,timestamp:Date.now()};
+   d.id=(await db().collection('lagoslife_music').add(d)).id;S.tracks.unshift(d);S.afile=null;S.mv='cat';toast('Track uploaded');render()}catch(e){toast('Upload failed: '+e.message)}},
+ // TikTok-style post: 5 second countdown, media uploads to R2 meanwhile, then text + link are saved to Firestore
+ post(el){const k=el.dataset.k,cap=$('#cap').value.trim(),f=S.file,pr=Math.max(0,Math.min(500,Math.floor(+($('#pr')&&$('#pr').value)||0)));
+  if(k==='buzz'?!cap:!f)return toast(k==='buzz'?'Write something first':'Choose a file first');
+  const lim=k==='video'?100:10;if(f&&f.size>lim*MB)return toast('Maximum is '+lim+' MB for a '+k);if(!S.fb)return toast('Sign-in is not ready. Try again.');
+  const sn=k==='video'?S.snd:null,up=f?r2(f,v=>{const b=$('#upb');if(b)b.style.width=Math.round(v*100)+'%'}):{p:Promise.resolve(null),abort(){}};up.p.catch(()=>{});S.cdAbort=up.abort;
+  let n=5;sheet('<h3 id="cdh">Posting in 5…</h3><p class="m">'+(f?'Uploading while you wait. ':'')+'Tap cancel to stop.</p><div class="pr"><i id="upb"></i></div><button class="btn" data-a="pcancel">Cancel</button>');
+  clearInterval(S.cd);S.cd=setInterval(async()=>{n--;const h=$('#cdh');if(n>0){if(h)h.textContent='Posting in '+n+'…';return}clearInterval(S.cd);if(h)h.textContent=f?'Finishing upload…':'Saving…';
+   try{const url=await up.p,d={type:k,caption:cap,url,userId:S.uid,name:S.p.name,likes:0,comments:0,price:k==='video'?pr:0,soundId:sn?sn.id:'',soundName:sn?sn.title:'',status:'live',timestamp:Date.now()};
+    const id=(await db().collection('lagoslife_posts').add(d)).id;
+    if(sn){db().collection('lagoslife_music').doc(sn.id).update({uses:FV().increment(1)}).catch(()=>{});sn.uses=(sn.uses||0)+1}S.snd=null;
+    S.posts.unshift(mp(id,d));S.page=k==='buzz'?'buzz':'foryou';closeSheet();render();ev('post_created',{type:k});toast('Posted')}
+   catch(e){closeSheet();toast(e.message==='cancelled'?'Post cancelled':'Post failed: '+e.message)}},1000)},
+ pcancel(){clearInterval(S.cd);S.cdAbort&&S.cdAbort();closeSheet();toast('Post cancelled')}});
+
+// ===== Channel dashboard (light Pose Channel look) =====
+Object.assign(IC,{shield:'M12 2l8 3v6c0 5-3.500 9.500-8 11C7.500 20.500 4 16 4 11V5l8-3z','thumbs-up':'M2 10h4v11H2zm6 11V10l4-8c1.700 0 2.500 1.200 2.200 2.800L13.500 9H20a2 2 0 0 1 2 2.300l-1.300 7.500A2 2 0 0 1 18.700 21H8z',inbox:'M4 4h16l2 9v7H2v-7l2-9zm2 2l-1.500 7H8a4 4 0 0 0 8 0h3.500L18 6H6z','list-check':'M4 5h3v3H4zm5 .5h11v2H9zM4 11h3v3H4zm5 .5h11v2H9zM4 17h3v3H4zm5 .5h11v2H9z'});
+const hdl=n=>'@'+String(n||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const slots=()=>{const d=new Date();return S.movies.filter(m=>{const t=new Date(m.timestamp);return m.uid===S.uid&&m.price>0&&t.getMonth()===d.getMonth()&&t.getFullYear()===d.getFullYear()}).length};
+S.fans=0;S.fl=[];S.ct='home';
+async function loadFans(){if(!S.uid)return;try{const r=await db().collection('lagoslife_follows').where('to','==',S.uid).get();S.fl=r.docs.map(d=>d.data()).sort((a,b)=>b.timestamp-a.timestamp);S.fans=r.size}catch(e){}if(S.page==='chan')render()}
+const cHead=()=>`<div class="cdh"><span class="lg lgo"></span><span class="cdt">Pose<br>Channel</span><span class="cdb" data-a="chinbox"><i class="fa-solid fa-inbox"></i> Inbox</span><span class="cdb" data-a="chset"><i class="fa-solid fa-gear"></i> Settings</span><span class="cdb pr3" data-p="pose"><i class="fa-solid fa-arrow-left"></i> Go back</span></div>`;
+const mvCard=x=>`<div class="cdc"><b style="font-size:18px">${esc(x.title)}</b><p class="m">${esc(x.cat)} · ${x.price?x.price+' coins':'Free'}</p><div class="tg3"><div><small>VIEWS</small><b>${x.views||0}</b></div><div><small>UNLOCKS</small><b>${x.unlocks||0}</b></div></div><div class="acts"><button class="mini" data-a="mopen" data-id="${x.id}"><i class="fa-solid fa-play"></i> Play</button><button class="mini dng" data-a="mvdel" data-id="${x.id}"><i class="fa-solid fa-trash"></i></button></div></div>`;
+PAGES.chan=()=>{const c=S.chan,m=S.movies.filter(x=>x.uid===S.uid),vw=m.reduce((a,x)=>a+(x.views||0),0),un=m.reduce((a,x)=>a+(x.unlocks||0),0),lk=S.posts.filter(mine).reduce((a,p)=>a+p.l,0),sl=slots(),t=S.ct;
+ if(!c)return `<div class="cd">${cHead()}<div class="cdl"><h2>Create your channel</h2><label>Channel name *</label><input type="text" id="chn" maxlength="40" placeholder="e.g. Lagos Cinema"><label>Category</label><select id="chc">${CATS.map(x=>`<option>${x}</option>`).join('')}</select><label>Description</label><textarea id="chd" rows="3" maxlength="200" placeholder="What is your channel about?"></textarea><button class="btn" data-a="chsave">Create channel</button><p class="m">Upload movies up to 250 MB. Set a coin price or make them free.</p></div></div>`;
+ const tabs=`<div class="cdn">${[['home','house','Home'],['studio','video','Studio'],['rewards','coins','Rewards'],['elig','list-check','Eligibility']].map(x=>`<span class="${t===x[0]?'on':''}" data-a="ctab" data-c="${x[0]}"><i class="fa-solid fa-${x[1]}"></i> ${x[2]}</span>`).join('')}</div>`;
+ let b='';
+ if(t==='home')b=`<div class="bn2" style="${c.banner?`background-image:url(${esc(c.banner)})`:''}"><span class="eb" data-a="banner"><i class="fa-solid fa-upload"></i> Edit banner</span></div>
+<div class="av2" style="${c.avatar?`background-image:url(${esc(c.avatar)})`:''}">${c.avatar?'':'<i class="fa-solid fa-user"></i>'}<span class="cam" data-a="avatar"><i class="fa-solid fa-camera"></i></span></div>
+<h1 class="cdn2">${esc(c.name)}</h1><p class="cds">${hdl(c.name)} · Nigeria · ${S.fans} Fans</p><span class="vp"><i class="fa-solid fa-check"></i> Channel Creator</span>
+<div class="cst"><div><i class="fa-solid fa-eye" style="color:#6D28D9"></i><b>${vw}</b><small>TOTAL VIEWS</small></div><div><i class="fa-solid fa-thumbs-up" style="color:#f472b6"></i><b>${lk}</b><small>TOTAL LIKES</small></div><div><i class="fa-solid fa-video" style="color:#6D28D9"></i><b>${m.length}</b><small>VIDEOS</small></div><div><i class="fa-solid fa-heart" style="color:#f43f5e"></i><b>${S.fans}</b><small>FANS</small></div></div>
+<div class="rq" data-a="ctab" data-c="elig"><span class="shd"><i class="fa-solid fa-shield"></i></span><div><b>Channel Requirements</b><p>${sl}/5 paid-movie slots used this month. Free videos are unlimited.</p></div></div>
+<div class="cbt"><button class="a" data-a="mvform"><i class="fa-solid fa-upload"></i> Upload Video</button><button class="b" data-a="ctab" data-c="studio"><i class="fa-solid fa-video"></i> See All Videos</button></div>`;
+ else if(t==='studio')b=`<div class="cdl"><button class="btn" data-a="mvform"><i class="fa-solid fa-upload"></i> Upload Video</button>${m.map(mvCard).join('')||'<p class="m">No videos yet.</p>'}</div>`;
+ else if(t==='rewards')b=`<div class="cdl"><h2>Rewards</h2><p class="m">Rewards on Pose are rank, badges and visibility. Coins viewers spend cannot be cashed out.</p>${stat('TOTAL VIEWS',vw,'eye')}${stat('PAID UNLOCKS',un,'coins')}${stat('FANS',S.fans,'heart')}</div>`;
+ else b=`<div class="cdl el"><h2>Eligibility</h2><p><i class="fa-solid fa-check"></i> Movies and videos up to 250 MB each.</p><p><i class="fa-solid fa-check"></i> ${sl}/5 paid-movie slots used this month. Free videos do not use a slot.</p><p><i class="fa-solid fa-check"></i> Thumbnails up to 5 MB.</p><p><i class="fa-solid fa-check"></i> No explicit content. Videos that break the rules are removed.</p></div>`;
+ return `<div class="cd">${cHead()}${tabs}${b}</div>`};
+async function chimg(k,f){toast('Uploading…');try{const u=await r2(f,v=>toast('Uploading '+Math.round(v*100)+'%')).p;S.chan[k]=u;await db().collection('lagoslife_channels').doc(S.uid).set({[k]:u},{merge:true});render();toast('Saved')}catch(e){toast('Upload failed: '+e.message)}}
+const _mv=A.mvsave;
+Object.assign(A,{ctab(el){S.ct=el.dataset.c;render()},banner(){pickFile('image/*',5,'',x=>chimg('banner',x))},avatar(){pickFile('image/*',5,'',x=>chimg('avatar',x))},
+ mvsave(){if(Math.floor(+$('#mpr').value||0)>0&&slots()>=5)return toast('You have used all 5 paid-movie slots this month');return _mv()},
+ chinbox(){const un=S.movies.filter(m=>m.uid===S.uid&&m.unlocks>0);sheet(`<h3>Inbox</h3>${S.fl.slice(0,10).map(f=>`<p>New fan <small class="m">${new Date(f.timestamp).toLocaleDateString()}</small></p>`).join('')}${un.map(m=>`<p>${esc(m.title)}: ${m.unlocks} unlocks, ${m.views||0} views</p>`).join('')||''}${S.fl.length||un.length?'':'<p class="m">Nothing new yet.</p>'}`)},
+ chset(){const c=S.chan;if(!c)return toast('Create your channel first');sheet(`<h3>Channel settings</h3><input type="text" id="sn2" value="${esc(c.name)}" maxlength="40"><select id="sc2">${CATS.map(x=>`<option ${x===c.cat?'selected':''}>${x}</option>`).join('')}</select><textarea id="sd2" rows="3" maxlength="200">${esc(c.desc||'')}</textarea><button class="btn" data-a="chupd">Save</button>`)},
+ async chupd(){const n=$('#sn2').value.trim();if(!n)return;const d={name:n,cat:$('#sc2').value,desc:$('#sd2').value.trim()};try{await db().collection('lagoslife_channels').doc(S.uid).set(d,{merge:true});Object.assign(S.chan,d);closeSheet();render();toast('Saved')}catch(e){toast('Could not save')}}});
+
+// Boot: Lagos Life signs the player in (Vatar.init). Outside Lagos Life, Firebase anonymous sign-in keeps a local account.
 (async()=>{
  try{if(typeof Vatar!=='undefined'){const r=await Vatar.init();S.p=r.player;S.live=true;
-  Vatar.onPurchase(claim);Vatar.purchases().then(l=>l.forEach(claim));
-  Vatar.onPause(()=>{S.paused=true;$$('video').forEach(v=>v.pause())});Vatar.onResume(()=>{S.paused=false;render()})}}catch(e){}
+  Vatar.onPurchase&&Vatar.onPurchase(claim);Vatar.purchases&&Vatar.purchases().then(l=>l.forEach(claim));
+  Vatar.onPause&&Vatar.onPause(()=>{S.paused=true;$$('video').forEach(v=>v.pause())});Vatar.onResume&&Vatar.onResume(()=>{S.paused=false;render()})}}catch(e){}
  try{S.coins=(await api('wallet',{})).coins}catch(e){}
- if(S.live)try{firebase.initializeApp({apiKey:"AIzaSyBUvceHqGL4iQlIESBj6iEN8e6Qie1y11A",authDomain:"pose-5c876.firebaseapp.com",projectId:"pose-5c876",storageBucket:"pose-5c876.firebasestorage.app",messagingSenderId:"862229563389",appId:"1:862229563389:web:eccd5951591a347d373b94"});const a=firebase.auth();await a.setPersistence(firebase.auth.Auth.Persistence.NONE);
-  await a.signInWithCustomToken((await api('token',{})).token);S.fb=true;S.uid=a.currentUser.uid;await loadPosts()}catch(e){}
- render();upd();const b=$('#boot');setTimeout(()=>{b.style.opacity=0;setTimeout(()=>b.remove(),400)},700)})();
+ try{firebase.initializeApp({apiKey:"AIzaSyDW8V2SjNITrA4LcdmeILh944mTbOKnM0c",authDomain:"rewarderhub.firebaseapp.com",databaseURL:"https://rewarderhub-default-rtdb.firebaseio.com",projectId:"rewarderhub",storageBucket:"rewarderhub.firebasestorage.app",messagingSenderId:"85965945106",appId:"1:85965945106:web:fa0a57d8968926e1041bcb",measurementId:"G-F2ERB5NGN0"});try{S.an=firebase.analytics()}catch(e){}
+  const a=firebase.auth();
+  if(OWN_LOGIN){const u=await new Promise(r=>{const x=a.onAuthStateChanged(u=>{x();r(u)})});if(u)setUser(u);else await showLogin()}
+  else{try{await a.signInAnonymously()}catch(e){await a.setPersistence(firebase.auth.Auth.Persistence.NONE);await a.signInAnonymously()}
+   S.uid=a.currentUser.uid;S.fb=true}}catch(e){setTimeout(()=>toast('Sign-in failed: '+(e.code||e.message)),1200)}
+ {const n=ls.g('nm2',0);if(n)S.p.name=n}try{S.coins=(await api('wallet',{})).coins}catch(e){}(S.pend||[]).forEach(claim);
+ upd();loadMusic();loadPose();loadFans();await load();
+ const b=$('#boot');setTimeout(()=>{b.style.opacity=0;setTimeout(()=>b.remove(),400)},500)})();
+
+// ===== PASTE THIS AT THE VERY END of your script in index.html, just above  </script></body></html> =====
+// It replaces the old r2(), buy(), claim(), showLogin() and setUser(). Nothing else needs to change.
+const LL={a:'83261b8df47f69831957975d36c76abf',b:'posedemo',k:'a8b6d8d56a020f2e142a36483a6d2da0',s:'caf640b624b00cd06561f174f839a947ddcfabda581297f15b2512062ec32df1',pub:'https://pub-4dcd9518cdd541499990b55d7337a662.r2.dev',vs:'PASTE_VATAR_TEST_SECRET'};
+const _te=new TextEncoder(),_hx=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+const _hm=async(k,d)=>crypto.subtle.sign('HMAC',await crypto.subtle.importKey('raw',k,{name:'HMAC',hash:'SHA-256'},false,['sign']),_te.encode(d));
+async function llSign(key){
+ const host=LL.a+'.r2.cloudflarestorage.com',d=new Date().toISOString().replace(/[-:]|\.\d{3}/g,''),day=d.slice(0,8),sc=day+'/auto/s3/aws4_request',
+ q=[['X-Amz-Algorithm','AWS4-HMAC-SHA256'],['X-Amz-Credential',LL.k+'/'+sc],['X-Amz-Date',d],['X-Amz-Expires','3600'],['X-Amz-SignedHeaders','host']].map(p=>p[0]+'='+encodeURIComponent(p[1])).join('&'),
+ path='/'+LL.b+'/'+key.split('/').map(encodeURIComponent).join('/'),
+ cr=['PUT',path,q,'host:'+host+'\n','host','UNSIGNED-PAYLOAD'].join('\n'),
+ sts=['AWS4-HMAC-SHA256',d,sc,_hx(await crypto.subtle.digest('SHA-256',_te.encode(cr)))].join('\n');
+ let k=await _hm(_te.encode('AWS4'+LL.s),day);k=await _hm(k,'auto');k=await _hm(k,'s3');k=await _hm(k,'aws4_request');
+ return 'https://'+host+path+'?'+q+'&X-Amz-Signature='+_hx(await _hm(k,sts))}
+// Uploads to R2 (3 tries). If R2 refuses, it saves to Firebase Storage instead, so videos always save.
+function r2(file,onp){let x;const p=(async()=>{
+ const key='lagoslife/'+(S.uid||'x')+'/'+Date.now()+'_'+file.name.replace(/[^\w.\-]/g,'_');
+ const put=async()=>{const url=await llSign(key);return new Promise((ok,no)=>{x=new XMLHttpRequest();x.open('PUT',url);x.timeout=20*60*1000;
+  x.setRequestHeader('Content-Type',file.type||'application/octet-stream');
+  x.upload.onprogress=e=>e.lengthComputable&&onp&&onp(e.loaded/e.total);
+  x.onload=()=>x.status<300?ok():no(Error('upload failed ('+x.status+')'));
+  x.onerror=()=>no(Error('network error'));x.ontimeout=()=>no(Error('upload timed out'));x.onabort=()=>no(Error('cancelled'));x.send(file)})};
+ try{for(let i=0;i<3;i++){try{await put();return LL.pub+'/'+key}catch(e){if(e.message==='cancelled'||i===2)throw e;await new Promise(r=>setTimeout(r,1500*(i+1)))}}}
+ catch(e){if(e.message==='cancelled')throw e;toast('Using backup storage...');return await upload(file)}})();
+ return{p,abort:()=>x&&x.abort()}}
+// Purchases: Lagos Life pay sheet, then check with Vatar (if a key is set), then credit the coins.
+const _llv=(p,b)=>fetch('https://lagoslife.app/api/games/v1'+p,{method:b?'POST':'GET',headers:{Authorization:'Bearer '+LL.vs,'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});
+async function buy(id){try{if(!S.live)return toast('Buying coins works inside Lagos Life only.');
+ const r=await Vatar.purchase(id);await claim({purchaseId:r.purchaseId,productId:r.productId||id})}
+ catch(e){if(e.code!=='cancelled')toast('Payment not completed')}}
+async function claim(p){if(!S.fb){(S.pend=S.pend||[]).push(p);return}
+ try{const useKey=LL.vs.indexOf('PASTE')!==0;let ok=true;
+  if(useKey)try{const g=await _llv('/purchases/'+encodeURIComponent(p.purchaseId)),j=await g.json().catch(()=>({}));ok=g.ok&&j.playerId===S.p.id&&j.status!=='refunded'}catch(e){}
+  if(!ok)return toast('Purchase could not be verified');
+  S.coins=(await api('claim',{purchaseId:p.purchaseId,productId:p.productId})).coins;upd();
+  if(useKey)try{await _llv('/purchases/'+encodeURIComponent(p.purchaseId)+'/deliver',{})}catch(e){}
+  hist('Bought coins',0);toast('Coins added')}
+ catch(e){toast('Could not add coins. Reopen the game.')}}
+// Sign-in: silent Firebase sign-in, and coins/posts follow the Lagos Life player.
+async function showLogin(){const a=firebase.auth();
+ try{await a.signInAnonymously()}catch(e){try{await a.setPersistence(firebase.auth.Auth.Persistence.NONE);await a.signInAnonymously()}catch(x){toast('Sign-in failed: '+(x.code||x.message))}}
+ if(a.currentUser)setUser(a.currentUser)}
+function setUser(u){S.uid=(S.live&&S.p&&S.p.id)||u.uid;S.fb=true;ev('login')}
 </script></body></html>
