@@ -601,9 +601,8 @@ Object.assign(A,{ctab(el){S.ct=el.dataset.c;render()},banner(){pickFile('image/*
  upd();loadMusic();loadPose();loadFans();await load();
  const b=$('#boot');setTimeout(()=>{b.style.opacity=0;setTimeout(()=>b.remove(),400)},500)})();
 
-// ===== PASTE THIS AT THE VERY END of your script in index.html, just above  </script></body></html> =====
-// It replaces the old r2(), buy(), claim(), showLogin() and setUser(). Nothing else needs to change.
-const LL={a:'83261b8df47f69831957975d36c76abf',b:'posedemo',k:'a8b6d8d56a020f2e142a36483a6d2da0',s:'caf640b624b00cd06561f174f839a947ddcfabda581297f15b2512062ec32df1',pub:'https://pub-4dcd9518cdd541499990b55d7337a662.r2.dev',vs:'PASTE_VATAR_TEST_SECRET'};
+
+const LL={a:'83261b8df47f69831957975d36c76abf',b:'posedemo',k:'a8b6d8d56a020f2e142a36483a6d2da0',s:'caf640b624b00cd06561f174f839a947ddcfabda581297f15b2512062ec32df1',pub:'https://pub-4dcd9518cdd541499990b55d7337a662.r2.dev',vs:'vtr_rsec_test_b_kZ1_KP78THANXQ29FX3mAMkDhakOJQ7lDtak5dlRU'};
 const _te=new TextEncoder(),_hx=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
 const _hm=async(k,d)=>crypto.subtle.sign('HMAC',await crypto.subtle.importKey('raw',k,{name:'HMAC',hash:'SHA-256'},false,['sign']),_te.encode(d));
 async function llSign(key){
