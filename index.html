@@ -212,7 +212,7 @@ let tt;const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='bloc
 const sheet=h=>{$('#sh>div').innerHTML=h;$('#sh').classList.add('on');svgI()},closeSheet=()=>{$('#sh').classList.remove('on');$('#sh>div').innerHTML=''};
 const upd=()=>$$('.cn').forEach(e=>e.textContent=S.coins);
 const bgOf=id=>`linear-gradient(160deg,hsl(${[...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0)%360} 55% 28%),#0a0a0c)`;
-const mp=(id,d)=>({id,uid:d.userId,u:d.name||'Player',k:d.type,src:d.url,cap:d.caption||'',l:d.likes||0,c:d.comments||0,price:d.price||0,snd:d.soundName||'',sid:d.soundId||'',bg:bgOf(id)});
+const mp=(id,d)=>({id,uid:d.userId,u:d.name||'Player',k:d.type,src:d.url,cap:d.caption||'',l:d.likes||0,snd:d.soundName||'',sid:d.soundId||'',bg:bgOf(id)});
 const mine=p=>p.uid&&p.uid===S.uid;
 
 // Lagos Life server (wallet, Firebase token, purchase checks). Outside Lagos Life a local demo wallet is used.
@@ -390,8 +390,12 @@ PAGES.profile=()=>{const m=S.posts.filter(mine),L=S.pt==='Liked'?S.posts.filter(
 <div class="mc2"><button class="coral2" data-a="mychan"><i class="fa-solid fa-clapperboard"></i> My Channel</button><button class="wal" data-a="shop"><i class="fa-solid fa-wallet"></i></button></div>
 <div class="chips">${['Feed','Photos','Buzz','Liked'].map(c=>`<b class="${c===S.pt?'on':''}" data-a="ptab" data-c="${c}">${c}</b>`).join('')}</div>
 <div class="pg">${L.length?L.map(p=>`<div class="pcard" data-a="sgo" data-id="${p.id}"><i class="fa-solid fa-${p.k==='buzz'?'comment':p.k==='photo'?'image':'play'}" style="font-size:26px"></i><small>${esc(p.cap).slice(0,24)}</small><div><i class="fa-solid fa-heart" style="color:var(--acc)"></i> ${p.l} <i class="fa-solid fa-comments"></i> ${p.c}</div></div>`).join(''):'<p class="m" style="padding:20px">Nothing here yet.</p>'}</div></div>`};
-// Composer with price, sound and drafts
-const composer2=(k,f,txt)=>{S.file=f;sheet(`<h3>${k==='buzz'?'New Buzz':'Add a caption'}</h3>${f?`<p class="m">${esc(f.name)}</p>`:''}${S.snd&&k==='video'?`<p class="chip2"><i class="fa-solid fa-music"></i> ${esc(S.snd.title)} <span data-a="nosnd">remove</span></p>`:''}<textarea id="cap" rows="3" maxlength="300" placeholder="${k==='buzz'?'What is on your mind?':'Caption'}">${esc(txt||'')}</textarea>${k==='video'?'<input type="text" id="pr" inputmode="numeric" placeholder="Price in coins (0 = free)">':''}<div class="row"><button data-a="post" data-k="${k}">Post</button><button data-a="draft" data-k="${k}">Save draft</button></div>`)};
+
+// Composer with sound and drafts
+const composer2=(k,f,txt)=>{S.file=f;sheet(`<h3>${k==='buzz'?'New Buzz':'Add a caption'}</h3>${f?`<p class="m">${esc(f.name)}</p>`:''}${S.snd&&k==='video'?`<p class="chip2"><i class="fa-solid fa-music"></i> ${esc(S.snd.title)} <span data-a="nosnd">remove</span></p>`:''}<textarea id="cap" rows="3" maxlength="300" placeholder="${k==='buzz'?'What is on your mind?':'Caption'}">${esc(txt||'')}</textarea><div class="row"><button data-a="post" data-k="${k}">Post</button><button data-a="draft" data-k="${k}">Save draft</button></div>`)};
+
+
+
 const sres=q=>{q=q.trim().toLowerCase();const r=$('#sr');if(!r)return;if(!q){r.innerHTML='';return}
  const ps=S.posts.filter(p=>(p.cap+' '+p.u).toLowerCase().includes(q)).slice(0,10),ms=S.tracks.filter(t=>(t.title+' '+t.artist).toLowerCase().includes(q)).slice(0,6);
  r.innerHTML=(ps.map(p=>`<div class="song" data-a="sgo" data-id="${p.id}"><div class="cover"><i class="fa-solid fa-${p.k==='buzz'?'comment':'play'}"></i></div><div><b>${esc((p.cap||'Post').slice(0,40))}</b><p class="m">@${esc(p.u)}</p></div></div>`).join('')+ms.map(t=>`<div class="song" data-a="sgo" data-m="1" data-id="${t.id}"><div class="cover"><i class="fa-solid fa-music"></i></div><div><b>${esc(t.title)}</b><p class="m">${esc(t.artist)}</p></div></div>`).join(''))||'<p class="m">No results.</p>';svgI()};
@@ -518,7 +522,7 @@ Object.assign(A,{
  async chsave(){const n=$('#chn').value.trim();if(!n)return toast('Add a channel name');if(!S.fb)return toast('Sign-in is not ready. Try again.');
   const d={name:n,cat:$('#chc').value,desc:$('#chd').value.trim(),uid:S.uid,owner:S.p.name,timestamp:Date.now()};
   try{await db().collection('lagoslife_channels').doc(S.uid).set(d);S.chan=d;render();toast('Channel created')}catch(e){toast('Could not create channel: '+(e.code||e.message))}},
- mvform(){S.mvf=null;S.mvt=null;sheet(`<h3>Upload movie</h3><input type="text" id="mt" placeholder="Title *" maxlength="80"><textarea id="md" rows="2" maxlength="300" placeholder="Description"></textarea><select id="mc2">${CATS.map(x=>`<option>${x}</option>`).join('')}</select><input type="text" id="mpr" inputmode="numeric" placeholder="Price in coins (0 = free)"><div class="row"><button data-a="mvthumb"><i class="fa-solid fa-image"></i><br><span id="mtn">Thumbnail</span></button><button data-a="mvfile"><i class="fa-solid fa-video"></i><br><span id="mvn">Movie file</span></button></div><p class="m">Movie: up to 250 MB. Thumbnail: up to 5 MB.</p><button class="btn" data-a="mvsave">Publish</button>`)},
+ mvform(){S.mvf=null;S.mvt=null;sheet(`<h3>Upload movie</h3><input type="text" id="mt" placeholder="Title *" maxlength="80"><textarea id="md" rows="2" maxlength="300" placeholder="Description"></textarea><select id="mc2">${CATS.map(x=>`<option>${x}</option>`).join('')}</select><input type="text" id="mpr" inputmode="numeric" <div class="row"><button data-a="mvthumb"><i class="fa-solid fa-image"></i><br><span id="mtn">Thumbnail</span></button><button data-a="mvfile"><i class="fa-solid fa-video"></i><br><span id="mvn">Movie file</span></button></div><p class="m">Movie: up to 250 MB. Thumbnail: up to 5 MB.</p><button class="btn" data-a="mvsave">Publish</button>`)},
  mvthumb(){pickFile('image/*',5,'',x=>{S.mvt=x;$('#mtn').textContent=x.name.slice(0,18)})},
  mvfile(){pickFile('video/*',250,'',x=>{S.mvf=x;$('#mvn').textContent=x.name.slice(0,16)+' ('+Math.round(x.size/MB)+' MB)'})},
  async mvsave(){const t=$('#mt').value.trim(),f=S.mvf;if(!t||!f)return toast('Add a title and a movie file');if(!S.fb||!S.chan)return toast('Create your channel first');
