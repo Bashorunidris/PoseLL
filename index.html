@@ -212,7 +212,7 @@ let tt;const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='bloc
 const sheet=h=>{$('#sh>div').innerHTML=h;$('#sh').classList.add('on');svgI()},closeSheet=()=>{$('#sh').classList.remove('on');$('#sh>div').innerHTML=''};
 const upd=()=>$$('.cn').forEach(e=>e.textContent=S.coins);
 const bgOf=id=>`linear-gradient(160deg,hsl(${[...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0)%360} 55% 28%),#0a0a0c)`;
-const mp=(id,d)=>({id,uid:d.userId,u:d.name||'Player',k:d.type,src:d.url,cap:d.caption||'',l:d.likes||0,snd:d.soundName||'',sid:d.soundId||'',bg:bgOf(id)});
+const mp=(id,d)=>({id,uid:d.userId,u:d.name||'Player',k:d.type,src:d.url,cap:d.caption||'',l:d.likes||0,snd:d.soundName||'',sid:d.soundId||'',x:d,bg:bgOf(id)});
 const mine=p=>p.uid&&p.uid===S.uid;
 
 // Lagos Life server (wallet, Firebase token, purchase checks). Outside Lagos Life a local demo wallet is used.
@@ -549,7 +549,7 @@ Object.assign(A,{
  // TikTok-style post: 5 second countdown, media uploads to R2 meanwhile, then text + link are saved to Firestore
  post(el){const k=el.dataset.k,cap=$('#cap').value.trim(),f=S.file,pr=Math.max(0,Math.min(500,Math.floor(+($('#pr')&&$('#pr').value)||0)));
   if(k==='buzz'?!cap:!f)return toast(k==='buzz'?'Write something first':'Choose a file first');
-  const lim=k==='video'?100:10;if(f&&f.size>lim*MB)return toast('Maximum is '+lim+' MB for a '+k);if(!S.fb)return toast('Sign-in is not ready. Try again.');
+  const lim=k==='photo'?10:100;if(f&&f.size>lim*MB)return toast('Maximum is '+lim+' MB for a '+k);if(!S.fb)return toast('Sign-in is not ready. Try again.');
   const sn=k==='video'?S.snd:null,up=f?r2(f,v=>{const b=$('#upb');if(b)b.style.width=Math.round(v*100)+'%'}):{p:Promise.resolve(null),abort(){}};up.p.catch(()=>{});S.cdAbort=up.abort;
   let n=5;sheet('<h3 id="cdh">Posting in 5…</h3><p class="m">'+(f?'Uploading while you wait. ':'')+'Tap cancel to stop.</p><div class="pr"><i id="upb"></i></div><button class="btn" data-a="pcancel">Cancel</button>');
   clearInterval(S.cd);S.cd=setInterval(async()=>{n--;const h=$('#cdh');if(n>0){if(h)h.textContent='Posting in '+n+'…';return}clearInterval(S.cd);if(h)h.textContent=f?'Finishing upload…':'Saving…';
@@ -680,14 +680,14 @@ A.pcancel=()=>{clearInterval(S.cd);S.cdAbort&&S.cdAbort();$('#cdo').classList.re
 A.post=function(el){
  const k=el.dataset.k,cap=$('#cap').value.trim(),f=S.file;
  if(k==='buzz'?!cap:!f)return toast(k==='buzz'?'Write something first':'Choose a file first');
- const lim=k==='video'?100:10;if(f&&f.size>lim*MB)return toast('Maximum is '+lim+' MB for a '+k);
+ const lim=k==='photo'?10:100;if(f&&f.size>lim*MB)return toast('Maximum is '+lim+' MB for a '+k);
  if(!S.fb)return toast('Sign-in is not ready. Try again.');
  const sn=k==='video'?S.snd:null,o=$('#cdo'),num=$('#cdn'),ring=$('#cdr'),txt=$('#cdt'),retry=$('#cdy');let up=null,gone=false;
  closeSheet();S.cdAbort=()=>{gone=true;up&&up.abort()};
  const setP=v=>{const p=Math.round(v*100);ring.style.setProperty('--pc',p+'%');$('#cdp').textContent=p+'%'};
  _run=async()=>{gone=false;retry.style.display='none';$('#cdx').textContent='Cancel';num.style.display='none';ring.style.display='grid';setP(0);txt.textContent=f?'Uploading your '+k+'...':'Posting...';
   try{let url=null;if(f){up=r2(f,setP);url=await up.p}setP(1);txt.textContent='Finishing...';
-   const d={type:k,caption:cap,url,userId:S.uid,name:S.p.name,likes:0,comments:0,price:0,soundId:sn?sn.id:'',soundName:sn?sn.title:'',status:'live',timestamp:Date.now()};
+   const d={type:k,caption:cap,url,userId:S.uid,name:S.p.name,likes:0,comments:0,price:0,...(S.xtra||{}),soundId:sn?sn.id:'',soundName:sn?sn.title:'',status:'live',timestamp:Date.now()};
    const id=(await db().collection('lagoslife_posts').add(d)).id;
    if(sn){db().collection('lagoslife_music').doc(sn.id).update({uses:FV().increment(1)}).catch(()=>{});sn.uses=(sn.uses||0)+1}S.snd=null;
    S.posts.unshift(mp(id,d));S.page=k==='buzz'?'buzz':'foryou';o.classList.remove('on');render();ev('post_created',{type:k});toast('Posted')}
@@ -743,4 +743,89 @@ footer .plus{padding:clamp(6px,1.2vh,8px) clamp(16px,6vw,22px)}
 #cdo #cdr{width:clamp(120px,40vw,160px);height:clamp(120px,40vw,160px)}
 #sh>div{max-height:88%}
 `;document.head.appendChild(s)})();
+
+// ===== Pose-style create flow: full-page EDIT VIDEO, then full-page Post form =====
+Object.assign(IC,{scissors:'M6 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm0 12a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM8 8l12 12-2 2-6-6-3 3L8 8zm4 2l8-8 2 2-8 8-2-2z',
+ palette:'M12 2a10 10 0 1 0 0 20c1.500 0 2-1 2-2s-.5-1.500 0-2.500c.5-1 1.500-1 3-1h2a3 3 0 0 0 3-3C22 6 17.500 2 12 2zM7 12a1.500 1.500 0 1 1 0-3 1.500 1.500 0 0 1 0 3zm3-4a1.500 1.500 0 1 1 0-3 1.500 1.500 0 0 1 0 3zm5 0a1.500 1.500 0 1 1 0-3 1.500 1.500 0 0 1 0 3z',
+ tag:'M3 3h8l10 10-8 8L3 11V3zm4 2.500a1.500 1.500 0 1 0 0 3 1.500 1.500 0 0 0 0-3z',download:'M11 3h2v9l3-3 1.400 1.400L12 16l-5.400-5.600L8 9l3 3V3zM4 18h16v3H4z'});
+const FILTERS=[['Normal',''],['Warm','sepia(.35) saturate(1.3)'],['Cool','hue-rotate(185deg) saturate(1.2)'],['Mono','grayscale(1)'],['Vivid','saturate(1.8) contrast(1.1)'],['Fade','contrast(.85) brightness(1.1) saturate(.8)']];
+(function(){const s=document.createElement('style');s.textContent=`
+#cp{position:fixed;inset:0;background:#000;display:none;flex-direction:column;z-index:3000;padding-top:env(safe-area-inset-top)}#cp.on{display:flex}
+#cp .ch{display:flex;align-items:center;justify-content:space-between;padding:10px 14px}#cp .ch b{letter-spacing:.12em;font-size:clamp(14px,4.2vw,17px)}
+.cbk{width:clamp(38px,11vw,48px);height:clamp(38px,11vw,48px);border-radius:50%;background:#2c2c2e;border:0;color:#fff;display:grid;place-items:center;font-size:20px}.cok{background:#ff0050;box-shadow:0 0 18px #ff005088}
+#cp .vw{flex:1;position:relative;min-height:0;display:grid;place-items:center}#cp .vw video,#cp .vw img{max-width:100%;max-height:100%}
+.tools{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:grid;gap:12px}
+.tools button{width:clamp(42px,12vw,54px);height:clamp(42px,12vw,54px);border-radius:50%;background:#2c2c2e;border:0;color:#fff;font-size:20px}.tools button.on{background:#ff0050;box-shadow:0 0 18px #ff005088}
+.tpn{padding:10px 14px;display:grid;gap:8px;background:#0a0a0a;max-height:34vh;overflow:auto}.tpn label{display:grid;gap:4px}.tpn input[type=range]{width:100%}
+.ebar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px calc(10px + env(safe-area-inset-bottom))}.pp2{width:48px;height:48px;border-radius:50%;border:0;background:#d8d8d8;color:#000;font-size:20px}
+#cp .pb{flex:1;overflow:auto;padding:0 16px 230px}#cp .pv{height:clamp(150px,30vh,300px);position:relative;display:grid;place-items:center}#cp .pv video,#cp .pv img{max-width:100%;max-height:100%}#cp .dur{position:absolute;right:12px;top:8px}
+.fl2{border-top:1px solid #1a1a1a;padding:16px 0;display:grid;gap:10px}.fl2 label{font-weight:700;font-size:17px;display:flex;gap:8px;align-items:center;justify-content:space-between}
+.fl2 input,.fl2 textarea,.fl2 select{background:#0f0f0f;border:1px solid #222;border-radius:12px;padding:13px;color:#fff;font:inherit;width:100%}
+.trow{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid #1a1a1a;font-weight:600;font-size:17px;gap:10px}
+.sw{width:52px;height:30px;border-radius:99px;background:#444;position:relative;flex:none}.sw:after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}.sw.on{background:#ff0050}.sw.on:after{left:25px}
+.cbot{position:absolute;left:0;right:0;bottom:0;background:#000;border-top:1px solid #1a1a1a;padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:grid;gap:10px}
+.cbot button{border-radius:12px;padding:clamp(10px,1.8vh,15px);font:700 16px inherit;color:#fff;border:1px solid #333;background:#1c1c1e}.cbot .go{background:linear-gradient(90deg,#ff0050,#ff3d7f);border:0;box-shadow:0 6px 22px #ff005055}`;
+ document.head.appendChild(s)})();
+const _fm=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+const cxK=()=>{const t=(S.cx.f&&S.cx.f.type)||'';return t.startsWith('video')?'video':t.startsWith('audio')?'audio':t.startsWith('image')?'image':''};
+const cxPanel=()=>{const x=S.cx;
+ if(x.tool==='trim')return `<div class="tpn"><label>Start <span id="cxsl">${_fm(x.start)}</span><input type="range" id="cxs" min="0" max="${x.dur||0}" step="0.1" value="${x.start}"></label><label>End <span id="cxel">${_fm(x.end||x.dur)}</span><input type="range" id="cxe" min="0" max="${x.dur||0}" step="0.1" value="${x.end||x.dur||0}"></label></div>`;
+ if(x.tool==='flt')return `<div class="tpn"><div class="chips" style="padding:0">${FILTERS.map(f=>`<b class="${x.flt===f[1]?'on':''}" data-a="cxflt" data-f="${f[1]}">${f[0]}</b>`).join('')}</div></div>`;
+ if(x.tool==='mus')return `<div class="tpn">${S.tracks.length?S.tracks.slice(0,20).map(t=>`<div class="song" data-a="cxsnd" data-id="${t.id}"><div class="cover"><i class="fa-solid fa-music"></i></div><div><b>${esc(t.title)}</b><p class="m">${esc(t.artist)}</p></div>${S.snd&&S.snd.id===t.id?'<i class="fa-solid fa-check"></i>':''}</div>`).join(''):'<p class="m">No sounds yet. Upload one from the Music page.</p>'}${S.snd?'<button class="mini" data-a="cxsnd" data-id="">Remove sound</button>':''}</div>`;
+ return ''};
+function cxOpen(k,f,txt){const o=S.cx;o&&o.url&&URL.revokeObjectURL(o.url);S.xtra=null;
+ S.cx={k,f,url:f?URL.createObjectURL(f):null,cap:txt||'',cat:'',ht:'',pp:'',priv:'Everyone',com:1,duet:1,stitch:1,reuse:1,dl:0,music:1,start:0,end:0,dur:0,flt:'',tool:'',view:(k==='video'&&f)?'edit':'post'};
+ let c=$('#cp');if(!c){c=document.createElement('div');c.id='cp';document.body.appendChild(c)}c.className='on';cxDraw()}
+function cxDraw(){const x=S.cx,c=$('#cp'),m=cxK(),ed=x.view==='edit';
+ const media=x.url?(m==='audio'?`<audio id="cxv" controls src="${x.url}"></audio>`:(m==='image'||x.k==='photo')?`<img src="${x.url}">`:`<video id="cxv" src="${x.url}" playsinline loop ${ed?'autoplay':'controls'} style="${x.flt?'filter:'+x.flt:''}"></video>`):'';
+ if(ed){c.innerHTML=`<div class="ch"><button class="cbk" data-a="cxback"><i class="fa-solid fa-arrow-left"></i></button><b>EDIT VIDEO</b><button class="cbk cok" data-a="cxok"><i class="fa-solid fa-check"></i></button></div>
+<div class="vw">${media}<div class="tools">${[['trim','scissors'],['flt','palette'],['mus','music']].map(t=>`<button class="${x.tool===t[0]?'on':''}" data-a="cxtool" data-t="${t[0]}"><i class="fa-solid fa-${t[1]}"></i></button>`).join('')}</div></div>
+<div id="cxp">${cxPanel()}</div><div class="ebar"><span id="cxt">0:00</span><button class="pp2" data-a="cxplay"><i class="fa-solid fa-pause"></i></button></div>`}
+ else{c.innerHTML=`<div class="ch"><button class="cbk" data-a="cxback"><i class="fa-solid fa-arrow-left"></i></button><b style="font-size:20px;letter-spacing:0">Post</b><span style="width:48px"></span></div>
+<div class="pb">${(x.k==='buzz'&&!x.f)?`<div class="fl2"><label>Add media (optional)</label><div class="row"><button data-a="cxattach" data-m="image"><i class="fa-solid fa-image"></i><br>Image</button><button data-a="cxattach" data-m="video"><i class="fa-solid fa-video"></i><br>Video</button><button data-a="cxattach" data-m="audio"><i class="fa-solid fa-music"></i><br>Audio</button></div></div>`:`<div class="pv">${media}<span class="dur" id="cxt">${x.dur?_fm((x.end||x.dur)-x.start):''}</span></div>`}
+<div class="fl2"><label>Caption <span class="m" id="cxn">${x.cap.length}/300</span></label><textarea id="cap" rows="3" maxlength="300" placeholder="Add a caption...">${esc(x.cap)}</textarea></div>
+${x.k==='buzz'?'':`<div class="fl2"><label><span><i class="fa-solid fa-tag" style="color:#f5b301"></i> Category</span></label><input type="text" id="cxcat" value="${esc(x.cat)}" maxlength="30" placeholder="Select or type a category (e.g. Football, Cooking)"></div>`}
+<div class="fl2"><label># Hashtags</label><input type="text" id="cxht" value="${esc(x.ht)}" maxlength="100" placeholder="#lagos #fun"></div>
+<div class="fl2"><label>@ Tags</label><input type="text" id="cxpp" value="${esc(x.pp)}" maxlength="100" placeholder="Tag people"></div>
+<div class="fl2"><label><span><i class="fa-solid fa-eye" style="color:var(--p2)"></i> Privacy</span></label><select id="cxpv">${['Everyone','Followers','Only me'].map(v=>`<option ${v===x.priv?'selected':''}>${v}</option>`).join('')}</select></div>
+${[['com','comment','Allow Comments'],['duet','user','Allow Duet'],['stitch','scissors','Allow Stitch'],['reuse','music','Allow Sound Reuse'],['dl','download','Allow Download'],['music','music','Allow Music Usage']].map(t=>`<div class="trow"><span><i class="fa-solid fa-${t[1]}" style="color:var(--p2)"></i> ${t[2]}</span><span class="sw ${x[t[0]]?'on':''}" data-a="cxtg" data-k="${t[0]}"></span></div>`).join('')}</div>
+<div class="cbot"><button class="go" data-a="post" data-k="${x.k}">Post</button><button data-a="cxstory">Your Story</button><button data-a="draft" data-k="${x.k}">Draft</button></div>`}
+ svgI();const v=$('#cxv');if(!v||m==='audio')return;
+ v.onloadedmetadata=()=>{x.dur=v.duration||0;if(!x.end)x.end=x.dur;const s=$('#cxs');if(s){s.max=x.dur;$('#cxe').max=x.dur;$('#cxe').value=x.end}const t=$('#cxt');if(!ed&&t&&x.dur)t.textContent=_fm((x.end||x.dur)-x.start)};
+ v.ontimeupdate=()=>{if(ed){const t=$('#cxt');if(t)t.textContent=_fm(v.currentTime)}if(x.end&&v.currentTime>=x.end)v.currentTime=x.start||0};
+ if(ed)v.play().catch(()=>{})}
+document.addEventListener('input',e=>{const x=S.cx,i=e.target.id;if(!x||!e.target.closest('#cp'))return;
+ if(i==='cap'){x.cap=e.target.value;$('#cxn').textContent=x.cap.length+'/300'}else if(i==='cxcat')x.cat=e.target.value;else if(i==='cxht')x.ht=e.target.value;else if(i==='cxpp')x.pp=e.target.value;else if(i==='cxpv')x.priv=e.target.value;
+ else if(i==='cxs'){x.start=Math.min(+e.target.value,(x.end||x.dur)-.5);$('#cxsl').textContent=_fm(x.start);const v=$('#cxv');if(v)v.currentTime=x.start}
+ else if(i==='cxe'){x.end=Math.max(+e.target.value,x.start+.5);$('#cxel').textContent=_fm(x.end)}});
+const _cpost=A.post;
+Object.assign(A,{
+ pick(el){const k=el.dataset.k,t=S.dtxt||'';S.dtxt='';if(k==='buzz')return cxOpen(k,null,t);const f=$('#f');f.accept=k+'/*';f.onchange=()=>f.files[0]&&cxOpen(k,f.files[0],t);f.value='';f.click()},
+ cxback(){const x=S.cx;if(x.view==='post'&&x.k==='video'&&x.f){x.view='edit';cxDraw()}else $('#cp').className=''},
+ cxok(){S.cx.view='post';cxDraw()},
+ cxplay(){const v=$('#cxv');if(!v)return;v.paused?v.play():v.pause();$('.pp2').innerHTML='<i class="fa-solid fa-'+(v.paused?'play':'pause')+'"></i>';svgI()},
+ cxtool(el){const x=S.cx,t=el.dataset.t;x.tool=x.tool===t?'':t;$('#cxp').innerHTML=cxPanel();$$('.tools button').forEach(b=>b.classList.toggle('on',b.dataset.t===x.tool));svgI()},
+ cxflt(el){S.cx.flt=el.dataset.f;const v=$('#cxv');if(v)v.style.filter=S.cx.flt;$('#cxp').innerHTML=cxPanel()},
+ cxsnd(el){S.snd=el.dataset.id?tr(el.dataset.id):null;$('#cxp').innerHTML=cxPanel();svgI()},
+ cxtg(el){const x=S.cx,k=el.dataset.k;x[k]=x[k]?0:1;el.classList.toggle('on',!!x[k])},
+ cxattach(el){const f=$('#f');f.accept=el.dataset.m+'/*';f.onchange=()=>{const g=f.files[0];if(!g)return;S.cx.f=g;S.cx.url=URL.createObjectURL(g);cxDraw()};f.value='';f.click()},
+ cxstory(){toast('Stories are coming soon')},
+ post(el){const x=S.cx;if(!x)return _cpost(el);const cap=($('#cap')||{value:''}).value.trim();
+  if(x.k==='buzz'?!cap:!x.f)return toast(x.k==='buzz'?'Write something first':'Choose a file first');
+  S.file=x.f;S.xtra={cat:x.cat.trim(),hashtags:x.ht.trim(),tags:x.pp.trim(),priv:x.priv,com:x.com,duet:x.duet,stitch:x.stitch,reuse:x.reuse,dl:x.dl,music:x.music,start:x.start||0,end:(x.end&&x.dur&&x.end<x.dur-.2)?x.end:0,flt:x.flt,media:cxK()};
+  $('#cp').className='';_cpost(el)},
+ draft(el){const x=S.cx,c=($('#cap')||{value:''}).value.trim();if(!c)return toast('Write a caption first');S.drafts.unshift({k:x?x.k:el.dataset.k,c});ls.s('dr',S.drafts);$('#cp').className='';toast('Draft saved')}});
+// Respect the new post settings in the feed
+const _cc=A.cmt;A.cmt=function(el){const p=pf(pid(el));if(p&&p.x&&p.x.com===0)return toast('Comments are turned off for this post');_cc(el)};
+const cxVis=p=>!p.x||!p.x.priv||p.x.priv==='Everyone'||mine(p)||(p.x.priv==='Followers'&&S.fol.has(p.uid));
+const cxF=fn=>()=>{const k=S.posts;S.posts=k.filter(cxVis);try{return fn()}finally{S.posts=k}};
+PAGES.foryou=cxF(PAGES.foryou);PAGES.buzz=cxF(PAGES.buzz);PAGES.trend=cxF(PAGES.trend);
+function cxApply(){
+ $$('.post').forEach(sec=>{const p=S.posts.find(y=>String(y.id)===sec.dataset.id),v=sec.querySelector('video');if(!p||!p.x||!v||v.dataset.tr)return;v.dataset.tr=1;const x=p.x;
+  if(x.flt)v.style.filter=x.flt;if(x.start)v.addEventListener('loadedmetadata',()=>{v.currentTime=x.start},{once:true});
+  if(x.end>0)v.addEventListener('timeupdate',()=>{if(v.currentTime>=x.end)v.currentTime=x.start||0})});
+ $$('.bz').forEach(b=>{const p=S.posts.find(y=>String(y.id)===b.dataset.id);if(!p||!p.src||b.querySelector('.bzm'))return;const m=(p.x&&p.x.media)||'image';
+  const h=m==='audio'?`<audio class="bzm" controls src="${esc(p.src)}" style="width:100%"></audio>`:m==='video'?`<video class="bzm" controls playsinline preload="metadata" src="${esc(p.src)}" style="width:100%;border-radius:12px;max-height:50vh"></video>`:`<img class="bzm" loading="lazy" src="${esc(p.src)}" style="width:100%;border-radius:12px">`;
+  const t=b.querySelector('p[style]');t?t.insertAdjacentHTML('afterend',h):b.insertAdjacentHTML('beforeend',h)})}
+const _wt=watch;watch=function(){_wt();cxApply()};
 </script></body></html>
