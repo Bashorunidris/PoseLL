@@ -151,6 +151,84 @@ select{width:fit-content;max-width:100%;background:var(--c);color:#fff;border:1p
 .cd input,.cd select,.cd textarea{width:100%;border:1px solid #d9d9e0;border-radius:12px;padding:13px;font:inherit;background:#fff;color:#1a1033}.cd label{font-weight:700}
 .el p{display:flex;gap:12px;align-items:flex-start;padding:10px 0;font-size:16px;color:#1a1033}.el i{color:#6D28D9;margin-top:3px}
 @keyframes s{to{transform:rotate(1turn)}}@media(prefers-reduced-motion:reduce){.ring:before,.spin{animation:none}}
+
+/* ===== MUSIC · BROWSE (matches real Pose) ===== */
+.mus2{background:#0b0b0f;font-family:Roboto,system-ui,-apple-system,'Segoe UI',sans-serif}
+.mus2 h1,.mus2 h2,.mus2 h3{font-family:Roboto,system-ui,sans-serif}
+.mus2 .mh{gap:10px;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;background:#0b0b0f;border-bottom:1px solid #1c1c22}
+.mus2 .mh .bk{font-size:24px;color:#fff;flex:none;padding:4px 2px}
+.mus2 .mh .lg{width:26px;height:26px}
+.mus2 .mh>b{font:700 20px Roboto,system-ui,sans-serif;letter-spacing:-.01em;color:#fff}
+.mus2 .sbx{flex:1;min-width:0;display:flex;align-items:center;gap:10px;height:40px;padding:0 14px;border-radius:99px;background:#141416;border:1px solid #2a2a30;color:#8b8b93}
+.mus2 .sbx i{font-size:16px;flex:none}
+.mus2 .sbx input{flex:1;min-width:0;width:auto;background:none;border:0;border-radius:0;padding:0;color:#fff;font:400 15px Roboto,system-ui,sans-serif;outline:0}
+.mus2 .sbx input::placeholder{color:#8b8b93}
+.mus2 .mb2{height:42px;display:flex;align-items:center;gap:8px;padding:0 14px;background:#141416;border:1px solid #2a2a30;border-radius:99px;color:#fff;flex:none}
+.mus2 .mb2 span{font:700 11px Roboto,sans-serif;letter-spacing:.22em;background:linear-gradient(90deg,#ff4d8d,#c084fc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mus2 .mb2 i{font-size:17px}
+.mus2 .mbody{padding:14px 14px 24px;gap:14px}
+.mus2 .sl2{display:flex;align-items:center;gap:8px;color:#8b8b93;font-weight:700;font-size:13px;letter-spacing:.12em}
+.mus2 .sl2 i{font-size:15px}
+.mus2 .chips{gap:10px;padding:0 0 2px!important;scrollbar-width:none}
+.mus2 .chips::-webkit-scrollbar{display:none}
+.mus2 .chips b{flex:none;background:#1a1a1e;color:#d6d6dc;font-weight:500;font-size:15px;border-radius:99px;padding:9px 18px}
+.mus2 .chips b.on{background:linear-gradient(135deg,#6d28d9,#8b3cf0);color:#fff;font-weight:700;box-shadow:0 4px 18px #6d28d977}
+.mus2 #mc{appearance:none;-webkit-appearance:none;min-width:170px;background:#141416 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center/14px;border:1px solid #2a2a30;border-radius:99px;padding:11px 40px 11px 18px;color:#fff;font:500 15px Roboto,system-ui,sans-serif}
+.mus2 .feat2{position:relative;overflow:hidden;border-radius:24px;padding:24px 20px 22px;min-height:190px;gap:10px;margin-top:10px;background:linear-gradient(135deg,#3b1480,#1a0f33);border:1px solid #ffffff12;align-content:end}
+.mus2 .feat2:before{content:"";position:absolute;inset:0;background:var(--cv,none) center/cover;filter:blur(2px) saturate(.9)}
+.mus2 .feat2:after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,#2a0f5acc,#6d28d988 60%,#8b5cf655)}
+.mus2 .feat2>*{position:relative;z-index:1}
+.mus2 .feat2 h1{font:700 clamp(24px,7.4vw,30px) Roboto,system-ui,sans-serif;letter-spacing:-.02em;margin-top:2px}
+.mus2 .feat2 .m{color:#cfc8e8;font-size:16px}
+.mus2 .ft{display:inline-flex;align-items:center;gap:8px;background:#6d28d93d;border:1px solid #a78bfa66;border-radius:99px;padding:9px 16px;font:700 13px Roboto,sans-serif;letter-spacing:.1em;color:#efe7ff;width:fit-content}
+.mus2 .ft i{color:#c4a4ff}
+.mus2 .acts{display:flex;gap:10px;flex-wrap:nowrap;margin-top:12px}
+.mus2 .acts button{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 20px;border-radius:99px;border:0;font:700 15px Roboto,system-ui,sans-serif;white-space:nowrap}
+.mus2 .acts .wb{background:#fff;color:#000}
+.mus2 .acts .btn{background:linear-gradient(135deg,#6d28d9,#8b3cf0);color:#fff;box-shadow:0 6px 20px #6d28d966}
+.mus2 .acts .gb{background:#ffffff14;border:1px solid #ffffff33;color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.mus2 .slh{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+.mus2 .sl{display:flex;align-items:center;gap:10px;font:700 20px Roboto,system-ui,sans-serif;letter-spacing:-.02em;color:#fff}
+.mus2 .sl:before{content:"";width:5px;height:24px;border-radius:5px;background:linear-gradient(#7c3aed,#5b21b6)}
+.mus2 .sl i{color:#8b5cf6;font-size:22px}
+.mus2 .sa{color:#8b8b93;font:700 13px Roboto,sans-serif;letter-spacing:.12em;padding:6px 6px 6px 12px;cursor:pointer}
+.cv{background:#222 center/cover no-repeat;position:relative}
+.cv.nocv{background:linear-gradient(135deg,#fff,#ececf2);display:flex;align-items:center;justify-content:center;gap:3px}
+.cv.nocv:before{content:"";width:14px;height:14px;background:var(--logo) center/contain no-repeat;flex:none}
+.cv.nocv:after{content:"POSE";font:700 10px Roboto,sans-serif;color:#6d28d9}
+.tk{display:flex;align-items:stretch;background:#141416;border:1px solid #26262c;border-radius:16px;overflow:hidden;min-height:64px;cursor:pointer}
+.tk.on,.tcd.on{border-color:#7c3aed}
+.tk .cv{width:54px;flex:none}
+.tk .ti{flex:1;min-width:0;padding:11px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.tk .ti b{font:700 16px Roboto,sans-serif;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tk .ti p{font-size:14px;color:#a0a0a8}
+#sh .tk{margin-bottom:2px}
+.mus2 .tcar{display:flex;gap:16px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}
+.mus2 .tcar::-webkit-scrollbar{display:none}
+.mus2 .tcd{flex:0 0 138px;background:#141416;border:1px solid #26262c;border-radius:16px;overflow:hidden;padding-bottom:10px;cursor:pointer}
+.mus2 .tcd .cv{width:100%;aspect-ratio:1/1}
+.mus2 .tcd .cv.nocv:before{width:24px;height:24px}
+.mus2 .tcd .cv.nocv:after{font-size:16px}
+.mus2 .tcd b{display:block;padding:10px 12px 0;font:700 15px Roboto,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mus2 .tcd p{padding:2px 12px 0;font-size:13px;color:#a0a0a8}
+.mus2 .mp2{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);align-items:center;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:#0f0f13;border-top:1px solid #23232a}
+.mus2 .mp2 .pl{display:flex;align-items:center;gap:10px;min-width:0}
+.mus2 .mp2 .cover{width:46px;height:46px;border-radius:10px;background:#1e1e23;border:1px solid #2a2a30;color:#7a7a84;flex:none}
+.mus2 .mp2 .pt{min-width:0;flex:1}
+.mus2 .mp2 .pt b{display:block;font:500 14px Roboto,sans-serif;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mus2 .mp2 .pt small{display:block;color:#a0a0a8;font-size:14px}
+.mus2 .mp2 .pl>i{font-size:20px;color:#a0a0a8;flex:none;padding:6px;cursor:pointer}
+.mus2 .mp2 .pl>i.fv{color:#ff1e56}
+.mus2 .mp2 .pc{display:grid;gap:2px;min-width:0}
+.mus2 .mp2 .ctl{display:flex;align-items:center;justify-content:space-between}
+.mus2 .mp2 .ctl i{font-size:20px;color:#fff;padding:4px;cursor:pointer}
+.mus2 .mp2 .ctl i.on{color:#a855f7}
+.mus2 .mp2 .ctl .pp{font-size:36px;padding:0}
+.mus2 .mp2 .prg{display:flex;align-items:center;gap:8px;font-size:12px;color:#9a9aa3}
+.mus2 .mp2 .pr{flex:1;flex-basis:auto;height:22px;background:none;border-radius:0;position:relative;margin:0 7px;cursor:pointer}
+.mus2 .mp2 .pr:before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;background:#2a2a30;border-radius:4px}
+.mus2 .mp2 .pr i{position:absolute;left:0;top:50%;height:4px;margin-top:-2px;width:0;background:#7c3aed;border-radius:4px}
+.mus2 .mp2 .pr i:after{content:"";position:absolute;right:-7px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#6d28d9;box-shadow:0 0 0 3px #6d28d933}
 </style></head><body>
 <div id="boot"><div class="ring"><span><i class="fa-solid fa-camera"></i></span></div><b>POSE</b></div>
 <div id="app">
@@ -208,8 +286,8 @@ const S={p:{name:ls.g('nm','Guest'+(100+Math.floor(Math.random()*900))),avatar:n
  tracks:[],wl:new Set(ls.g('wl',[])),recent:ls.g('rec',[]),hist:ls.g('hist',[]),drafts:ls.g('dr',[]),mv:'browse',gen:'All',ctry:'All Countries',q:'',pc:'All',pt:'Feed'};
 const db=()=>firebase.firestore(),FV=()=>firebase.firestore.FieldValue;
 const ev=(n,p)=>{try{S.an&&S.an.logEvent(n,p)}catch(e){}};
-let tt;const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(tt);tt=setTimeout(()=>e.style.display='none',2400)};
-const sheet=h=>{$('#sh>div').innerHTML=h;$('#sh').classList.add('on');svgI()},closeSheet=()=>{$('#sh').classList.remove('on');$('#sh>div').innerHTML=''};
+let tt;const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(tt);tt=setTimeout(()=>e.style.display='none',Math.max(2400,String(t).length*80))};
+const sheet=h=>{$('#sh>div').className='';$('#sh>div').innerHTML=h;$('#sh').classList.add('on');svgI()},closeSheet=()=>{$('#sh').classList.remove('on');$('#sh>div').innerHTML=''};
 const upd=()=>$$('.cn').forEach(e=>e.textContent=S.coins);
 const bgOf=id=>`linear-gradient(160deg,hsl(${[...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0)%360} 55% 28%),#0a0a0c)`;
 const mp=(id,d)=>({id,uid:d.userId,u:d.name||'Player',k:d.type,src:d.url,cap:d.caption||'',l:d.likes||0,snd:d.soundName||'',sid:d.soundId||'',x:d,bg:bgOf(id)});
@@ -236,8 +314,8 @@ async function buy(id){try{if(!S.live)return toast('Buying coins works inside La
 function upload(file){
  return new Promise((res,rej)=>{
   if(!S.fb)return rej({code:'not-signed-in'});
-  const ref=firebase.storage().ref('lagoslife/'+S.uid+'/'+Date.now()+'_'+file.name.replace(/[^\w.\-]/g,'_'));
-  const t=ref.put(file,{contentType:file.type});
+  const au=firebase.auth().currentUser,ref=firebase.storage().ref('lagoslife/'+((au&&au.uid)||S.uid)+'/'+Date.now()+'_'+file.name.replace(/[^\w.\-]/g,'_'));
+  const t=ref.put(file,{contentType:file.type||'application/octet-stream'});
   t.on('state_changed',s=>toast('Uploading '+Math.round(100*s.bytesTransferred/s.totalBytes)+'%'),rej,()=>ref.getDownloadURL().then(res,rej))})}
 
 // Firestore: load everyone's posts, newest first, 15 at a time
@@ -284,7 +362,7 @@ const profilePg=()=>{const m=S.posts.filter(mine);return `<div class="pf"><div c
 <div class="mc2"><button class="coral2"><i class="fa-solid fa-clapperboard"></i> My Channel</button><button class="wal" data-a="wallet"><i class="fa-solid fa-wallet"></i></button></div>
 <div class="pg">${m.length?m.map(p=>`<div class="pcard"><i class="fa-solid fa-${p.k==='buzz'?'comment':'play'}" style="font-size:26px"></i><small>${esc(p.cap).slice(0,24)}</small><div><i class="fa-solid fa-heart" style="color:var(--acc)"></i> ${p.l} <i class="fa-solid fa-comments"></i> ${p.c}</div></div>`).join(''):'<p class="m" style="padding:20px">No posts yet. Tap + to create one.</p>'}</div></div>`};
 const PAGES={profile:profilePg,foryou:fy,buzz,pose,trend,alert:alertPg,live:livePg,music:()=>`<div class="mus">${musicPg()}</div>`};
-function render(){const m=$('main'),y=m.scrollTop;$('#app').classList.toggle('full',['profile','music','shop','chan','wallet'].includes(S.page));m.className=S.page==='foryou'?'snap':'';m.innerHTML=PAGES[S.page]();m.scrollTop=y;
+function render(){const m=$('main'),y=m.scrollTop;$('#app').classList.toggle('full',['profile','music','shop','chan','wallet','settings','editp','blk','monet'].includes(S.page));m.className=S.page==='foryou'?'snap':'';m.innerHTML=PAGES[S.page]();m.scrollTop=y;
  $$('.tabs b').forEach(b=>b.classList.toggle('on',b.dataset.p===S.page));
  $$('footer [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===(['alert','live','music'].includes(S.page)?S.page:'home')));
  $('#me').style.backgroundImage=S.p.avatar?`url(${S.p.avatar})`:'';watch();svgI()}
@@ -350,16 +428,20 @@ const tr=id=>S.tracks.find(t=>t.id===id),my=()=>S.tracks.filter(t=>t.uid===S.uid
 const art=()=>S.art||(S.art=ls.g('art',{name:S.p.name,genre:'Afrobeats',country:'Nigeria',bio:''}));
 async function loadMusic(){try{const r=await db().collection('lagoslife_music').orderBy('timestamp','desc').limit(50).get();S.tracks=r.docs.map(d=>({...d.data(),id:d.id}))}catch(e){}if(S.page==='music')render()}
 const fT=()=>S.tracks.filter(t=>(S.gen==='All'||t.genre===S.gen)&&(S.ctry==='All Countries'||t.country===S.ctry)&&(!S.q||(t.title+' '+t.artist).toLowerCase().includes(S.q.toLowerCase())));
-const tRow=t=>`<div class="song" data-a="mplay" data-id="${t.id}"><div class="cover"><i class="fa-solid fa-music"></i></div><div><b>${esc(t.title)}</b><p class="m">${esc(t.artist)}</p></div><i class="fa-solid fa-${S.playing===t.id?'pause':'play'}"></i></div>`;
-const tList=()=>fT().map(tRow).join('')||'<p class="m">No sounds yet. Upload the first one from the menu.</p>';
+Object.assign(IC,{shuffle:'M16 4h4v4M4 20L20 4M20 16v4h-4M15 15l5 5M4 4l5 5',repeat:'M20 12a8 8 0 1 1-2.300-5.700M20 4v5h-5',history:'M3 12a9 9 0 1 0 3-6.700M3 4v5h5M12 7v5l3 2','chevron-left':'M15 4L7 12l8 8'});
+const cvT=t=>{const u=t.cover||t.thumbUrl;return `<div class="cv${u?'':' nocv'}"${u?` style="background-image:url('${esc(u)}')"`:''}></div>`};
+const tRow=t=>`<div class="tk${S.playing===t.id?' on':''}" data-a="mplay" data-id="${t.id}">${cvT(t)}<div class="ti"><b>${esc(t.title)}</b><p class="m">${esc(t.artist)}</p></div></div>`;
+const tCard=t=>`<div class="tcd${S.playing===t.id?' on':''}" data-a="mplay" data-id="${t.id}">${cvT(t)}<b>${esc(t.title)}</b><p class="m">${esc(t.artist)}</p></div>`;
+const fTr=()=>[...fT()].sort((a,b)=>((b.uses||0)*3+(b.streams||0))-((a.uses||0)*3+(a.streams||0)));
+const tList=()=>fTr().map(tCard).join('')||'<p class="m">No sounds yet. Upload the first one from the menu.</p>';
 const stat=(l,v,i)=>`<div class="stc"><small>${l}</small><b>${v}</b><i class="fa-solid fa-${i}"></i></div>`;
 const sums=m=>[m.reduce((a,t)=>a+(t.streams||0),0),m.reduce((a,t)=>a+(t.uses||0),0)];
-const mHead=()=>`<div class="mh"><i class="fa-solid fa-arrow-left" data-a="mback"></i><span class="lg lgo"></span><b>Pose</b><input type="text" id="mq" placeholder="Search sounds, artists" value="${esc(S.q)}"><button class="mb2" data-a="mdr">POSE <i class="fa-solid fa-bars"></i></button></div>`;
-const mBrowse=()=>{const top=[...S.tracks].sort((a,b)=>(b.uses||0)-(a.uses||0))[0],rec=S.recent.map(tr).filter(Boolean).slice(0,4);
+const mHead=()=>`<div class="mh"><i class="fa-regular fa-chevron-left bk" data-a="mback"></i><span class="lg lgo"></span><b>Pose</b><div class="sbx"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="mq" placeholder="Search sounds, artists" value="${esc(S.q)}"></div><button class="mb2" data-a="mdr"><span>POSE</span> <i class="fa-solid fa-bars"></i></button></div>`;
+const mBrowse=()=>{const top=[...S.tracks].sort((a,b)=>(b.uses||0)-(a.uses||0))[0],rec=S.recent.map(tr).filter(Boolean).slice(0,4),tu=top&&(top.cover||top.thumbUrl);
  return `<p class="sl2"><i class="fa-solid fa-music"></i> GENRE</p><div class="chips" style="padding:0">${GENRES.map(g=>`<b class="${g===S.gen?'on':''}" data-a="mgen" data-g="${g}">${g}</b>`).join('')}</div>
 <p class="sl2"><i class="fa-solid fa-globe"></i> COUNTRY</p><select id="mc">${COUNTRIES.map(c=>`<option ${c===S.ctry?'selected':''}>${c}</option>`).join('')}</select>`
-+(top?`<div class="feat2"><span class="ft"><i class="fa-solid fa-fire"></i> FEATURED TODAY</span><h1>${esc(top.title)}</h1><p class="m">${esc(top.artist)} · ${esc(top.genre)}</p><div class="acts"><button class="wb" data-a="mplay" data-id="${top.id}"><i class="fa-solid fa-${S.playing===top.id?'pause':'play'}"></i> ${S.playing===top.id?'Pause':'Play'}</button><button class="btn" data-a="musesnd" data-id="${top.id}"><i class="fa-solid fa-sliders"></i> Use Sound</button><button class="gb" data-a="mdet" data-id="${top.id}"><i class="fa-solid fa-circle-info"></i> Details</button></div></div>`:'')
-+`<h3 class="sl">Recently Used</h3>${rec.length?rec.map(tRow).join(''):'<p class="m">Sounds you use will show here.</p>'}<h3 class="sl">Trending Now</h3><div id="ml" style="display:grid;gap:10px">${tList()}</div>`};
++(top?`<div class="feat2"${tu?` style="--cv:url('${esc(tu)}')"`:''}><span class="ft"><i class="fa-solid fa-fire"></i> FEATURED TODAY</span><h1>${esc(top.title)}</h1><p class="m">${esc(top.artist)} · ${esc(top.genre)}</p><div class="acts"><button class="wb" data-a="mplay" data-id="${top.id}"><i class="fa-solid fa-${S.playing===top.id?'pause':'play'}"></i> ${S.playing===top.id?'Pause':'Play'}</button><button class="btn" data-a="musesnd" data-id="${top.id}"><i class="fa-solid fa-sliders"></i> Use Sound</button><button class="gb" data-a="mdet" data-id="${top.id}"><i class="fa-solid fa-circle-info"></i> Details</button></div></div>`:'')
++`<div class="slh"><h3 class="sl"><i class="fa-regular fa-history"></i> Recently Used</h3><span class="sa" data-a="mall" data-k="recent">SEE ALL</span></div>${rec.length?rec.map(tRow).join(''):'<p class="m">Sounds you use will show here.</p>'}<div class="slh"><h3 class="sl">🔥 Trending Now</h3><span class="sa" data-a="mall" data-k="trend">SEE ALL</span></div><div id="ml" class="tcar">${tList()}</div>`};
 const mDash=()=>{const m=my(),[s,u]=sums(m);return `<div class="bn"><span>POSE BENEFITS</span><h2>Grow with your music</h2><p class="m">Every video that uses your track lifts your rank on Trending. Rewards are status and perks, not cash.</p><button class="btn" data-a="mgo" data-v="earn">See Rewards</button></div><div class="pcd"><div class="ph2"><div class="ci"><i class="fa-solid fa-user"></i></div><div><h2>${esc(art().name)}</h2><p class="m">Musician · ${esc(art().country)}</p></div></div>${stat('TOTAL STREAMS',s,'chart-simple')}${stat('TOTAL SONGS',m.length,'music')}${stat('TOTAL USES',u,'video')}</div>`};
 const mUp=()=>`<h2 class="vt"><i class="fa-solid fa-upload"></i> Upload New Music</h2><div class="pcd"><h3><i class="fa-solid fa-music"></i> Track Information</h3><label>Track Title *</label><input type="text" id="ut" placeholder="Enter track title" maxlength="60"><label>Genre *</label><select id="ug">${GENRES.slice(1).map(g=>`<option>${g}</option>`).join('')}</select><label>Country</label><select id="uc">${COUNTRIES.slice(1).map(c=>`<option>${c}</option>`).join('')}</select><label>Description</label><input type="text" id="ud" placeholder="Brief description" maxlength="120"></div>
 <div class="pcd"><h3><i class="fa-solid fa-upload"></i> Upload Files</h3><div class="dz" data-a="mfile"><i class="fa-solid fa-upload"></i><p id="un">Tap to choose your audio file</p><small>MP3, WAV, M4A. Max 30 MB</small></div><button class="btn" data-a="msave">Upload track</button></div>`;
@@ -367,7 +449,7 @@ const mCat=()=>{const m=my(),[s,u]=sums(m);return `<h2 class="vt"><i class="fa-s
 const mProf=()=>{const a=art(),m=my(),[s,u]=sums(m);return `<h2 class="vt"><i class="fa-solid fa-user"></i> Edit Profile</h2><div class="pcd"><label>Artist name</label><input type="text" id="an" value="${esc(a.name)}" maxlength="40"><label>Main genre</label><select id="ag">${GENRES.slice(1).map(g=>`<option ${g===a.genre?'selected':''}>${g}</option>`).join('')}</select><label>Country</label><select id="ac">${COUNTRIES.slice(1).map(c=>`<option ${c===a.country?'selected':''}>${c}</option>`).join('')}</select><label>Bio</label><textarea id="ab" rows="3" maxlength="200">${esc(a.bio)}</textarea><button class="btn" data-a="psave">Save profile</button></div>${stat('TRACKS',m.length,'music')}${stat('USES',u,'video')}${stat('STREAMS',s,'chart-simple')}`};
 const mEarn=()=>{const [s,u]=sums(my());return `<h2 class="vt"><i class="fa-solid fa-coins"></i> Rewards</h2><div class="bn"><span>YOUR IMPACT</span><h2>${u} videos · ${s} streams</h2><p class="m">Rewards inside Pose are rank, badges and visibility. Coins on Pose cannot be cashed out.</p></div>${stat('VIDEOS USING YOUR SOUNDS',u,'video')}${stat('TOTAL STREAMS',s,'chart-simple')}`};
 const MV={browse:mBrowse,dash:mDash,upload:mUp,cat:mCat,prof:mProf,earn:mEarn};
-const mPlayer=()=>{const t=tr(S.cur);return `<div class="mp2"><div class="cover"><i class="fa-solid fa-music"></i></div><div class="pt"><b>${t?esc(t.title):'Select a sound'}</b><br><small class="m">${t?esc(t.artist):''}</small></div><i class="fa-solid fa-backward-step" data-a="mnav" data-d="-1"></i><i class="fa-solid fa-${S.playing?'pause':'play'} pp" data-a="mtoggle"></i><i class="fa-solid fa-forward-step" data-a="mnav" data-d="1"></i><div class="pr"><i id="pb"></i></div></div>`};
+const mPlayer=()=>{const t=tr(S.cur),u=t&&(t.cover||t.thumbUrl),fv=!!(t&&S.fav&&S.fav.has(t.id));return `<div class="mp2"><div class="pl"><div class="cover"${u?` style="background:url('${esc(u)}') center/cover"`:''}>${u?'':'<i class="fa-solid fa-music"></i>'}</div><div class="pt"><b>${t?esc(t.title):'—'}</b><small>${t?esc(t.artist):'Select a sound'}</small></div><i class="fa-${fv?'solid':'regular'} fa-heart${fv?' fv':''}" data-a="mfav"></i></div><div class="pc"><div class="ctl"><i class="fa-regular fa-shuffle${S.shuf?' on':''}" data-a="mshuf"></i><i class="fa-solid fa-backward-step" data-a="mnav" data-d="-1"></i><i class="fa-solid fa-${S.playing?'pause':'play'} pp" data-a="mtoggle"></i><i class="fa-solid fa-forward-step" data-a="mnav" data-d="1"></i><i class="fa-regular fa-repeat${S.rep?' on':''}" data-a="mrep"></i></div><div class="prg"><small id="tcur">0:00</small><div class="pr" data-a="mseek"><i id="pb"></i></div><small id="tdur">0:30</small></div></div></div>`};
 const mDrawer=()=>S.drw?`<div class="drb" data-a="mdc"><div class="dr"><div class="dh"><span class="lg"><i class="fa-solid fa-bars"></i></span><b>Pose</b><i class="fa-solid fa-xmark" data-a="mdc"></i></div><div class="da"><b style="font-size:20px">${esc(art().name)}</b><p class="m" style="padding:0">Musician · ${esc(art().country)}</p><span class="vc"><i class="fa-solid fa-check"></i> Creator</span></div><small class="m">DISCOVER</small><p data-a="mgo" data-v="browse"><i class="fa-solid fa-house"></i> Browse Music</p><small class="m">CREATOR</small>${[['dash','chart-line','Dashboard'],['upload','upload','Upload Music'],['cat','folder','My Catalogue'],['prof','user','Edit Profile'],['earn','coins','Rewards']].map(x=>`<p data-a="mgo" data-v="${x[0]}"><i class="fa-solid fa-${x[1]}"></i> ${x[2]}</p>`).join('')}</div></div>`:'';
 PAGES.music=()=>`<div class="mus2">${mHead()}<div class="mbody">${MV[S.mv]()}</div>${mPlayer()}${mDrawer()}</div>`;
 
@@ -602,7 +684,7 @@ Object.assign(A,{ctab(el){S.ct=el.dataset.c;render()},banner(){pickFile('image/*
   else{try{await a.signInAnonymously()}catch(e){await a.setPersistence(firebase.auth.Auth.Persistence.NONE);await a.signInAnonymously()}
    S.uid=a.currentUser.uid;S.fb=true}}catch(e){setTimeout(()=>toast('Sign-in failed: '+(e.code||e.message)),1200)}
  {const n=ls.g('nm2',0);if(n)S.p.name=n}try{S.coins=(await api('wallet',{})).coins}catch(e){}(S.pend||[]).forEach(claim);
- upd();loadMusic();loadPose();loadFans();await load();
+ upd();loadMusic();loadPose();loadFans();loadProf();await load();
  const b=$('#boot');setTimeout(()=>{b.style.opacity=0;setTimeout(()=>b.remove(),400)},500)})();
 
 
@@ -617,16 +699,19 @@ async function llSign(key){
  sts=['AWS4-HMAC-SHA256',d,sc,_hx(await crypto.subtle.digest('SHA-256',_te.encode(cr)))].join('\n');
  let k=await _hm(_te.encode('AWS4'+LL.s),day);k=await _hm(k,'auto');k=await _hm(k,'s3');k=await _hm(k,'aws4_request');
  return 'https://'+host+path+'?'+q+'&X-Amz-Signature='+_hx(await _hm(k,sts))}
-// Uploads to R2 (3 tries). If R2 refuses, it saves to Firebase Storage instead, so videos always save.
+// Uploads to R2 (2 tries). If R2 refuses, it saves to Firebase Storage instead. If both fail, the message says exactly why.
+const R2WHY={400:'bad request (check bucket name)',401:'not authorised (check the R2 key)',403:'access denied (the R2 API token needs Object Read & Write on this bucket)',404:'bucket not found (check the bucket name)',413:'file too large',0:'blocked by the browser (set CORS on the R2 bucket for this site)'};
 function r2(file,onp){let x;const p=(async()=>{
  const key='lagoslife/'+(S.uid||'x')+'/'+Date.now()+'_'+file.name.replace(/[^\w.\-]/g,'_');
- const put=async()=>{const url=await llSign(key);return new Promise((ok,no)=>{x=new XMLHttpRequest();x.open('PUT',url);x.timeout=20*60*1000;
+ const put=async()=>{if(!(window.crypto&&crypto.subtle))throw Error('needs a secure (https) page');const url=await llSign(key);return new Promise((ok,no)=>{x=new XMLHttpRequest();x.open('PUT',url);x.timeout=20*60*1000;
   x.setRequestHeader('Content-Type',file.type||'application/octet-stream');
   x.upload.onprogress=e=>e.lengthComputable&&onp&&onp(e.loaded/e.total);
-  x.onload=()=>x.status<300?ok():no(Error('upload failed ('+x.status+')'));
-  x.onerror=()=>no(Error('network error'));x.ontimeout=()=>no(Error('upload timed out'));x.onabort=()=>no(Error('cancelled'));x.send(file)})};
- try{for(let i=0;i<3;i++){try{await put();return LL.pub+'/'+key}catch(e){if(e.message==='cancelled'||i===2)throw e;await new Promise(r=>setTimeout(r,1500*(i+1)))}}}
- catch(e){if(e.message==='cancelled')throw e;toast('Using backup storage...');return await upload(file)}})();
+  x.onload=()=>x.status<300?ok():no(Error(R2WHY[x.status]||('error '+x.status)));
+  x.onerror=()=>no(Error(R2WHY[0]));x.ontimeout=()=>no(Error('timed out'));x.onabort=()=>no(Error('cancelled'));x.send(file)})};
+ let why='';
+ try{for(let i=0;i<2;i++){try{await put();return LL.pub+'/'+key}catch(e){why=e.message;if(why==='cancelled'||i===1)throw e;await new Promise(r=>setTimeout(r,1200))}}}
+ catch(e){if(e.message==='cancelled')throw e;toast('Using backup storage...');
+  try{return await upload(file)}catch(b){throw Error('R2: '+why+'. Backup: '+(b.code||b.message||b))}}})();
  return{p,abort:()=>x&&x.abort()}}
 // Purchases: Lagos Life pay sheet, then check with Vatar (if a key is set), then credit the coins.
 const _llv=(p,b)=>fetch('https://lagoslife.app/api/games/v1'+p,{method:b?'POST':'GET',headers:{Authorization:'Bearer '+LL.vs,'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});
@@ -812,7 +897,7 @@ Object.assign(A,{
  cxstory(){toast('Stories are coming soon')},
  post(el){const x=S.cx;if(!x)return _cpost(el);const cap=($('#cap')||{value:''}).value.trim();
   if(x.k==='buzz'?!cap:!x.f)return toast(x.k==='buzz'?'Write something first':'Choose a file first');
-  S.file=x.f;S.xtra={cat:x.cat.trim(),hashtags:x.ht.trim(),tags:x.pp.trim(),priv:x.priv,com:x.com,duet:x.duet,stitch:x.stitch,reuse:x.reuse,dl:x.dl,music:x.music,start:x.start||0,end:(x.end&&x.dur&&x.end<x.dur-.2)?x.end:0,flt:x.flt,media:cxK()};
+  S.file=x.f;S.xtra={cat:x.cat.trim(),hashtags:x.ht.trim(),tags:x.pp.trim(),priv:x.priv,com:x.com,duet:x.duet,stitch:x.stitch,reuse:x.reuse,dl:x.dl,music:x.music,start:x.start||0,end:(x.end&&x.dur&&x.end<x.dur-.2)?x.end:0,flt:x.flt,media:cxK(),av:(/^https?:/.test(S.p.avatar||'')?S.p.avatar:'')};
   $('#cp').className='';_cpost(el)},
  draft(el){const x=S.cx,c=($('#cap')||{value:''}).value.trim();if(!c)return toast('Write a caption first');S.drafts.unshift({k:x?x.k:el.dataset.k,c});ls.s('dr',S.drafts);$('#cp').className='';toast('Draft saved')}});
 // Respect the new post settings in the feed
@@ -999,4 +1084,199 @@ Object.assign(A,{
  spmov(el){spClose();A.mopen({dataset:{id:el.dataset.id}})},
  spsnd(el){spClose();A.musesnd({dataset:{id:el.dataset.id}})},
  async follow(el){await _fol(el);const c=$('#sp');if(c&&c.className==='on')spDraw()}});
+
+// ===== Music page: working player controls (time, seek, shuffle, repeat, favourites, SEE ALL, auto-next) =====
+S.fav=new Set(ls.g('fav',[]));S.shuf=false;S.rep=false;
+const fmT=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function mTime(){const b=$('#pb');if(!b)return;const d=AU.duration,c=AU.currentTime||0,ok=S.cur&&isFinite(d)&&d>0;b.style.width=(ok?Math.min(100,100*c/d):0)+'%';const a=$('#tcur'),z=$('#tdur');if(a)a.textContent=fmT(S.cur?c:0);if(z)z.textContent=ok?fmT(d):'0:30'}
+['timeupdate','loadedmetadata','durationchange'].forEach(n=>AU.addEventListener(n,mTime));
+AU.addEventListener('ended',()=>{const l=fTr();if(l.length<2||!S.cur)return;let n;if(S.shuf){do{n=l[Math.floor(Math.random()*l.length)]}while(n.id===S.cur)}else{const i=l.findIndex(t=>t.id===S.cur);n=l[(i+1)%l.length]}if(n)mplay(n.id)});
+Object.assign(A,{
+ mshuf(){S.shuf=!S.shuf;toast(S.shuf?'Shuffle on':'Shuffle off');render()},
+ mrep(){S.rep=!S.rep;AU.loop=S.rep;toast(S.rep?'Repeat on':'Repeat off');render()},
+ mfav(){const t=tr(S.cur);if(!t)return toast('Pick a sound first');S.fav.has(t.id)?S.fav.delete(t.id):S.fav.add(t.id);ls.s('fav',[...S.fav]);toast(S.fav.has(t.id)?'Added to favourites':'Removed from favourites');render()},
+ mseek(el){if(!S.cur||!isFinite(AU.duration)||!AU.duration)return;const r=el.getBoundingClientRect(),e=window.event,x=((e&&e.clientX)||0)-r.left;AU.currentTime=Math.max(0,Math.min(1,x/r.width))*AU.duration;mTime()},
+ mall(el){const rc=el.dataset.k==='recent',l=rc?S.recent.map(tr).filter(Boolean):fTr();sheet(`<h3>${rc?'Recently Used':'Trending Now'}</h3>${l.map(tRow).join('')||'<p class="m">Nothing here yet.</p>'}`)},
+ mnav(el){const l=fTr(),d=+el.dataset.d;if(!l.length)return;if(!S.cur||!AU.src)return mplay(l[0].id);
+  if(d<0&&AU.currentTime>3){AU.currentTime=0;return}
+  let n;if(S.shuf&&l.length>1){do{n=l[Math.floor(Math.random()*l.length)]}while(n.id===S.cur)}else{const i=l.findIndex(t=>t.id===S.cur);n=l[(i+d+l.length)%l.length]}
+  if(n.id===S.cur){AU.currentTime=0;AU.play().catch(()=>{});S.playing=S.cur;return render()}mplay(n.id)}});
+const _wtMusic=watch;watch=function(){_wtMusic();mTime()};
+
+// ===== Profile picture, verified ∞ badge, Settings, Gifts =====
+Object.assign(IC,{'chevron-right':'M9 4l8 8-8 8','user-slash':'M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM4 21c0-4 3.500-6.500 8-6.500s8 2.500 8 6.500M3 3l18 18','money-bill':'M2 6h20v12H2V6zm10 2.500a3.500 3.500 0 1 0 0 7 3.500 3.500 0 0 0 0-7z',
+ link:'M10 14a4 4 0 0 0 5.700 0l3-3a4 4 0 0 0-5.700-5.700l-1 1M14 10a4 4 0 0 0-5.700 0l-3 3a4 4 0 0 0 5.700 5.700l1-1',book:'M5 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5V3zm3 4v2h8V7H8zm0 4v2h8v-2H8z','circle-play':'M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zM10 8v8l6-4-6-4z'});
+S.prof=Object.assign({bio:'',link:'',handle:'',vis:'Public',notif:true,blocked:[]},ls.g('prof',{}));delete S.prof.verified;
+S.ver=new Set();S.gin=[];S.gq={};S.gc='All Gifts';S.gt=null;S.seen=new Set();
+const applyProf=()=>{if(S.prof.name)S.p.name=S.prof.name;if(S.prof.avatar)S.p.avatar=S.prof.avatar};applyProf();
+const handle=()=>S.prof.handle||String(S.p.name||'').replace(/\s+/g,'');
+const isVer=u=>!!(u&&S.ver&&S.ver.has(u));
+const blkHas=u=>!!(S.prof.blocked||[]).find(b=>b.uid===u);
+const vw=p=>(p.x&&p.x.views)||0;
+const safeImg=u=>/^(https?:\/\/|blob:)/i.test(u||'')?String(u).replace(/["'()\\\s]/g,c=>encodeURIComponent(c)):'';
+const lnkName=u=>{try{const h=new URL(u).hostname.replace(/^www\./,'').split('.')[0];return h.charAt(0).toUpperCase()+h.slice(1)}catch(e){return 'Link'}};
+const vbadge='<span class="vb">∞</span>';
+async function saveProf(patch){Object.assign(S.prof,patch);const c={...S.prof};delete c.verified;ls.s('prof',c);applyProf();
+ if(!S.fb)return false;try{const d={...patch};delete d.verified;await db().collection('lagoslife_users').doc(S.uid).set({...d,uid:S.uid,timestamp:Date.now()},{merge:true});return true}catch(e){toast('Saved on this device only');return false}}
+async function loadProf(){if(!S.fb)return;
+ try{const d=await db().collection('lagoslife_users').doc(S.uid).get();if(d.exists){const x=d.data();Object.assign(S.prof,x);S.prof.verified=!!x.verified;if(!Array.isArray(S.prof.blocked))S.prof.blocked=[];const c={...S.prof};delete c.verified;ls.s('prof',c);applyProf()}}catch(e){}
+ try{const r=await db().collection('lagoslife_users').where('verified','==',true).limit(300).get();S.ver=new Set(r.docs.map(d=>d.id))}catch(e){}
+ if(S.prof.verified)S.ver.add(S.uid);
+ try{const r=await db().collection('lagoslife_gifts').where('to','==',S.uid).limit(200).get();S.gin=r.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>b.timestamp-a.timestamp)}catch(e){}
+ render()}
+
+// ---- Profile page (matches real Pose) ----
+const TABS=[['Feed','circle-play'],['Photos','image'],['Buzz','comments'],['Liked','heart'],['Stories','book'],['Gifts','gift']];
+const pcx=p=>{const own=mine(p),pn=own&&p.x&&p.x.pinned;return `<div class="pcard" data-a="sgo" data-id="${p.id}"><div class="pr1"><i class="fa-solid fa-${p.k==='buzz'?'comment':p.k==='photo'?'image':'play'}"></i>${own?`<span class="pin${pn?' on':''}" data-a="pin" data-id="${p.id}">📌</span>`:''}</div><div class="pr2"><small>${esc(p.cap).slice(0,24)}</small><div><span><i class="fa-solid fa-eye"></i> ${vw(p)}</span><span><i class="fa-solid fa-heart" style="color:#ff1e56"></i> ${p.l}</span><span><i class="fa-solid fa-comments"></i> ${p.c}</span></div></div></div>`};
+const giftsTab=()=>{const a={};S.gin.forEach(g=>{(a[g.gift]=a[g.gift]||{emoji:g.emoji,name:g.name,qty:0}).qty+=g.qty});const l=Object.values(a);
+ return l.length?`<div class="gr">${l.map(g=>`<div class="gri"><span>${g.emoji}</span><b>${esc(g.name)}</b><small>×${g.qty}</small></div>`).join('')}</div>`:msg('fa-gift','No gifts yet','Gifts people send you show up here.')};
+PAGES.profile=()=>{const m=S.posts.filter(mine),t=S.pt,ver=S.prof.verified||isVer(S.uid),av=safeImg(S.p.avatar),lk=S.prof.link,lik=m.reduce((a,p)=>a+p.l,0),vws=m.reduce((a,p)=>a+vw(p),0);
+ let L=[];if(t==='Feed')L=m.filter(p=>p.k==='video');else if(t==='Photos')L=m.filter(p=>p.k==='photo');else if(t==='Buzz')L=m.filter(p=>p.k==='buzz');else if(t==='Liked')L=S.posts.filter(p=>S.liked.has(String(p.id)));
+ L=[...L].sort((a,b)=>((b.x&&b.x.pinned)?1:0)-((a.x&&a.x.pinned)?1:0));
+ const body=t==='Gifts'?giftsTab():t==='Stories'?msg('fa-book','No stories yet','Stories are coming soon.'):(L.length?`<div class="pg">${L.map(pcx).join('')}</div>`:'<p class="m" style="padding:24px 18px">Nothing here yet.</p>');
+ return `<div class="pfx"><div class="pxh"><span class="cbn" data-p="foryou"><i class="fa-solid fa-arrow-left"></i></span><span style="display:flex;gap:12px;align-items:center"><span class="cbn" data-a="settings"><i class="fa-solid fa-gear"></i></span><span class="drf" data-a="drafts"><i class="fa-solid fa-bookmark"></i> Drafts</span></span></div>
+<div class="pxi"><div class="pxa" data-a="avpick"><div class="pxav" style="${av?`background-image:url(${av})`:''}">${av?'':'<i class="fa-solid fa-user"></i>'}</div>${ver?vbadge.replace('vb','vb big'):''}${av?'':'<span class="pxcam"><i class="fa-solid fa-camera"></i></span>'}</div>
+<div class="pxt"><h1>${esc(S.p.name).toUpperCase()}</h1><p class="pxh2">@${esc(handle())}</p><p class="pxb">${esc(S.prof.bio||'Creator on Pose')}</p>${lk?`<span class="pxl" data-a="plink"><i class="fa-regular fa-link"></i> ${esc(lnkName(lk))}</span>`:''}</div></div>
+<div class="pxs"><div><b>${S.fans}</b><small>FOLLOWERS</small></div><div><b>${S.fol.size}</b><small>FOLLOWING</small></div><div><b>${lik}</b><small>LIKES</small></div><div><b>${vws}</b><small>VIEWS</small></div></div>
+<div class="mc2"><button class="coral2" data-a="mychan"><i class="fa-solid fa-clapperboard"></i> My Channel</button><button class="wal" data-a="wallet"><i class="fa-solid fa-wallet"></i></button></div>
+<div class="pxtabs">${TABS.map(x=>`<span class="${x[0]===t?'on':''}" data-a="ptab" data-c="${x[0]}"><i class="fa-solid fa-${x[1]}"></i>${x[0]}</span>`).join('')}</div>${body}</div>`};
+
+// ---- Settings, Edit Profile, Blocked, Monetization ----
+const sxr=(ic,t,a,x)=>`<div class="sxr" data-a="${a}"><i class="fa-${ic==='user-slash'?'regular':'solid'} fa-${ic}"></i><span>${t}</span>${x||'<i class="fa-regular fa-chevron-right ch"></i>'}</div>`;
+const sxHead=(t,back)=>`<div class="sxh"><i class="fa-solid fa-arrow-left" data-p="${back}"></i><h1>${t}</h1></div>`;
+PAGES.settings=()=>{const v=S.prof.verified||isVer(S.uid);
+ return `<div class="sx">${sxHead('Settings','profile')}
+<div class="sxc"><h2>Account Settings</h2>${sxr('user','Edit Profile','sedit')}${sxr('check','Verification','sver',`<span class="sxv">${v?'∞ Verified':'Not verified'}</span>`)}</div>
+<div class="sxc"><h2>Privacy &amp; Security</h2><div class="sxr"><i class="fa-solid fa-eye"></i><span>Profile Visibility</span><select id="svis">${['Public','Followers','Only me'].map(o=>`<option ${o===S.prof.vis?'selected':''}>${o}</option>`).join('')}</select></div>${sxr('user-slash','Blocked Accounts','sblk')}</div>
+<div class="sxc"><h2>Monetization &amp; Ads</h2>${sxr('money-bill','Monetization Dashboard','smon')}</div>
+<div class="sxc"><h2>Notifications</h2><div class="sxr"><i class="fa-solid fa-bell"></i><span>Push Notifications</span><span class="tgl ${S.prof.notif?'on':''}" data-a="snotif"></span></div></div>
+<div class="sxc"><h2>Support</h2>${sxr('circle-info','Community Rules','srules')}${sxr('bookmark','My Drafts ('+S.drafts.length+')','drafts')}</div></div>`};
+PAGES.editp=()=>{const av=safeImg(S.p.avatar);
+ return `<div class="sx">${sxHead('Edit Profile','settings')}<div class="sxc epf"><div class="epa"><div class="pxa" data-a="avpick"><div class="pxav" style="${av?`background-image:url(${av})`:''}">${av?'':'<i class="fa-solid fa-user"></i>'}</div></div><div class="epb"><button class="btn" data-a="avpick"><i class="fa-solid fa-camera"></i> ${av?'Change photo':'Add photo'}</button>${av?'<button class="mini" data-a="avdel">Remove</button>':''}</div></div>
+<label>Display name</label><input type="text" id="en" maxlength="30" value="${esc(S.p.name)}"><label>Username</label><input type="text" id="eh" maxlength="20" value="${esc(handle())}" autocapitalize="off"><label>Bio</label><textarea id="eb" rows="3" maxlength="120" placeholder="Tell people about you">${esc(S.prof.bio||'')}</textarea><label>Link (LinkedIn, website...)</label><input type="text" id="el" maxlength="120" placeholder="https://linkedin.com/in/you" value="${esc(S.prof.link||'')}" autocapitalize="off"><button class="btn" data-a="epsave">Save changes</button></div></div>`};
+PAGES.blk=()=>{const l=S.prof.blocked||[];return `<div class="sx">${sxHead('Blocked Accounts','settings')}<div class="sxc">${l.length?l.map(b=>`<div class="sxr"><i class="fa-regular fa-user-slash"></i><span>${esc(b.name||'User')}</span><button class="mini" data-a="unblk" data-u="${esc(b.uid)}">Unblock</button></div>`).join(''):'<p class="m" style="padding:26px 6px">You have not blocked anyone.</p>'}</div></div>`};
+PAGES.monet=()=>{const g=S.gin,gq=g.reduce((a,x)=>a+x.qty,0),gv=g.reduce((a,x)=>a+x.total,0),mv=S.movies.filter(x=>x.uid===S.uid),un=mv.reduce((a,x)=>a+(x.unlocks||0),0),uv=mv.reduce((a,x)=>a+(x.unlocks||0)*(x.price||0),0);
+ return `<div class="sx">${sxHead('Monetization','settings')}<div class="sxc epf"><p class="m">Your earnings on Pose. Rewards are rank, badges and visibility. Coins cannot be cashed out.</p>${stat('GIFTS RECEIVED',gq,'gift')}${stat('GIFT VALUE (POSE COINS)',gv,'coins')}${stat('PAID MOVIE UNLOCKS',un,'video')}${stat('UNLOCK VALUE (POSE COINS)',uv,'coins')}<p class="m">Ads: not available yet.</p></div></div>`};
+Object.assign(A,{
+ settings(){closeSheet();S.page='settings';render()},sedit(){S.page='editp';render()},sblk(){S.page='blk';render()},smon(){S.page='monet';render()},
+ srules(){sheet('<h3>Community rules</h3><p class="m">No explicit content, hate, harassment or scams. Posts that break these rules are removed and repeat offenders lose access.</p>')},
+ async snotif(){const on=!S.prof.notif;if(on&&window.Notification&&Notification.permission==='default'){try{await Notification.requestPermission()}catch(e){}}await saveProf({notif:on});render();toast(on?'Push notifications on':'Push notifications off')},
+ sver(){const v=S.prof.verified||isVer(S.uid);sheet(v?'<h3>Verified <span class="vb sm">∞</span></h3><p class="m">Your account is verified. The ∞ badge shows on your profile and posts.</p>':'<h3>Get verified</h3><p class="m">Verified accounts get the ∞ badge on their profile and posts. Requests are reviewed by the Pose team.</p><button class="btn" data-a="sverreq">Request verification</button>')},
+ async sverreq(){if(!S.fb)return toast('Sign-in is not ready. Try again.');try{await db().collection('lagoslife_verify_requests').doc(S.uid).set({uid:S.uid,name:S.p.name,handle:handle(),timestamp:Date.now()});closeSheet();toast('Request sent. We will review it.')}catch(e){toast('Could not send request')}},
+ avpick(){pickFile('image/*',5,'',async f=>{const old=S.p.avatar;S.p.avatar=URL.createObjectURL(f);render();toast('Uploading photo...');
+  try{const u=await r2(f).p;S.p.avatar=u;await saveProf({avatar:u});toast('Profile photo updated')}catch(e){S.p.avatar=old;toast('Photo upload failed: '+e.message)}render()})},
+ async avdel(){S.p.avatar=null;await saveProf({avatar:''});render();toast('Photo removed')},
+ async epsave(){const n=$('#en').value.trim(),h=$('#eh').value.trim().replace(/^@/,'').replace(/[^\w.]/g,'').slice(0,20),b=$('#eb').value.trim();let l=$('#el').value.trim();
+  if(!n)return toast('Enter a display name');if(l&&!/^https?:\/\//i.test(l))l='https://'+l;ls.s('nm2',n);ls.s('nm',n);await saveProf({name:n,handle:h,bio:b,link:l});S.page='profile';render();toast('Profile saved')},
+ plink(){const u=S.prof.link;if(u&&/^https?:\/\//i.test(u))window.open(u,'_blank','noopener')},
+ async pin(el){const id=String(el.dataset.id),p=pf(id);if(!p)return;p.x=p.x||{};const on=!p.x.pinned;if(on&&S.posts.filter(x=>mine(x)&&x.x&&x.x.pinned).length>=3)return toast('You can pin up to 3 posts');
+  p.x.pinned=on;if(S.fb)db().collection('lagoslife_posts').doc(id).update({pinned:on}).catch(()=>toast('Could not pin'));toast(on?'Pinned to your profile':'Unpinned');render()},
+ report(el){const p=pf(pid(el));if(!p)return;S.rp=p;sheet(`<h3>${esc(p.u)}'s post</h3><div class="row"><button data-a="rpdo">Report post</button>${mine(p)||!p.uid?'':'<button data-a="blkdo">Block user</button>'}</div>`)},
+ async rpdo(){closeSheet();if(!S.fb||!S.rp)return;try{await db().collection('lagoslife_reports').add({postId:String(S.rp.id),by:S.uid,timestamp:Date.now()});toast('Reported. Thank you.')}catch(e){toast('Could not report')}},
+ blkdo(){const p=S.rp;if(!p||!p.uid||mine(p))return;saveProf({blocked:[...(S.prof.blocked||[]).filter(b=>b.uid!==p.uid),{uid:p.uid,name:p.u}]});closeSheet();render();toast('Blocked '+p.u)},
+ unblk(el){saveProf({blocked:(S.prof.blocked||[]).filter(b=>b.uid!==el.dataset.u)});render();toast('Unblocked')}});
+document.addEventListener('change',e=>{if(e.target.id==='svis'){saveProf({vis:e.target.value});toast('Profile is now '+e.target.value)}});
+const bF=fn=>()=>{const k=S.posts;S.posts=k.filter(p=>!blkHas(p.uid));try{return fn()}finally{S.posts=k}};
+['foryou','buzz','trend'].forEach(k=>PAGES[k]=bF(PAGES[k]));
+
+// ---- Gifts (Send a Gift sheet) ----
+const GL=[['thumbs','👍','Thumbs Up',1,'Popular'],['heart','❤️','Heart',5,'Popular'],['kiss','💋','Kiss',1,'Popular'],['cheers','🍻','Cheers',1,'Popular'],
+ ['bubbles','🫧','Bubbles',1,'New'],['winner','🎉','Winner',5,'New'],['splash','🍅','Splash',5,'New'],['goggles','🕶️','Goggles',10,'New'],
+ ['cat','🛸','Space Cat',10,'Special'],['visitor','👽','Visitor',10,'Special'],['match','🏈','Matchup',10,'Special'],['toast','🍷','Toast',10,'Special'],
+ ['wig','🧑‍🦱','Wig',10,'Special'],['energy','⚡','Energy',18,'Popular'],['pow','🥊','Pow',20,'Popular'],['grad','🎓','Congratulation',50,'Special']];
+const gTotal=()=>GL.reduce((a,g)=>a+(S.gq[g[0]]||0)*g[3],0);
+const gHtml=()=>{const t=gTotal();return `<div class="gbar"></div><div class="gh"><b><i class="fa-solid fa-gift"></i> Send a Gift</b><span class="gc"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span></span><span class="gcl" data-a="gclose"><i class="fa-solid fa-xmark"></i></span></div>
+<div class="gt">${['All Gifts','Popular','New','Special'].map(c=>`<b class="${c===S.gc?'on':''}" data-a="gcat" data-c="${c}">${c}</b>`).join('')}</div>
+<div class="gg">${GL.filter(g=>S.gc==='All Gifts'||g[4]===S.gc).map(g=>`<div class="gi"><div class="gp">${g[1]}</div><b>${g[2]}</b><small><i class="fa-solid fa-coins"></i> ${g[3]} Pose</small><div class="gs"><button data-a="gdec" data-g="${g[0]}">−</button><span>${S.gq[g[0]]||0}</span><button data-a="ginc" data-g="${g[0]}">+</button></div></div>`).join('')}</div>
+<div class="gf"><div><small>Total</small><b><i class="fa-solid fa-coins"></i> ${t} Pose Coins</b></div><button class="${t?'on':''}" data-a="gsend">${t?'Send gift':'+ Add'}</button></div>`};
+const gDraw=()=>{const o=$('.gg'),y=o?o.scrollTop:0;sheet(gHtml());$('#sh>div').classList.add('gx');const g=$('.gg');if(g)g.scrollTop=y};
+Object.assign(A,{
+ gift(el){const p=el&&el.closest&&el.closest('[data-id]')?pf(pid(el)):null;if(!p||!p.uid)return toast('Open a post to send a gift');if(mine(p))return toast("You can't send a gift to yourself");S.gt={uid:p.uid,name:p.u,postId:String(p.id)};S.gq={};S.gc='All Gifts';gDraw()},
+ gclose(){closeSheet()},gcat(el){S.gc=el.dataset.c;gDraw()},
+ ginc(el){const k=el.dataset.g;S.gq[k]=Math.min(99,(S.gq[k]||0)+1);gDraw()},gdec(el){const k=el.dataset.g;S.gq[k]=Math.max(0,(S.gq[k]||0)-1);gDraw()},
+ async gsend(){const t=gTotal();if(!t)return toast('Pick a gift first');if(!S.gt)return;if(S.coins<t){closeSheet();toast('Not enough coins');return A.shop()}
+  if(!(await spend(t,'Gift to '+S.gt.name)))return;const it=GL.filter(g=>S.gq[g[0]]>0);let bad=0;
+  if(S.fb)for(const g of it){try{await db().collection('lagoslife_gifts').add({to:S.gt.uid,toName:S.gt.name,from:S.uid,fromName:S.p.name,gift:g[0],emoji:g[1],name:g[2],qty:S.gq[g[0]],price:g[3],total:S.gq[g[0]]*g[3],postId:S.gt.postId,timestamp:Date.now()})}catch(e){bad++}}
+  closeSheet();S.gq={};toast(bad?'Gift sent, but delivery had a problem':'Gift sent '+it.map(g=>g[1]).join(' '));ev('gift_sent',{value:t})}});
+PAGES.alert=()=>{const a=S.posts.filter(mine).filter(p=>p.l||p.c),g=S.gin.slice(0,20);
+ return `<div class="ah"><i class="fa-solid fa-arrow-left rb" data-p="foryou"></i><h2>Activity</h2><i class="rb"></i></div>`+
+ (g.length||a.length?g.map(x=>`<div class="ai"><div class="ap" style="font-size:26px">${x.emoji}</div><div><b>${esc(x.fromName)} sent you ${x.qty}× ${esc(x.name)}</b><p class="m">${x.total} Pose · ${new Date(x.timestamp).toLocaleDateString()}</p></div></div>`).join('')+a.map(p=>`<div class="ai"><div class="ap"><i class="fa-solid fa-heart" style="color:var(--acc)"></i></div><div><b>${esc((p.cap||'Your post').slice(0,40))}</b><p class="m">${p.l} likes · ${p.c} comments</p></div></div>`).join(''):msg('fa-bell','No alerts yet','Likes, comments and gifts on your posts show up here.'))};
+
+// ---- ∞ verified badge + profile pictures on feed, and view counting ----
+function decorate(){$$('.post,.bz').forEach(el=>{if(el.dataset.dc)return;const p=pf(String(el.dataset.id));if(!p)return;el.dataset.dc=1;
+  const img=safeImg(p.uid===S.uid?S.p.avatar:(p.x&&p.x.av)),ver=isVer(p.uid)||(p.uid===S.uid&&S.prof.verified),wa=el.querySelector('.wa,.ba');
+  if(wa){if(img){wa.style.backgroundImage='url('+img+')';wa.style.backgroundSize='cover';wa.style.backgroundPosition='center';wa.innerHTML=''}if(ver)wa.insertAdjacentHTML('beforeend','<span class="vb sm">∞</span>')}
+  const nm=el.querySelector('.who b,.bh b');if(nm&&ver)nm.insertAdjacentHTML('beforeend',' <span class="vb inl">∞</span>')})}
+let vio;function trackViews(){vio&&vio.disconnect();vio=new IntersectionObserver(es=>es.forEach(e=>{if(e.intersectionRatio<.6)return;const id=String(e.target.dataset.id),p=pf(id);if(!p||mine(p)||S.seen.has(id))return;S.seen.add(id);p.x=p.x||{};p.x.views=(p.x.views||0)+1;if(S.fb)db().collection('lagoslife_posts').doc(id).update({views:FV().increment(1)}).catch(()=>{})}),{threshold:[.6]});$$('.post').forEach(x=>vio.observe(x))}
+const _wtPro=watch;watch=function(){_wtPro();decorate();trackViews()};
+
+(function(){const st=document.createElement('style');st.textContent=`
+.vb{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#7c3aed;color:#fff;font:800 17px Roboto,sans-serif;line-height:1;border:3px solid #0a0a0c;flex:none}
+.vb.big{position:absolute;right:-8px;bottom:-8px;width:44px;height:44px;font-size:26px;border-width:4px;background:#5b21b6}
+.vb.sm{position:absolute;right:-4px;bottom:-4px;width:22px;height:22px;font-size:13px;border-width:2px}
+.vb.inl{width:18px;height:18px;font-size:11px;border-width:0;vertical-align:middle;margin-left:4px}
+.wa,.ba{position:relative}
+.pfx{min-height:100%;background:#0a0a0c;font-family:Roboto,system-ui,sans-serif}
+.pfx .pxh{display:flex;justify-content:space-between;align-items:center;padding:calc(18px + env(safe-area-inset-top)) 16px 18px;background:linear-gradient(135deg,#dcc233,#a58a1c)}
+.pfx .cbn{width:46px;height:46px;border-radius:50%;background:#ffffff38;color:#fff;display:grid;place-items:center;font-size:20px}
+.pfx .drf{display:flex;gap:8px;align-items:center;border:1.5px solid #ffffff66;background:#ffffff26;color:#fff;border-radius:99px;padding:11px 20px;font-weight:700;font-size:16px}
+.pfx .pxi{display:flex;gap:18px;padding:24px 18px 18px;align-items:flex-start}
+.pxa{position:relative;flex:none;width:clamp(96px,28vw,112px);height:clamp(96px,28vw,112px);padding:3px;border-radius:28px;background:linear-gradient(135deg,#ec4899,#8b5cf6);box-shadow:0 0 26px #d946ef66}
+.pxav{width:100%;height:100%;border-radius:25px;background:#1d1233 center/cover no-repeat;display:grid;place-items:center;color:#a78bfa;font-size:40px}
+.pxcam{position:absolute;left:-6px;bottom:-6px;width:32px;height:32px;border-radius:50%;background:#6d28d9;border:3px solid #0a0a0c;display:grid;place-items:center;color:#fff;font-size:15px}
+.pfx .pxt{min-width:0;flex:1}
+.pfx .pxt h1{font:800 clamp(20px,6.6vw,28px) Roboto,sans-serif;letter-spacing:-.02em;line-height:1.05;word-break:break-word}
+.pxh2{color:#a855f7;font-weight:700;font-size:clamp(16px,4.6vw,19px);margin-top:8px}
+.pxb{color:#cfcfd6;font-size:clamp(14px,4.2vw,17px);margin-top:8px;line-height:1.35}
+.pxl{display:inline-flex;gap:8px;align-items:center;margin-top:12px;background:#2e1a5c;border:1px solid #5b3fb0;color:#c4a4ff;border-radius:99px;padding:9px 18px;font-weight:600;font-size:15px}
+.pfx .pxs{display:grid;grid-template-columns:repeat(4,1fr);margin:6px 16px 0;background:#111114;border:1px solid #26262c;border-radius:22px;padding:18px 0}
+.pxs div{text-align:center;border-right:1px solid #26262c;padding:0 2px}.pxs div:last-child{border:0}
+.pxs b{display:block;font:700 clamp(22px,7vw,30px) Roboto,sans-serif}.pxs small{color:#9a9aa3;font-weight:700;letter-spacing:.1em;font-size:clamp(10px,3vw,13px)}
+.pfx .mc2{padding:22px 16px 10px}
+.pfx .coral2{background:linear-gradient(135deg,#ff7070,#ff8c8c);box-shadow:0 8px 24px #ff707055;display:flex;gap:10px;align-items:center;justify-content:center;font:700 clamp(17px,5vw,20px) Roboto,sans-serif;border-radius:20px}
+.pfx .wal{width:66px;border-radius:20px;background:#111114;border:1px solid #26262c}
+.pxtabs{display:flex;overflow-x:auto;border-bottom:1px solid #1c1c22;scrollbar-width:none;margin-top:12px}.pxtabs::-webkit-scrollbar{display:none}
+.pxtabs span{flex:none;display:grid;justify-items:center;gap:8px;padding:14px 16px 12px;color:#9a9aa3;font-size:clamp(15px,4.4vw,18px);border-bottom:3px solid transparent;margin-bottom:-1px}
+.pxtabs span i{font-size:24px}.pxtabs span.on{color:#fff;border-color:#a855f7}
+.pfx .pg{grid-template-columns:repeat(3,1fr);gap:3px;padding:4px}
+.pfx .pcard{aspect-ratio:9/16;padding:10px;background:#000;border-radius:6px;justify-content:space-between}
+.pr1{display:flex;justify-content:space-between;align-items:flex-start;font-size:clamp(26px,8vw,36px);color:#fff}
+.pin{font-size:22px;filter:grayscale(1);opacity:.35;padding:2px}.pin.on{filter:none;opacity:1}
+.pr2 small{display:block;font-size:clamp(11px,3.3vw,13px);color:#e6e6ea;margin-bottom:8px}
+.pr2 div{display:flex;gap:10px;align-items:center;font-size:clamp(11px,3.3vw,14px);font-weight:700}
+.pr2 span{display:flex;gap:4px;align-items:center}
+.gr{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px}
+.gri{background:#111114;border:1px solid #26262c;border-radius:18px;padding:16px 8px;display:grid;justify-items:center;gap:6px}.gri span{font-size:38px}.gri small{color:#fbbf24;font-weight:700}
+.sx{min-height:100%;background:#101010;font-family:Roboto,system-ui,sans-serif;padding-bottom:30px}
+.sxh{display:flex;align-items:center;gap:22px;padding:calc(26px + env(safe-area-inset-top)) 20px 24px;border-bottom:1px solid #222}
+.sxh>i{color:#a21caf;font-size:26px;flex:none}.sxh h1{font:700 clamp(26px,8vw,34px) Roboto,sans-serif}
+.sxc{margin:20px 18px 0;background:#1b1b1b;border-radius:26px;padding:8px 20px 12px}
+.sxc h2{font:600 clamp(20px,6vw,25px) Roboto,sans-serif;padding:24px 0 20px;border-bottom:1px solid #2e2e2e;margin-bottom:6px}
+.sxr{display:flex;align-items:center;gap:16px;padding:20px 6px;font-size:clamp(17px,5vw,21px)}
+.sxr>i:first-child{color:#9b30e8;font-size:28px;flex:none}.sxr>span:nth-child(2){flex:1;min-width:0}
+.sxr .ch{color:#8a8a8a;font-size:22px}.sxv{color:#a78bfa;font-weight:700;font-size:16px}
+.sxr select{width:auto;max-width:44%;appearance:none;-webkit-appearance:none;background:#2b2b2b url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ddd' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/16px;border:0;border-radius:14px;padding:13px 38px 13px 16px;color:#ddd;font:500 17px Roboto,sans-serif}
+.tgl{width:66px;height:40px;border-radius:99px;background:#444;position:relative;flex:none;transition:.2s}.tgl:after{content:"";position:absolute;top:5px;left:5px;width:30px;height:30px;border-radius:50%;background:#fff;transition:.2s}
+.tgl.on{background:#a21caf}.tgl.on:after{left:31px}
+.epf{display:grid;gap:12px;padding-bottom:22px}.epf label{color:#bbb;font-weight:700;margin-top:6px}.epf input,.epf textarea{background:#141414;border:1px solid #2a2a2a}
+.epa{display:flex;gap:18px;align-items:center;padding:16px 0 6px}.epb{display:grid;gap:10px;justify-items:start}
+.sxc .stc{background:#141414}
+#sh>div.gx{padding:0;gap:0;max-height:92%;display:flex;flex-direction:column;overflow:hidden;background:#0e1024;border-radius:28px 28px 0 0;font-family:Roboto,system-ui,sans-serif}
+.gx .gbar{width:70px;height:6px;border-radius:6px;background:#2b2e4a;margin:12px auto 4px;flex:none}
+.gx .gh{display:flex;align-items:center;gap:12px;padding:14px 18px;flex:none}.gx .gh b{flex:1;color:#ffa31a;font-size:clamp(20px,6vw,25px);display:flex;gap:10px;align-items:center}
+.gx .gc{display:flex;gap:8px;align-items:center;background:#2b2108;border:1px solid #6b5210;color:#fbbf24;border-radius:99px;padding:10px 18px;font-weight:700;font-size:18px}
+.gx .gcl{width:46px;height:46px;border-radius:50%;background:#25283f;display:grid;place-items:center;color:#cfd2ea;font-size:18px}
+.gx .gt{display:flex;gap:10px;overflow-x:auto;padding:4px 18px 14px;border-bottom:1px solid #23263d;flex:none;scrollbar-width:none}.gx .gt::-webkit-scrollbar{display:none}
+.gx .gt b{flex:none;background:#1f2237;color:#a9adc9;border-radius:99px;padding:11px 20px;font-size:17px}.gx .gt b.on{background:#ff9f1c;color:#111;font-weight:700}
+.gx .gg{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:16px 14px;align-content:start}
+.gx .gi{background:#15172c;border:1px solid #2a2d4a;border-radius:20px;padding:12px 4px 12px;display:grid;justify-items:center;gap:6px;min-width:0}
+.gx .gp{width:clamp(48px,15vw,62px);height:clamp(48px,15vw,62px);border-radius:16px;background:#0f1120;display:grid;place-items:center;font-size:clamp(28px,9vw,38px)}
+.gx .gi b{color:#fff;font-size:clamp(11px,3.4vw,14px);font-weight:500;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gx .gi small{color:#ffa31a;font-weight:700;font-size:clamp(11px,3.4vw,14px);display:flex;gap:4px;align-items:center}
+.gx .gs{display:flex;align-items:center;gap:clamp(4px,1.6vw,8px);color:#fff;font-weight:700}
+.gx .gs button{width:clamp(26px,8vw,34px);height:clamp(26px,8vw,34px);border-radius:50%;border:0;background:#2a2d45;color:#e5e7f5;font-size:18px;line-height:1}
+.gx .gf{display:flex;align-items:center;gap:14px;padding:14px 18px calc(14px + env(safe-area-inset-bottom));border-top:1px solid #23263d;background:#0e1024;flex:none}
+.gx .gf>div{flex:0 0 auto}.gx .gf small{display:block;color:#8e92b3;font-size:16px}.gx .gf b{color:#ffa31a;font-size:clamp(18px,5.6vw,24px);display:flex;gap:8px;align-items:center}
+.gx .gf button{flex:1;border:0;border-radius:20px;padding:clamp(14px,2.4vh,20px);background:#1d2038;color:#6c7094;font:700 clamp(16px,4.8vw,20px) Roboto,sans-serif}.gx .gf button.on{background:#ff9f1c;color:#111}
+`;document.head.appendChild(st)})();
 </script></body></html>
