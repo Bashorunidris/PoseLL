@@ -281,10 +281,10 @@ const musicPg=()=>{const c=S.cur||0,pl=i=>S.playing===i?'pause':'play';return `<
 const profilePg=()=>{const m=S.posts.filter(mine);return `<div class="pf"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="foryou"></i><span class="coins" style="padding:6px 14px;font-size:16px"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span></span></div>
 <div class="pid"><div class="pa" style="${S.p.avatar?`background-image:url(${esc(S.p.avatar)})`:''}"></div><div><h1>${esc(S.p.name).toUpperCase()}</h1><p style="color:var(--p2);font-size:17px">@${esc(S.p.name)}</p><p class="m">Creator on Pose</p></div></div>
 <div class="stats"><div><b>${m.length}</b><small>POSTS</small></div><div><b>${S.fol.size}</b><small>FOLLOWING</small></div><div><b>${m.reduce((a,p)=>a+p.l,0)}</b><small>LIKES</small></div></div>
-<div class="mc2"><button class="coral2"><i class="fa-solid fa-clapperboard"></i> My Channel</button><button class="wal" data-a="shop"><i class="fa-solid fa-wallet"></i></button></div>
+<div class="mc2"><button class="coral2"><i class="fa-solid fa-clapperboard"></i> My Channel</button><button class="wal" data-a="wallet"><i class="fa-solid fa-wallet"></i></button></div>
 <div class="pg">${m.length?m.map(p=>`<div class="pcard"><i class="fa-solid fa-${p.k==='buzz'?'comment':'play'}" style="font-size:26px"></i><small>${esc(p.cap).slice(0,24)}</small><div><i class="fa-solid fa-heart" style="color:var(--acc)"></i> ${p.l} <i class="fa-solid fa-comments"></i> ${p.c}</div></div>`).join(''):'<p class="m" style="padding:20px">No posts yet. Tap + to create one.</p>'}</div></div>`};
 const PAGES={profile:profilePg,foryou:fy,buzz,pose,trend,alert:alertPg,live:livePg,music:()=>`<div class="mus">${musicPg()}</div>`};
-function render(){const m=$('main'),y=m.scrollTop;$('#app').classList.toggle('full',['profile','music','shop','chan'].includes(S.page));m.className=S.page==='foryou'?'snap':'';m.innerHTML=PAGES[S.page]();m.scrollTop=y;
+function render(){const m=$('main'),y=m.scrollTop;$('#app').classList.toggle('full',['profile','music','shop','chan','wallet'].includes(S.page));m.className=S.page==='foryou'?'snap':'';m.innerHTML=PAGES[S.page]();m.scrollTop=y;
  $$('.tabs b').forEach(b=>b.classList.toggle('on',b.dataset.p===S.page));
  $$('footer [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===(['alert','live','music'].includes(S.page)?S.page:'home')));
  $('#me').style.backgroundImage=S.p.avatar?`url(${S.p.avatar})`:'';watch();svgI()}
@@ -387,7 +387,7 @@ PAGES.profile=()=>{const m=S.posts.filter(mine),L=S.pt==='Liked'?S.posts.filter(
  return `<div class="pf"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="foryou"></i><span style="display:flex;gap:12px;align-items:center"><i class="fa-solid fa-gear" data-a="settings"></i><b class="coins" style="padding:6px 14px;font-size:16px" data-a="drafts"><i class="fa-solid fa-bookmark"></i> Drafts</b></span></div>
 <div class="pid"><div class="pa" style="${S.p.avatar?`background-image:url(${esc(S.p.avatar)})`:''}"></div><div><h1>${esc(S.p.name).toUpperCase()}</h1><p style="color:var(--p2);font-size:17px">@${esc(S.p.name)}</p><p class="m">Creator on Pose</p></div></div>
 <div class="stats"><div><b>${m.length}</b><small>POSTS</small></div><div><b>${S.fol.size}</b><small>FOLLOWING</small></div><div><b>${m.reduce((a,p)=>a+p.l,0)}</b><small>LIKES</small></div></div>
-<div class="mc2"><button class="coral2" data-a="mychan"><i class="fa-solid fa-clapperboard"></i> My Channel</button><button class="wal" data-a="shop"><i class="fa-solid fa-wallet"></i></button></div>
+<div class="mc2"><button class="coral2" data-a="mychan"><i class="fa-solid fa-clapperboard"></i> My Channel</button><button class="wal" data-a="wallet"><i class="fa-solid fa-wallet"></i></button></div>
 <div class="chips">${['Feed','Photos','Buzz','Liked'].map(c=>`<b class="${c===S.pt?'on':''}" data-a="ptab" data-c="${c}">${c}</b>`).join('')}</div>
 <div class="pg">${L.length?L.map(p=>`<div class="pcard" data-a="sgo" data-id="${p.id}"><i class="fa-solid fa-${p.k==='buzz'?'comment':p.k==='photo'?'image':'play'}" style="font-size:26px"></i><small>${esc(p.cap).slice(0,24)}</small><div><i class="fa-solid fa-heart" style="color:var(--acc)"></i> ${p.l} <i class="fa-solid fa-comments"></i> ${p.c}</div></div>`).join(''):'<p class="m" style="padding:20px">Nothing here yet.</p>'}</div></div>`};
 
@@ -828,4 +828,47 @@ function cxApply(){
   const h=m==='audio'?`<audio class="bzm" controls src="${esc(p.src)}" style="width:100%"></audio>`:m==='video'?`<video class="bzm" controls playsinline preload="metadata" src="${esc(p.src)}" style="width:100%;border-radius:12px;max-height:50vh"></video>`:`<img class="bzm" loading="lazy" src="${esc(p.src)}" style="width:100%;border-radius:12px">`;
   const t=b.querySelector('p[style]');t?t.insertAdjacentHTML('afterend',h):b.insertAdjacentHTML('beforeend',h)})}
 const _wt=watch;watch=function(){_wt();cxApply()};
+
+// ===== Wallet page (Pose "My Wallet" look) + thumbnails in the profile grid =====
+Object.assign(IC,{clock:'M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-1 5v6l5 3 1-1.700-4-2.300V7h-2z'});
+(function(){const s=document.createElement('style');s.textContent=`
+.wx{min-height:100%;background:#07050d}
+.wx .gold b{display:flex;gap:10px;align-items:center;font-size:clamp(18px,5.4vw,22px)}
+.wcard{margin:16px;border-radius:28px;padding:clamp(16px,5vw,24px);background:radial-gradient(circle at 80% 0,#6d3fd6aa,transparent 55%),linear-gradient(160deg,#3b1a78,#1a0b3d);border:1px solid #4c2a9a;display:grid;gap:clamp(10px,2.4vh,16px)}
+.wid{width:fit-content;background:#ffffff1f;border-radius:99px;padding:10px 16px;font-size:clamp(13px,3.8vw,16px);color:#d9ccff}.wid b{color:#fff;letter-spacing:.04em}
+.wbl{display:flex;gap:12px;align-items:center;letter-spacing:.14em;font-weight:700;color:#d9ccff;font-size:clamp(12px,3.6vw,15px)}
+.wbl .eye{background:#ffffff26;border-radius:10px;padding:8px 10px;display:inline-grid;place-items:center}
+.wamt{font:800 clamp(40px,13vw,58px) Syne,sans-serif;line-height:1}.wamt small{font:600 clamp(14px,4vw,18px) 'DM Sans';color:#cdbfff}
+.wpill{display:flex;gap:10px;align-items:center;background:#00000040;border:1px solid #ffffff22;border-radius:99px;padding:8px 16px 8px 8px;width:fit-content}
+.wpill .pc2{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#f5c518,#b8860b);display:grid;place-items:center;font-weight:800;color:#3a2a00}
+.wbtn{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}.wbtn button{border:0;border-radius:18px;padding:clamp(12px,2.2vh,18px);font:700 clamp(15px,4.4vw,18px) 'DM Sans';display:flex;gap:8px;align-items:center;justify-content:center}
+.wbtn .tu{background:#fff;color:#2d1b69}.wbtn .hs{background:#ffffff2b;color:#fff}
+.wc2{margin:0 16px 14px;background:#0f0b18;border:1px solid #1f1536;border-left:4px solid #6D28D9;border-radius:22px;padding:clamp(14px,4vw,20px);display:grid;gap:6px}
+.wc2 small{letter-spacing:.12em;font-weight:700;color:#a99bd1;display:flex;gap:8px;align-items:center}.wc2 b{font-size:clamp(20px,6vw,28px)}.wc2 p{color:#8a7fa8;font-size:clamp(12px,3.5vw,14px);line-height:1.5}
+.wtl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 16px 30px}.wtl button{background:#0f0b18;border:1px solid #2a1a4d;border-radius:20px;padding:clamp(14px,3vh,20px);color:#fff;display:grid;gap:8px;justify-items:center;font:600 16px 'DM Sans'}
+.wtl button i{width:clamp(40px,12vw,52px);height:clamp(40px,12vw,52px);border-radius:50%;background:#6D28D9;display:grid;place-items:center;font-size:22px}
+.pcard{position:relative;overflow:hidden}.pcard>*{position:relative;z-index:1}
+.pcard:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 50%,#000c);z-index:0}
+.pcard>.pth{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0;transition:opacity .35s}.pcard>.pth.ok{opacity:1}
+.pcard.sk{background:linear-gradient(90deg,#111 25%,#1e1e1e 50%,#111 75%);background-size:200% 100%;animation:shim 1.2s linear infinite}
+@keyframes shim{to{background-position:-200% 0}}@media(prefers-reduced-motion:reduce){.pcard.sk{animation:none}}`;
+ document.head.appendChild(s)})();
+S.hide=false;
+PAGES.wallet=()=>{const c=S.coins,id=String((S.p&&S.p.id)||S.uid||'guest'),mv=S.posts.filter(mine),lk=mv.reduce((a,p)=>a+p.l,0),cm=mv.reduce((a,p)=>a+p.c,0);
+ return `<div class="wx"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="profile"></i><b><i class="fa-solid fa-wallet"></i> My Wallet</b><span style="width:22px"></span></div>
+<div class="wcard"><div class="wid">ID &nbsp;<b>${esc(id.slice(0,16))}</b></div>
+<div class="wbl">TOTAL BALANCE <span class="eye" data-a="weye"><i class="fa-solid fa-eye"></i></span></div>
+<div class="wamt">${S.hide?'••••':c}<small> coins</small></div>
+<div class="wpill"><span class="pc2">P</span><b>${S.hide?'••':c} Pose Coin</b></div>
+<div class="wbtn"><button class="tu" data-a="shop"><i class="fa-solid fa-plus"></i> Top Up</button><button class="hs" data-a="whist"><i class="fa-solid fa-clock"></i> History</button></div></div>
+<div class="wc2"><small><i class="fa-solid fa-star"></i> YOUR ACTIVITY</small><b>${mv.length} posts</b><p>${lk} likes · ${cm} comments on your posts</p></div>
+<div class="wc2"><small><i class="fa-solid fa-coins"></i> HOW COINS WORK</small><p>Coins unlock paid videos and movies, open Wave chat rooms and send gifts. Coins never expire and cannot be cashed out.</p></div>
+<div class="wtl"><button data-a="shop"><i class="fa-solid fa-coins"></i>Buy coins</button><button data-a="whist"><i class="fa-solid fa-clock"></i>History</button></div></div>`};
+Object.assign(A,{wallet(){S.page='wallet';render()},weye(){S.hide=!S.hide;render()},
+ whist(){sheet(`<h3>History</h3>${S.hist.slice(0,30).map(h=>`<p>${esc(h[0])} <b>${h[1]||''}</b> <small class="m">${new Date(h[2]).toLocaleDateString()}</small></p>`).join('')||'<p class="m">No activity yet.</p>'}`)}});
+function pthumbs(){$$('.pcard[data-id]').forEach(c=>{if(c.dataset.t)return;c.dataset.t=1;const p=S.posts.find(x=>String(x.id)===c.dataset.id);if(!p||!p.src||p.k==='buzz')return;c.classList.add('sk');
+ const m=document.createElement(p.k==='photo'?'img':'video');m.className='pth';const done=()=>{m.classList.add('ok');c.classList.remove('sk')};
+ if(p.k==='photo'){m.loading='lazy';m.onload=done;m.src=p.src}else{m.muted=true;m.playsInline=true;m.preload='metadata';m.onloadeddata=done;m.src=p.src+'#t=0.1'}
+ m.onerror=()=>c.classList.remove('sk');c.prepend(m)})}
+const _wt2=watch;watch=function(){_wt2();pthumbs()};
 </script></body></html>
