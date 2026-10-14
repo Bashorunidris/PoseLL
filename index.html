@@ -476,8 +476,8 @@ PAGES.shop=()=>{const L=PK.map(pkc),po=L.find(x=>x.pop);
  return `<div class="sp"><div class="spn"><i class="fa-solid fa-arrow-left rb" data-p="foryou"></i><span class="spb"><b class="mono2 cn">${S.coins}</b> <i class="fa-solid fa-coins"></i></span></div>
 <div class="sph"><span class="spbadge"><span class="ldot"></span> OFFICIAL COIN STORE</span><h1>POSE<br><em>COINS</em></h1><p class="m">Watch what you love. Support who you love.</p>
 <div class="spr"><div class="spr1"><span>POPULAR PACK, RIGHT NOW</span><span class="tg">NIGERIA</span></div><div class="spp mono2">${NG(po.price)}</div><div class="m">${po.total} coins total <b style="color:var(--gold)">(${po.b} + ${po.bonus} bonus)</b></div></div></div>
-<div class="spm"><p class="spl">POSE SHOP</p><h2>BUY <em>POSE COINS</em></h2><p class="m">Prices in Naira: \u20A625 per coin plus a 4% service fee. Coins never expire and cannot be cashed out.</p>
-<div class="spk">${L.map(x=>`<div class="pkc ${x.pop?'pop':''}" data-a="buy" data-id="${x.id}">${x.pop?'<span class="ptag">MOST POPULAR</span>':''}<small>${x.n.toUpperCase()}</small><div class="pc mono2">${x.total}<span> coins</span></div><div class="pb2">${x.bonus?'+'+x.bonus+' bonus coins':''}</div><hr><div class="pr2 mono2">${NG(x.price)}</div><div class="pfn">incl. ${NG(x.fee)} service fee</div><button class="pbtn">Buy Now</button></div>`).join('')}</div>
+<div class="spm"><p class="spl">POSE SHOP</p><h2>BUY <em>POSE COINS</em></h2><p class="m">Prices in Naira. Coins never expire and cannot be cashed out.</p>
+<div class="spk">${L.map(x=>`<div class="pkc ${x.pop?'pop':''}" data-a="buy" data-id="${x.id}">${x.pop?'<span class="ptag">MOST POPULAR</span>':''}<small>${x.n.toUpperCase()}</small><div class="pc mono2">${x.total}<span> coins</span></div><div class="pb2">${x.bonus?'+'+x.bonus+' bonus coins':''}</div><hr><div class="pr2 mono2">${NG(x.price)}</div><div class="pfn">${x.total} coins in total</div><button class="pbtn">Buy Now</button></div>`).join('')}</div>
 <div class="wg"><div><i class="fa-solid fa-play"></i><h3>Unlock Premium Videos</h3><p>Exclusive videos from your favourite creators.</p></div><div><i class="fa-solid fa-coins"></i><h3>Coins Never Expire</h3><p>Buy today, spend whenever.</p></div><div><i class="fa-solid fa-heart"></i><h3>Support Creators</h3><p>Send gifts and tips to the people you love.</p></div><div><i class="fa-solid fa-star"></i><h3>Fair Pricing</h3><p>Bigger packs come with bonus coins.</p></div></div>
 <div class="hw"><div><b>01</b><h3>Choose a Pack</h3><p>See the total coins before you pay.</p></div><div><b>02</b><h3>Pay in Lagos Life</h3><p>Lagos Life's secure checkout handles the payment.</p></div><div><b>03</b><h3>Enjoy</h3><p>Coins land in your wallet as soon as payment confirms.</p></div></div>
 <h3>History</h3>${S.hist.slice(0,10).map(h=>`<p>${esc(h[0])} <b>${h[1]||''}</b> <small class="m">${new Date(h[2]).toLocaleDateString()}</small></p>`).join('')||'<p class="m">No activity yet.</p>'}</div></div>`};
@@ -487,7 +487,7 @@ A.shop=()=>{S.page='shop';render()};
 const MB=1048576,CATS=['Movies','Series','Comedy','Music Video','Dance','Afrobeats','Gospel','Nollywood','Documentary','Tutorial'];
 // Uploads a file to Cloudflare R2 through /api/r2-presign. Returns {p:Promise<publicUrl>, abort()}.
 // Your live Pose site's existing Cloudflare presign endpoint (change this if your live site address is different)
-const R2_PRESIGN='https://www.poseweb.site/api/r2-presign';
+const R2_PRESIGN='/api/r2-presign';
 function r2(file,onp){let x;const p=(async()=>{
  const body={filename:file.name,contentType:file.type||'application/octet-stream',folder:'lagoslife'};
  const r=await fetch(R2_PRESIGN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -606,7 +606,7 @@ Object.assign(A,{ctab(el){S.ct=el.dataset.c;render()},banner(){pickFile('image/*
  const b=$('#boot');setTimeout(()=>{b.style.opacity=0;setTimeout(()=>b.remove(),400)},500)})();
 
 
-const LL={a:'83261b8df47f69831957975d36c76abf',b:'posedemo',k:'a8b6d8d56a020f2e142a36483a6d2da0',s:'caf640b624b00cd06561f174f839a947ddcfabda581297f15b2512062ec32df1',pub:'https://pub-4dcd9518cdd541499990b55d7337a662.r2.dev',vs:'vtr_test_f8388fb3089d4c838ed1_r9N8nTT4x4M2A_sS6O8SMvLGozJngf6CP7uZHGSNqlc'};
+const LL={a:'83261b8df47f69831957975d36c76abf',b:'posedemo',k:'a8b6d8d56a020f2e142a36483a6d2da0',s:'caf640b624b00cd06561f174f839a947ddcfabda581297f15b2512062ec32df1',pub:'https://pub-4dcd9518cdd541499990b55d7337a662.r2.dev',vs:'PASTE_VATAR_TEST_SECRET'};
 const _te=new TextEncoder(),_hx=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
 const _hm=async(k,d)=>crypto.subtle.sign('HMAC',await crypto.subtle.importKey('raw',k,{name:'HMAC',hash:'SHA-256'},false,['sign']),_te.encode(d));
 async function llSign(key){
@@ -695,4 +695,52 @@ A.post=function(el){
  let n=5;o.classList.add('on');ring.style.display='none';num.style.display='block';txt.textContent='Get ready...';
  const show=x=>{num.textContent=x;num.style.animation='none';void num.offsetWidth;num.style.animation=''};show(5);
  clearInterval(S.cd);S.cd=setInterval(()=>{n--;if(n>0)show(n);else{clearInterval(S.cd);_run()}},1000)};
+
+// ===== Responsive: scales every screen to the player's window =====
+(function(){const s=document.createElement('style');s.textContent=`
+header{padding:8px clamp(8px,3vw,12px);gap:clamp(6px,2vw,10px)}
+.av{width:clamp(30px,9vw,38px);height:clamp(30px,9vw,38px)}
+.tabs{gap:clamp(10px,3.6vw,18px);font-size:clamp(13px,4.3vw,17px);min-width:0}
+.tabs b{white-space:nowrap}
+.srch{width:clamp(34px,10vw,42px);height:clamp(34px,10vw,42px);font-size:clamp(14px,4.4vw,17px)}
+footer{padding:clamp(4px,1vh,8px) 2px calc(clamp(4px,1vh,8px) + env(safe-area-inset-bottom))}
+footer button{font-size:clamp(10px,3vw,12px);padding:clamp(3px,.8vh,6px) clamp(6px,2.4vw,10px)}
+footer i{font-size:clamp(17px,5vw,20px)}
+footer .plus{padding:clamp(6px,1.2vh,8px) clamp(16px,6vw,22px)}
+.rail{right:clamp(6px,2vw,10px);bottom:clamp(64px,15%,150px);gap:2px}
+.rail button{width:clamp(38px,11.5vw,54px);height:clamp(38px,11.5vw,54px);font-size:clamp(15px,4.8vw,20px)}
+.rail small{font-size:clamp(11px,3.4vw,15px);margin-bottom:clamp(2px,1.2vh,10px)}
+.who{left:clamp(8px,2.5vw,12px);bottom:clamp(58px,13%,140px);gap:clamp(8px,2.5vw,12px)}
+.wa{width:clamp(34px,10vw,58px);height:clamp(34px,10vw,58px);font-size:clamp(14px,4.4vw,22px)}
+.who b{font-size:clamp(14px,4.2vw,19px)}
+.fol{padding:3px clamp(10px,3vw,14px);font-size:clamp(11px,3.4vw,14px)}
+.cap{bottom:clamp(40px,8%,100px);left:clamp(8px,2.5vw,12px);right:clamp(56px,17vw,80px);font-size:clamp(12px,3.6vw,15px)}
+.disc2{width:min(290px,62vw);height:clamp(64px,15vh,150px);left:clamp(8px,2.5vw,14px);bottom:clamp(20px,4vh,36px)}
+@media(max-height:560px){.disc2{display:none}.rail small{font-size:10px;margin-bottom:0}.rail button{width:36px;height:36px}}
+.ph{font-size:clamp(16px,5.4vw,22px);letter-spacing:.14em;padding:6px clamp(10px,3.5vw,16px)}
+.hr{height:clamp(200px,38vh,320px)}
+.hb{left:clamp(8px,2.5vw,14px);right:8px;gap:6px;flex-wrap:wrap}
+.wb,.gb{padding:clamp(8px,1.6vh,12px) clamp(8px,3vw,14px);font-size:clamp(12px,3.6vw,14px)}
+.mg{gap:clamp(8px,2.6vw,12px);padding:6px clamp(8px,3vw,14px) 20px}
+.tc{width:clamp(100px,30vw,120px);height:clamp(150px,44vw,190px)}
+.pa{width:clamp(70px,22vw,96px);height:clamp(70px,22vw,96px)}
+.pid h1{font-size:clamp(18px,6vw,24px)}
+.stats b{font-size:clamp(18px,5.6vw,24px)}
+.coral2{font-size:clamp(14px,4.4vw,17px);padding:clamp(12px,2vh,16px)}
+.av2{--s:clamp(110px,40vw,170px);width:var(--s);height:var(--s);margin:calc(var(--s) / -2) auto 0}
+.bn2{height:clamp(140px,30vh,290px)}
+.cdn2{font-size:clamp(26px,8.5vw,38px)}
+.cst b{font-size:clamp(20px,6.5vw,32px)}.cst i{font-size:clamp(22px,7vw,32px)}
+.cdn span{padding:clamp(12px,2.4vh,18px) clamp(12px,4vw,20px);font-size:clamp(14px,4.2vw,17px)}
+.cbt button{font-size:clamp(14px,4.2vw,17px);padding:clamp(12px,2.2vh,18px) 6px}
+.pkc{flex:0 0 clamp(170px,58vw,230px)}
+.sph{padding:clamp(16px,4vh,30px) 14px 10px}
+.feat2 h1{font-size:clamp(22px,7vw,30px)}
+.disc{width:clamp(80px,26vw,110px);height:clamp(80px,26vw,110px)}
+.lh>i{width:clamp(70px,22vw,96px);height:clamp(70px,22vw,96px)}
+.msg{padding:clamp(16px,5vw,30px)}
+#cdo #cdn{font-size:clamp(110px,42vw,180px)}
+#cdo #cdr{width:clamp(120px,40vw,160px);height:clamp(120px,40vw,160px)}
+#sh>div{max-height:88%}
+`;document.head.appendChild(s)})();
 </script></body></html>
