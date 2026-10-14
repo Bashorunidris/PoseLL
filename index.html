@@ -653,4 +653,42 @@ async function claim(p){if(!S.fb){(S.pend=S.pend||[]).push(p);return}
   await srv('deliver');hist('Bought coins',0);toast('Coins added')}
  catch(e){toast('Could not add coins: '+e.message)}}
 
+
+
+ (function(){
+ const st=document.createElement('style');st.textContent=`
+#cdo{position:fixed;inset:0;background:rgba(0,0,0,.95);display:none;align-items:center;justify-content:center;flex-direction:column;gap:22px;z-index:3500;text-align:center;padding:24px}
+#cdo.on{display:flex}
+#cdn{font-size:180px;font-weight:900;line-height:1;color:#fff;text-shadow:0 10px 30px rgba(76,29,149,.5);animation:cdScale 1s ease-in forwards}
+@keyframes cdScale{from{transform:scale(1.5);opacity:1}to{transform:scale(.6);opacity:.15}}
+#cdr{width:160px;height:160px;border-radius:50%;display:none;place-items:center;position:relative;background:conic-gradient(#a855f7 var(--pc,0%),#2a2a2a 0)}
+#cdr:after{content:"";position:absolute;inset:11px;border-radius:50%;background:#0a0a0c}
+#cdr b{position:relative;z-index:1;font:800 34px Syne,sans-serif}
+#cdt{font-size:18px;max-width:320px}#cdo .row2{display:flex;gap:10px}`;
+ document.head.appendChild(st);
+ const o=document.createElement('div');o.id='cdo';
+ o.innerHTML='<div id="cdn">5</div><div id="cdr"><b id="cdp">0%</b></div><p id="cdt"></p><div class="row2"><button class="btn" id="cdy" style="display:none" data-a="cdretry">Try again</button><button class="mini" data-a="pcancel" id="cdx">Cancel</button></div>';
+ document.body.appendChild(o);
+})();
+let _run=null;
+A.cdretry=()=>{if(_run)_run()};
+A.pcancel=()=>{clearInterval(S.cd);S.cdAbort&&S.cdAbort();$('#cdo').classList.remove('on');toast('Post cancelled')};
+A.post=function(el){
+ const k=el.dataset.k,cap=$('#cap').value.trim(),f=S.file;
+ if(k==='buzz'?!cap:!f)return toast(k==='buzz'?'Write something first':'Choose a file first');
+ const lim=k==='video'?100:10;if(f&&f.size>lim*MB)return toast('Maximum is '+lim+' MB for a '+k);
+ if(!S.fb)return toast('Sign-in is not ready. Try again.');
+ const sn=k==='video'?S.snd:null,o=$('#cdo'),num=$('#cdn'),ring=$('#cdr'),txt=$('#cdt'),retry=$('#cdy');let up=null,gone=false;
+ closeSheet();S.cdAbort=()=>{gone=true;up&&up.abort()};
+ const setP=v=>{const p=Math.round(v*100);ring.style.setProperty('--pc',p+'%');$('#cdp').textContent=p+'%'};
+ _run=async()=>{gone=false;retry.style.display='none';$('#cdx').textContent='Cancel';num.style.display='none';ring.style.display='grid';setP(0);txt.textContent=f?'Uploading your '+k+'...':'Posting...';
+  try{let url=null;if(f){up=r2(f,setP);url=await up.p}setP(1);txt.textContent='Finishing...';
+   const d={type:k,caption:cap,url,userId:S.uid,name:S.p.name,likes:0,comments:0,price:0,soundId:sn?sn.id:'',soundName:sn?sn.title:'',status:'live',timestamp:Date.now()};
+   const id=(await db().collection('lagoslife_posts').add(d)).id;
+   if(sn){db().collection('lagoslife_music').doc(sn.id).update({uses:FV().increment(1)}).catch(()=>{});sn.uses=(sn.uses||0)+1}S.snd=null;
+   S.posts.unshift(mp(id,d));S.page=k==='buzz'?'buzz':'foryou';o.classList.remove('on');render();ev('post_created',{type:k});toast('Posted')}
+  catch(e){if(gone)return;txt.textContent='Upload failed: '+(e.code||'')+' '+(e.message||e);retry.style.display='';$('#cdx').textContent='Close'}};
+ let n=5;o.classList.add('on');ring.style.display='none';num.style.display='block';txt.textContent='Get ready...';
+ const show=x=>{num.textContent=x;num.style.animation='none';void num.offsetWidth;num.style.animation=''};show(5);
+ clearInterval(S.cd);S.cd=setInterval(()=>{n--;if(n>0)show(n);else{clearInterval(S.cd);_run()}},1000)};
 </script></body></html>
