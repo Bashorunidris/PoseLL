@@ -1282,7 +1282,7 @@ const _wtPro=watch;watch=function(){_wtPro();decorate();trackViews()};
 
 // ===== POSE POOL: views, Stars, sound royalties, gifts credit, ad banners, music on videos =====
 // All numbers live here. Demo = a cycle is 5 minutes. For real life set demo:false (cycle becomes 24 hours, threshold 1,000 views).
-const POSE={demo:true,cycleMin:5,realHours:24,minViewsReal:1000,starPerImpr:0.0002,llPerCoin:1000,soundShare:0.02,viewSecs:3};
+const POSE={demo:true,cycleMin:5,realHours:24,minViewsReal:1000,gross:0.0002,creatorShare:0.7,starNaira:10000,llPerCoin:1000,soundShare:0.02,viewSecs:3};POSE.starPerImpr=POSE.gross*POSE.creatorShare;
 POSE.cycleMs=(POSE.demo?POSE.cycleMin:POSE.realHours*60)*60000;
 POSE.minViews=Math.max(1,Math.ceil(POSE.minViewsReal*POSE.cycleMs/(POSE.realHours*3600000)));
 // Ads: add your own entries to items. {t:'img',src:'https://…/logo.png',title:'Brand',text:'Short line'} or {t:'video',src:'https://…/ad.mp4',title:'Brand'} (15–30 s)
@@ -1309,7 +1309,7 @@ async function claimGifts(){if(!S.fb||S.gcb)return;S.gcb=1;let got=0;
    try{await db().runTransaction(async t=>{const cr=db().collection('lagoslife_gclaim').doc(g.id),er=db().collection('lagoslife_earn').doc(S.uid),cs=await t.get(cr),es=await t.get(er);
      if(!cs.exists){const ll=(g.total||0)*POSE.llPerCoin;t.set(cr,{uid:S.uid,gift:g.id,ll,timestamp:Date.now()});t.set(er,{uid:S.uid,ll:((es.exists&&es.data().ll)||0)+ll},{merge:true});got+=ll}});done.add(g.id)}catch(e){break}}
   ls.s('gcl',[...done].slice(-1000))}catch(e){}
- S.gcb=0;if(got)toast('Gifts: +'+got.toLocaleString()+' Lagos Life credit');await loadEarn()}
+ S.gcb=0;if(got)toast('Gifts: +'+got.toLocaleString()+' Pose Credit');await loadEarn()}
 async function settle(){if(!S.fb||S.stl)return;S.stl=1;
  try{const cur=cyc(Date.now()),done=new Set(ls.g('stl',[]));
   for(let c=cur-1;c>=cur-24&&c>=0;c--){const key=c+'_'+S.uid;if(done.has(key))continue;
@@ -1342,17 +1342,17 @@ PAGES.monet=()=>{const cur=cyc(Date.now()),left=(cur+1)*POSE.cycleMs-Date.now(),
 <div class="sxc epf"><div class="ppc"><small>NEXT PAYOUT IN</small><b id="pcd">${fmCd(left)}</b></div>
 <div class="ppb"><div class="ppr"><span>Your views this cycle</span><b>${S.myv} / ${need}</b></div><div class="ppt"><i style="width:${pct}%"></i></div></div>
 <p class="m">Views from <b>all</b> your videos are added together. Reach ${need} views in a cycle (${POSE.demo?POSE.cycleMin+' min in this demo, 24 hours in real life':'24 hours'}) and your share of the pool is paid automatically. Videos that use someone's sound give that artist ${POSE.soundShare*100}% of their revenue.</p></div>
-<div class="sxc epf">${stat('POSE STARS ⭐',fmS(S.earn.stars),'coins')}${stat('LAGOS LIFE CREDIT (FROM GIFTS)',(S.earn.ll||0).toLocaleString(),'gift')}${stat('SOUND ROYALTIES ⭐',fmS(S.earn.royalty),'music')}
-<button class="btn" data-a="wdraw"><i class="fa-solid fa-wallet"></i> Withdraw to Lagos Life</button><p class="m">Every Pose Coin gifted to you adds ${POSE.llPerCoin.toLocaleString()} Lagos Life credit.</p></div>
+<div class="sxc epf">${stat('POSE STARS ⭐',fmS(S.earn.stars),'coins')}${stat('POSE CREDIT (FROM GIFTS)',(S.earn.ll||0).toLocaleString(),'gift')}${stat('SOUND ROYALTIES ⭐',fmS(S.earn.royalty),'music')}
+<button class="btn" data-a="wdraw"><i class="fa-solid fa-wallet"></i> Request transfer to Lagos Life</button><p class="m">1 Pose Star ≈ ₦${POSE.starNaira.toLocaleString()}. Yours ≈ ₦${Math.round((S.earn.stars||0)*POSE.starNaira).toLocaleString()}. You keep ${Math.round(POSE.creatorShare*100)}% of the ad pool.</p><p class="m">Every Pose Coin gifted to you adds ${POSE.llPerCoin.toLocaleString()} Pose Credit. It is paid into your Lagos Life account once Lagos Life turns that on.</p></div>
 <div class="sxc epf"><h2 style="padding:6px 0 10px;border:0">Gifts received</h2>${stat('GIFTS',gq,'gift')}${stat('POSE COINS GIFTED TO YOU',gc,'coins')}</div>
 <div class="sxc"><h2>Payout history</h2>${S.stlH.length?S.stlH.map(h=>`<div class="sxr"><i class="fa-solid fa-${h.qualified?'check':'xmark'}"></i><span>${h.views} views<br><small class="m">${h.qualified?'Paid':'Needed '+h.need}</small></span><b>${h.qualified?'+'+fmS(h.stars)+' ⭐':'—'}</b></div>`).join(''):'<p class="m" style="padding:22px 6px">No payouts yet. Your first one appears after a full cycle.</p>'}</div></div>`};
 Object.assign(A,{
  smon(){S.page='monet';render();loadPoolInfo();loadEarn()},
- wdraw(){const st=S.earn.stars,ll=S.earn.ll;if(!(st>0||ll>0))return toast('Nothing to withdraw yet');sheet(`<h3>Withdraw</h3><p class="m">You are withdrawing everything you have earned:</p><div class="coins">${fmS(st)} ⭐ · ${(ll||0).toLocaleString()} credit</div><button class="btn" data-a="wdoit">Send withdrawal request</button>`)},
+ wdraw(){const st=S.earn.stars,ll=S.earn.ll;if(!(st>0||ll>0))return toast('Nothing to transfer yet');sheet(`<h3>Request transfer</h3><p class="m">You are asking to move everything you have earned to your Lagos Life account. It is paid when Lagos Life turns that on:</p><div class="coins">${fmS(st)} ⭐ · ${(ll||0).toLocaleString()} credit</div><button class="btn" data-a="wdoit">Send transfer request</button>`)},
  async wdoit(){if(!S.fb)return toast('Sign-in is not ready. Try again.');
   try{const out=await db().runTransaction(async t=>{const er=db().collection('lagoslife_earn').doc(S.uid),es=await t.get(er),e=es.exists?es.data():{},st=e.stars||0,ll=e.ll||0;if(!(st>0||ll>0))return null;
     t.set(er,{uid:S.uid,stars:0,ll:0},{merge:true});t.set(db().collection('lagoslife_withdrawals').doc(S.uid+'_'+Date.now()),{uid:S.uid,name:S.p.name,stars:st,ll,status:'pending',timestamp:Date.now()});return{st,ll}});
-   closeSheet();if(!out)return toast('Nothing to withdraw yet');S.earn={...S.earn,stars:0,ll:0};render();toast('Withdrawal request sent')}catch(e){toast('Could not send the request')}}});
+   closeSheet();if(!out)return toast('Nothing to transfer yet');S.earn={...S.earn,stars:0,ll:0};render();toast('Transfer request sent')}catch(e){toast('Could not send the request')}}});
 setInterval(()=>{const e=$('#pcd');if(e)e.textContent=fmCd((cyc(Date.now())+1)*POSE.cycleMs-Date.now())},1000);
 
 // ---- Sound sheet (tap the sound name on a video) ----
@@ -1505,4 +1505,9 @@ const _wtPan=watch;watch=function(){_wtPan();const v=$('#panv');if(v)v.muted=S.p
 .pnbt{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-top:6px}.pnbt button{border:0;border-radius:22px;padding:clamp(16px,2.6vh,22px);font:700 clamp(17px,5vw,21px) Roboto,sans-serif;color:#fff;display:flex;gap:10px;align-items:center;justify-content:center}
 .pnbt .sv{background:linear-gradient(135deg,#6d28d9,#8b5cf6)}.pnbt .dl{background:linear-gradient(135deg,#b4163a,#e11d48)}
 `;document.head.appendChild(st)})();
+
+// ===== No search on the Trend tab =====
+(function(){const st=document.createElement('style');st.textContent='#app.nosrch .srch{display:none}';document.head.appendChild(st)})();
+const _s9=A.search;A.search=function(){if(S.page==='trend')return;_s9()};
+const _w9=watch;watch=function(){_w9();$('#app').classList.toggle('nosrch',S.page==='trend')};
 </script></body></html>
