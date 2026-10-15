@@ -362,7 +362,7 @@ const profilePg=()=>{const m=S.posts.filter(mine);return `<div class="pf"><div c
 <div class="mc2"><button class="coral2"><i class="fa-solid fa-clapperboard"></i> My Channel</button><button class="wal" data-a="wallet"><i class="fa-solid fa-wallet"></i></button></div>
 <div class="pg">${m.length?m.map(p=>`<div class="pcard"><i class="fa-solid fa-${p.k==='buzz'?'comment':'play'}" style="font-size:26px"></i><small>${esc(p.cap).slice(0,24)}</small><div><i class="fa-solid fa-heart" style="color:var(--acc)"></i> ${p.l} <i class="fa-solid fa-comments"></i> ${p.c}</div></div>`).join(''):'<p class="m" style="padding:20px">No posts yet. Tap + to create one.</p>'}</div></div>`};
 const PAGES={profile:profilePg,foryou:fy,buzz,pose,trend,alert:alertPg,live:livePg,music:()=>`<div class="mus">${musicPg()}</div>`};
-function render(){const m=$('main'),y=m.scrollTop;$('#app').classList.toggle('full',['profile','music','shop','chan','wallet','settings','editp','blk','monet'].includes(S.page));m.className=S.page==='foryou'?'snap':'';m.innerHTML=PAGES[S.page]();m.scrollTop=y;
+function render(){const m=$('main'),y=m.scrollTop;$('#app').classList.toggle('full',['profile','music','shop','chan','wallet','settings','editp','blk','monet','pan'].includes(S.page));m.className=S.page==='foryou'?'snap':'';m.innerHTML=PAGES[S.page]();m.scrollTop=y;
  $$('.tabs b').forEach(b=>b.classList.toggle('on',b.dataset.p===S.page));
  $$('footer [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===(['alert','live','music'].includes(S.page)?S.page:'home')));
  $('#me').style.backgroundImage=S.p.avatar?`url(${S.p.avatar})`:'';watch();svgI()}
@@ -487,7 +487,7 @@ const rows=l=>l.length?l:'<p class="m">Nothing yet.</p>';
 Object.assign(A,{
  mback(){S.page='foryou';render()},mdr(){S.drw=1;render()},mdc(el){if(el.classList.contains('drb')&&event.target!==el)return;S.drw=0;render()},
  mgo(el){S.mv=el.dataset.v;S.drw=0;render()},mgen(el){S.gen=el.dataset.g;render()},
- mplay(el){mplay(el.dataset.id)},psnd(el){S.page='music';S.mv='browse';mplay(el.dataset.id)},
+ mplay(el){mplay(el.dataset.id)},psnd(el){sdet(el.dataset.id)},
  mtoggle(){if(!S.cur)return toast('Pick a sound first');if(S.playing){AU.pause();S.playing=null}else{AU.play().catch(()=>{});S.playing=S.cur}render()},
  mnav(el){const l=fT();if(!l.length)return;const i=l.findIndex(t=>t.id===S.cur);mplay(l[(i+ +el.dataset.d+l.length)%l.length].id)},
  mdet(el){const t=tr(el.dataset.id);if(t)sheet(`<h3>${esc(t.title)}</h3><p class="m">${esc(t.artist)} · ${esc(t.genre)} · ${esc(t.country||'')}</p><p>${esc(t.desc||'No description.')}</p><div class="tg3"><div><small>STREAMS</small><b>${t.streams||0}</b></div><div><small>VIDEOS</small><b>${t.uses||0}</b></div></div>`)},
@@ -684,7 +684,7 @@ Object.assign(A,{ctab(el){S.ct=el.dataset.c;render()},banner(){pickFile('image/*
   else{try{await a.signInAnonymously()}catch(e){await a.setPersistence(firebase.auth.Auth.Persistence.NONE);await a.signInAnonymously()}
    S.uid=a.currentUser.uid;S.fb=true}}catch(e){setTimeout(()=>toast('Sign-in failed: '+(e.code||e.message)),1200)}
  {const n=ls.g('nm2',0);if(n)S.p.name=n}try{S.coins=(await api('wallet',{})).coins}catch(e){}(S.pend||[]).forEach(claim);
- upd();loadMusic();loadPose();loadFans();loadProf();await load();
+ upd();loadMusic();loadPose();loadFans();loadProf();econBoot();await load();
  const b=$('#boot');setTimeout(()=>{b.style.opacity=0;setTimeout(()=>b.remove(),400)},500)})();
 
 
@@ -856,10 +856,10 @@ const cxK=()=>{const t=(S.cx.f&&S.cx.f.type)||'';return t.startsWith('video')?'v
 const cxPanel=()=>{const x=S.cx;
  if(x.tool==='trim')return `<div class="tpn"><label>Start <span id="cxsl">${_fm(x.start)}</span><input type="range" id="cxs" min="0" max="${x.dur||0}" step="0.1" value="${x.start}"></label><label>End <span id="cxel">${_fm(x.end||x.dur)}</span><input type="range" id="cxe" min="0" max="${x.dur||0}" step="0.1" value="${x.end||x.dur||0}"></label></div>`;
  if(x.tool==='flt')return `<div class="tpn"><div class="chips" style="padding:0">${FILTERS.map(f=>`<b class="${x.flt===f[1]?'on':''}" data-a="cxflt" data-f="${f[1]}">${f[0]}</b>`).join('')}</div></div>`;
- if(x.tool==='mus')return `<div class="tpn">${S.tracks.length?S.tracks.slice(0,20).map(t=>`<div class="song" data-a="cxsnd" data-id="${t.id}"><div class="cover"><i class="fa-solid fa-music"></i></div><div><b>${esc(t.title)}</b><p class="m">${esc(t.artist)}</p></div>${S.snd&&S.snd.id===t.id?'<i class="fa-solid fa-check"></i>':''}</div>`).join(''):'<p class="m">No sounds yet. Upload one from the Music page.</p>'}${S.snd?'<button class="mini" data-a="cxsnd" data-id="">Remove sound</button>':''}</div>`;
+ if(x.tool==='mus')return cxMus(x);
  return ''};
 function cxOpen(k,f,txt){const o=S.cx;o&&o.url&&URL.revokeObjectURL(o.url);S.xtra=null;
- S.cx={k,f,url:f?URL.createObjectURL(f):null,cap:txt||'',cat:'',ht:'',pp:'',priv:'Everyone',com:1,duet:1,stitch:1,reuse:1,dl:0,music:1,start:0,end:0,dur:0,flt:'',tool:'',view:(k==='video'&&f)?'edit':'post'};
+ S.cx={k,f,url:f?URL.createObjectURL(f):null,cap:txt||'',cat:'',ht:'',pp:'',priv:'Everyone',com:1,duet:1,stitch:1,reuse:1,dl:0,music:1,ov:50,mv:100,start:0,end:0,dur:0,flt:'',tool:'',view:(k==='video'&&f)?'edit':'post'};
  let c=$('#cp');if(!c){c=document.createElement('div');c.id='cp';document.body.appendChild(c)}c.className='on';cxDraw()}
 function cxDraw(){const x=S.cx,c=$('#cp'),m=cxK(),ed=x.view==='edit';
  const media=x.url?(m==='audio'?`<audio id="cxv" controls src="${x.url}"></audio>`:(m==='image'||x.k==='photo')?`<img src="${x.url}">`:`<video id="cxv" src="${x.url}" playsinline loop ${ed?'autoplay':'controls'} style="${x.flt?'filter:'+x.flt:''}"></video>`):'';
@@ -897,7 +897,7 @@ Object.assign(A,{
  cxstory(){toast('Stories are coming soon')},
  post(el){const x=S.cx;if(!x)return _cpost(el);const cap=($('#cap')||{value:''}).value.trim();
   if(x.k==='buzz'?!cap:!x.f)return toast(x.k==='buzz'?'Write something first':'Choose a file first');
-  S.file=x.f;S.xtra={cat:x.cat.trim(),hashtags:x.ht.trim(),tags:x.pp.trim(),priv:x.priv,com:x.com,duet:x.duet,stitch:x.stitch,reuse:x.reuse,dl:x.dl,music:x.music,start:x.start||0,end:(x.end&&x.dur&&x.end<x.dur-.2)?x.end:0,flt:x.flt,media:cxK(),av:(/^https?:/.test(S.p.avatar||'')?S.p.avatar:'')};
+  S.file=x.f;S.xtra={cat:x.cat.trim(),hashtags:x.ht.trim(),tags:x.pp.trim(),priv:x.priv,com:x.com,duet:x.duet,stitch:x.stitch,reuse:x.reuse,dl:x.dl,music:x.music,start:x.start||0,end:(x.end&&x.dur&&x.end<x.dur-.2)?x.end:0,flt:x.flt,media:cxK(),av:(/^https?:/.test(S.p.avatar||'')?S.p.avatar:''),soundUid:(S.snd&&S.snd.uid)||'',ov:x.ov,mv:x.mv,dur:Math.round(((x.end&&x.dur&&x.end<x.dur-.2)?x.end:(x.dur||0))-(x.start||0))};
   $('#cp').className='';_cpost(el)},
  draft(el){const x=S.cx,c=($('#cap')||{value:''}).value.trim();if(!c)return toast('Write a caption first');S.drafts.unshift({k:x?x.k:el.dataset.k,c});ls.s('dr',S.drafts);$('#cp').className='';toast('Draft saved')}});
 // Respect the new post settings in the feed
@@ -1107,7 +1107,7 @@ const _wtMusic=watch;watch=function(){_wtMusic();mTime()};
 Object.assign(IC,{'chevron-right':'M9 4l8 8-8 8','user-slash':'M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM4 21c0-4 3.500-6.500 8-6.500s8 2.500 8 6.500M3 3l18 18','money-bill':'M2 6h20v12H2V6zm10 2.500a3.500 3.500 0 1 0 0 7 3.500 3.500 0 0 0 0-7z',
  link:'M10 14a4 4 0 0 0 5.700 0l3-3a4 4 0 0 0-5.700-5.700l-1 1M14 10a4 4 0 0 0-5.700 0l-3 3a4 4 0 0 0 5.700 5.700l1-1',book:'M5 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5V3zm3 4v2h8V7H8zm0 4v2h8v-2H8z','circle-play':'M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zM10 8v8l6-4-6-4z'});
 S.prof=Object.assign({bio:'',link:'',handle:'',vis:'Public',notif:true,blocked:[]},ls.g('prof',{}));delete S.prof.verified;
-S.ver=new Set();S.gin=[];S.gq={};S.gc='All Gifts';S.gt=null;S.seen=new Set();
+S.ver=new Set();S.gin=[];S.gq={};S.gc='All Gifts';S.gt=null;S.seen=new Set(ls.g('seen',[]));
 const applyProf=()=>{if(S.prof.name)S.p.name=S.prof.name;if(S.prof.avatar)S.p.avatar=S.prof.avatar};applyProf();
 const handle=()=>S.prof.handle||String(S.p.name||'').replace(/\s+/g,'');
 const isVer=u=>!!(u&&S.ver&&S.ver.has(u));
@@ -1127,7 +1127,7 @@ async function loadProf(){if(!S.fb)return;
 
 // ---- Profile page (matches real Pose) ----
 const TABS=[['Feed','circle-play'],['Photos','image'],['Buzz','comments'],['Liked','heart'],['Stories','book'],['Gifts','gift']];
-const pcx=p=>{const own=mine(p),pn=own&&p.x&&p.x.pinned;return `<div class="pcard" data-a="sgo" data-id="${p.id}"><div class="pr1"><i class="fa-solid fa-${p.k==='buzz'?'comment':p.k==='photo'?'image':'play'}"></i>${own?`<span class="pin${pn?' on':''}" data-a="pin" data-id="${p.id}">📌</span>`:''}</div><div class="pr2"><small>${esc(p.cap).slice(0,24)}</small><div><span><i class="fa-solid fa-eye"></i> ${vw(p)}</span><span><i class="fa-solid fa-heart" style="color:#ff1e56"></i> ${p.l}</span><span><i class="fa-solid fa-comments"></i> ${p.c}</span></div></div></div>`};
+const pcx=p=>{const own=mine(p),pn=own&&p.x&&p.x.pinned;return `<div class="pcard" data-a="${own?'pan':'sgo'}" data-id="${p.id}"><div class="pr1"><i class="fa-solid fa-${p.k==='buzz'?'comment':p.k==='photo'?'image':'play'}"></i>${own?`<span class="pin${pn?' on':''}" data-a="pin" data-id="${p.id}">📌</span>`:''}</div><div class="pr2"><small>${esc(p.cap).slice(0,24)}</small><div><span><i class="fa-solid fa-eye"></i> ${vw(p)}</span><span><i class="fa-solid fa-heart" style="color:#ff1e56"></i> ${p.l}</span><span><i class="fa-solid fa-comments"></i> ${p.c}</span></div></div></div>`};
 const giftsTab=()=>{const a={};S.gin.forEach(g=>{(a[g.gift]=a[g.gift]||{emoji:g.emoji,name:g.name,qty:0}).qty+=g.qty});const l=Object.values(a);
  return l.length?`<div class="gr">${l.map(g=>`<div class="gri"><span>${g.emoji}</span><b>${esc(g.name)}</b><small>×${g.qty}</small></div>`).join('')}</div>`:msg('fa-gift','No gifts yet','Gifts people send you show up here.')};
 PAGES.profile=()=>{const m=S.posts.filter(mine),t=S.pt,ver=S.prof.verified||isVer(S.uid),av=safeImg(S.p.avatar),lk=S.prof.link,lik=m.reduce((a,p)=>a+p.l,0),vws=m.reduce((a,p)=>a+vw(p),0);
@@ -1168,7 +1168,7 @@ Object.assign(A,{
  async avdel(){S.p.avatar=null;await saveProf({avatar:''});render();toast('Photo removed')},
  async epsave(){const n=$('#en').value.trim(),h=$('#eh').value.trim().replace(/^@/,'').replace(/[^\w.]/g,'').slice(0,20),b=$('#eb').value.trim();let l=$('#el').value.trim();
   if(!n)return toast('Enter a display name');if(l&&!/^https?:\/\//i.test(l))l='https://'+l;ls.s('nm2',n);ls.s('nm',n);await saveProf({name:n,handle:h,bio:b,link:l});S.page='profile';render();toast('Profile saved')},
- plink(){const u=S.prof.link;if(u&&/^https?:\/\//i.test(u))window.open(u,'_blank','noopener')},
+ plink(){const u=S.prof.link;if(u)sheet(`<h3>Link</h3><p style="word-break:break-all">${esc(u)}</p><p class="m">Links cannot open inside the game. Copy it from here.</p>`)},
  async pin(el){const id=String(el.dataset.id),p=pf(id);if(!p)return;p.x=p.x||{};const on=!p.x.pinned;if(on&&S.posts.filter(x=>mine(x)&&x.x&&x.x.pinned).length>=3)return toast('You can pin up to 3 posts');
   p.x.pinned=on;if(S.fb)db().collection('lagoslife_posts').doc(id).update({pinned:on}).catch(()=>toast('Could not pin'));toast(on?'Pinned to your profile':'Unpinned');render()},
  report(el){const p=pf(pid(el));if(!p)return;S.rp=p;sheet(`<h3>${esc(p.u)}'s post</h3><div class="row"><button data-a="rpdo">Report post</button>${mine(p)||!p.uid?'':'<button data-a="blkdo">Block user</button>'}</div>`)},
@@ -1188,7 +1188,7 @@ const gTotal=()=>GL.reduce((a,g)=>a+(S.gq[g[0]]||0)*g[3],0);
 const gHtml=()=>{const t=gTotal();return `<div class="gbar"></div><div class="gh"><b><i class="fa-solid fa-gift"></i> Send a Gift</b><span class="gc"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span></span><span class="gcl" data-a="gclose"><i class="fa-solid fa-xmark"></i></span></div>
 <div class="gt">${['All Gifts','Popular','New','Special'].map(c=>`<b class="${c===S.gc?'on':''}" data-a="gcat" data-c="${c}">${c}</b>`).join('')}</div>
 <div class="gg">${GL.filter(g=>S.gc==='All Gifts'||g[4]===S.gc).map(g=>`<div class="gi"><div class="gp">${g[1]}</div><b>${g[2]}</b><small><i class="fa-solid fa-coins"></i> ${g[3]} Pose</small><div class="gs"><button data-a="gdec" data-g="${g[0]}">−</button><span>${S.gq[g[0]]||0}</span><button data-a="ginc" data-g="${g[0]}">+</button></div></div>`).join('')}</div>
-<div class="gf"><div><small>Total</small><b><i class="fa-solid fa-coins"></i> ${t} Pose Coins</b></div><button class="${t?'on':''}" data-a="gsend">${t?'Send gift':'+ Add'}</button></div>`};
+<div class="gf"><div><small>Total${t?` · they get ${(t*POSE.llPerCoin).toLocaleString()} credit`:''}</small><b><i class="fa-solid fa-coins"></i> ${t} Pose Coins</b></div><button class="${t?'on':''}" data-a="gsend">${t?'Send gift':'+ Add'}</button></div>`};
 const gDraw=()=>{const o=$('.gg'),y=o?o.scrollTop:0;sheet(gHtml());$('#sh>div').classList.add('gx');const g=$('.gg');if(g)g.scrollTop=y};
 Object.assign(A,{
  gift(el){const p=el&&el.closest&&el.closest('[data-id]')?pf(pid(el)):null;if(!p||!p.uid)return toast('Open a post to send a gift');if(mine(p))return toast("You can't send a gift to yourself");S.gt={uid:p.uid,name:p.u,postId:String(p.id)};S.gq={};S.gc='All Gifts';gDraw()},
@@ -1207,7 +1207,7 @@ function decorate(){$$('.post,.bz').forEach(el=>{if(el.dataset.dc)return;const p
   const img=safeImg(p.uid===S.uid?S.p.avatar:(p.x&&p.x.av)),ver=isVer(p.uid)||(p.uid===S.uid&&S.prof.verified),wa=el.querySelector('.wa,.ba');
   if(wa){if(img){wa.style.backgroundImage='url('+img+')';wa.style.backgroundSize='cover';wa.style.backgroundPosition='center';wa.innerHTML=''}if(ver)wa.insertAdjacentHTML('beforeend','<span class="vb sm">∞</span>')}
   const nm=el.querySelector('.who b,.bh b');if(nm&&ver)nm.insertAdjacentHTML('beforeend',' <span class="vb inl">∞</span>')})}
-let vio;function trackViews(){vio&&vio.disconnect();vio=new IntersectionObserver(es=>es.forEach(e=>{if(e.intersectionRatio<.6)return;const id=String(e.target.dataset.id),p=pf(id);if(!p||mine(p)||S.seen.has(id))return;S.seen.add(id);p.x=p.x||{};p.x.views=(p.x.views||0)+1;if(S.fb)db().collection('lagoslife_posts').doc(id).update({views:FV().increment(1)}).catch(()=>{})}),{threshold:[.6]});$$('.post').forEach(x=>vio.observe(x))}
+let vio,vt={};function trackViews(){vio&&vio.disconnect();Object.values(vt).forEach(clearTimeout);vt={};vio=new IntersectionObserver(es=>es.forEach(e=>{const id=String(e.target.dataset.id);if(e.intersectionRatio>=.6){if(vt[id]||S.seen.has(id))return;vt[id]=setTimeout(()=>{delete vt[id];countView(id)},POSE.viewSecs*1000)}else if(vt[id]){clearTimeout(vt[id]);delete vt[id]}}),{threshold:[0,.6]});$$('.post').forEach(x=>vio.observe(x))}
 const _wtPro=watch;watch=function(){_wtPro();decorate();trackViews()};
 
 (function(){const st=document.createElement('style');st.textContent=`
@@ -1278,5 +1278,231 @@ const _wtPro=watch;watch=function(){_wtPro();decorate();trackViews()};
 .gx .gf{display:flex;align-items:center;gap:14px;padding:14px 18px calc(14px + env(safe-area-inset-bottom));border-top:1px solid #23263d;background:#0e1024;flex:none}
 .gx .gf>div{flex:0 0 auto}.gx .gf small{display:block;color:#8e92b3;font-size:16px}.gx .gf b{color:#ffa31a;font-size:clamp(18px,5.6vw,24px);display:flex;gap:8px;align-items:center}
 .gx .gf button{flex:1;border:0;border-radius:20px;padding:clamp(14px,2.4vh,20px);background:#1d2038;color:#6c7094;font:700 clamp(16px,4.8vw,20px) Roboto,sans-serif}.gx .gf button.on{background:#ff9f1c;color:#111}
+`;document.head.appendChild(st)})();
+
+// ===== POSE POOL: views, Stars, sound royalties, gifts credit, ad banners, music on videos =====
+// All numbers live here. Demo = a cycle is 5 minutes. For real life set demo:false (cycle becomes 24 hours, threshold 1,000 views).
+const POSE={demo:true,cycleMin:5,realHours:24,minViewsReal:1000,starPerImpr:0.0002,llPerCoin:1000,soundShare:0.02,viewSecs:3};
+POSE.cycleMs=(POSE.demo?POSE.cycleMin:POSE.realHours*60)*60000;
+POSE.minViews=Math.max(1,Math.ceil(POSE.minViewsReal*POSE.cycleMs/(POSE.realHours*3600000)));
+// Ads: add your own entries to items. {t:'img',src:'https://…/logo.png',title:'Brand',text:'Short line'} or {t:'video',src:'https://…/ad.mp4',title:'Brand'} (15–30 s)
+const ADS={contact:{ig:'',mail:''},rot:12,items:[{t:'place'},{t:'pose'}]};
+const cyc=t=>Math.floor(t/POSE.cycleMs);
+const fmS=n=>{n=+n||0;return n>=1?n.toFixed(2):n.toFixed(4)};
+const fmCd=ms=>{ms=Math.max(0,Math.ceil(ms/1000));const h=Math.floor(ms/3600),m=Math.floor(ms%3600/60),s=ms%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s).padStart(2,'0')};
+S.earn={stars:0,ll:0,royalty:0};S.stlH=[];S.myv=0;
+
+// ---- count a real view (3 s on screen, once per post per device) ----
+function countView(id){const p=pf(id);if(!p||mine(p)||S.seen.has(id)||S.paused||document.hidden)return;S.seen.add(id);ls.s('seen',[...S.seen].slice(-2000));
+ p.x=p.x||{};p.x.views=(p.x.views||0)+1;if(!S.fb||!p.uid)return;const c=cyc(Date.now()),sid=p.sid||'',art=(p.x&&p.x.soundUid)||'',inc=()=>FV().increment(1);
+ db().collection('lagoslife_posts').doc(id).update({views:inc()}).catch(()=>{});db().collection('lagoslife_pviews').doc(id).set({h:{[Math.floor(Date.now()/3600000)]:inc()}},{merge:true}).catch(()=>{});
+ const vd={uid:p.uid,cycle:c,views:inc()};if(sid){vd.sv={[sid]:inc()};vd.sa={[sid]:art}}
+ db().collection('lagoslife_views').doc(c+'_'+p.uid).set(vd,{merge:true}).catch(()=>{});
+ db().collection('lagoslife_pool').doc(String(c)).set({cycle:c,views:inc(),impr:inc()},{merge:true}).catch(()=>{})}
+
+// ---- wallet + settlement ----
+async function loadEarn(){if(!S.fb)return;try{const d=await db().collection('lagoslife_earn').doc(S.uid).get();if(d.exists){const x=d.data();S.earn={stars:x.stars||0,ll:x.ll||0,royalty:x.royalty||0}}}catch(e){}if(S.page==='monet')render()}
+async function claimGifts(){if(!S.fb||S.gcb)return;S.gcb=1;let got=0;
+ try{const r=await db().collection('lagoslife_gifts').where('to','==',S.uid).limit(200).get();S.gin=r.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>b.timestamp-a.timestamp);
+  const done=new Set(ls.g('gcl',[]));
+  for(const g of S.gin){if(done.has(g.id))continue;
+   try{await db().runTransaction(async t=>{const cr=db().collection('lagoslife_gclaim').doc(g.id),er=db().collection('lagoslife_earn').doc(S.uid),cs=await t.get(cr),es=await t.get(er);
+     if(!cs.exists){const ll=(g.total||0)*POSE.llPerCoin;t.set(cr,{uid:S.uid,gift:g.id,ll,timestamp:Date.now()});t.set(er,{uid:S.uid,ll:((es.exists&&es.data().ll)||0)+ll},{merge:true});got+=ll}});done.add(g.id)}catch(e){break}}
+  ls.s('gcl',[...done].slice(-1000))}catch(e){}
+ S.gcb=0;if(got)toast('Gifts: +'+got.toLocaleString()+' Lagos Life credit');await loadEarn()}
+async function settle(){if(!S.fb||S.stl)return;S.stl=1;
+ try{const cur=cyc(Date.now()),done=new Set(ls.g('stl',[]));
+  for(let c=cur-1;c>=cur-24&&c>=0;c--){const key=c+'_'+S.uid;if(done.has(key))continue;
+   const [vd,pd]=await Promise.all([db().collection('lagoslife_views').doc(key).get(),db().collection('lagoslife_pool').doc(String(c)).get()]);
+   if(!vd.exists){done.add(key);continue}
+   const v=vd.data(),views=v.views||0,pl=pd.exists?pd.data():{},impr=pl.impr||0,tv=Math.max(pl.views||0,views),rate=tv>0?impr*POSE.starPerImpr/tv:0,ok=views>=POSE.minViews;
+   let ded=0;const roy=[];if(ok&&v.sv)for(const sid of Object.keys(v.sv)){const r=v.sv[sid]*rate*POSE.soundShare;ded+=r;const art=(v.sa||{})[sid];if(art)roy.push({sid,art,stars:r})}
+   const net=ok?Math.max(0,views*rate-ded):0;
+   await db().runTransaction(async t=>{const sr=db().collection('lagoslife_settle').doc(key),er=db().collection('lagoslife_earn').doc(S.uid),ss=await t.get(sr);if(ss.exists)return;const es=await t.get(er);
+     t.set(sr,{uid:S.uid,cycle:c,views,qualified:ok,stars:net,royalties:ded,need:POSE.minViews,timestamp:Date.now()});
+     if(net>0)t.set(er,{uid:S.uid,stars:((es.exists&&es.data().stars)||0)+net},{merge:true});
+     roy.forEach(x=>t.set(db().collection('lagoslife_royalty').doc(key+'_'+x.sid),{artist:x.art,sound:x.sid,creator:S.uid,cycle:c,stars:x.stars,timestamp:Date.now()}))});
+   done.add(key);if(net>0)toast('Pose Pool: you earned '+fmS(net)+' ⭐')}
+  ls.s('stl',[...done].slice(-300))}catch(e){}
+ S.stl=0;await loadEarn()}
+async function claimRoy(){if(!S.fb||S.rcb)return;S.rcb=1;let tot=0;
+ try{const r=await db().collection('lagoslife_royalty').where('artist','==',S.uid).limit(300).get(),done=new Set(ls.g('rcl',[]));
+  for(const d of r.docs){if(done.has(d.id))continue;const x=d.data();
+   try{await db().runTransaction(async t=>{const cr=db().collection('lagoslife_rclaim').doc(d.id),er=db().collection('lagoslife_earn').doc(S.uid),cs=await t.get(cr),es=await t.get(er);if(cs.exists)return;
+     const e=es.exists?es.data():{};t.set(cr,{uid:S.uid,stars:x.stars,timestamp:Date.now()});t.set(er,{uid:S.uid,stars:(e.stars||0)+x.stars,royalty:(e.royalty||0)+x.stars},{merge:true});tot+=x.stars});done.add(d.id)}catch(e){break}}
+  ls.s('rcl',[...done].slice(-1000))}catch(e){}
+ S.rcb=0;if(tot>0)toast('Sound royalties: +'+fmS(tot)+' ⭐');await loadEarn()}
+async function loadPoolInfo(){if(!S.fb)return;try{const d=await db().collection('lagoslife_views').doc(cyc(Date.now())+'_'+S.uid).get();S.myv=d.exists?(d.data().views||0):0}catch(e){}
+ try{const r=await db().collection('lagoslife_settle').where('uid','==',S.uid).limit(30).get();S.stlH=r.docs.map(d=>d.data()).sort((a,b)=>b.cycle-a.cycle)}catch(e){}if(S.page==='monet')render()}
+function econBoot(){loadEarn();claimGifts();claimRoy();settle();setInterval(settle,20000);setInterval(()=>{claimGifts();claimRoy()},45000);setInterval(()=>{if(S.page==='monet')loadPoolInfo()},10000)}
+
+// ---- Pose Pool dashboard (replaces the old Monetization page) ----
+PAGES.monet=()=>{const cur=cyc(Date.now()),left=(cur+1)*POSE.cycleMs-Date.now(),need=POSE.minViews,pct=Math.min(100,100*S.myv/need),g=S.gin,gq=g.reduce((a,x)=>a+x.qty,0),gc=g.reduce((a,x)=>a+x.total,0);
+ return `<div class="sx">${sxHead('Pose Pool','settings')}
+<div class="sxc epf"><div class="ppc"><small>NEXT PAYOUT IN</small><b id="pcd">${fmCd(left)}</b></div>
+<div class="ppb"><div class="ppr"><span>Your views this cycle</span><b>${S.myv} / ${need}</b></div><div class="ppt"><i style="width:${pct}%"></i></div></div>
+<p class="m">Views from <b>all</b> your videos are added together. Reach ${need} views in a cycle (${POSE.demo?POSE.cycleMin+' min in this demo, 24 hours in real life':'24 hours'}) and your share of the pool is paid automatically. Videos that use someone's sound give that artist ${POSE.soundShare*100}% of their revenue.</p></div>
+<div class="sxc epf">${stat('POSE STARS ⭐',fmS(S.earn.stars),'coins')}${stat('LAGOS LIFE CREDIT (FROM GIFTS)',(S.earn.ll||0).toLocaleString(),'gift')}${stat('SOUND ROYALTIES ⭐',fmS(S.earn.royalty),'music')}
+<button class="btn" data-a="wdraw"><i class="fa-solid fa-wallet"></i> Withdraw to Lagos Life</button><p class="m">Every Pose Coin gifted to you adds ${POSE.llPerCoin.toLocaleString()} Lagos Life credit.</p></div>
+<div class="sxc epf"><h2 style="padding:6px 0 10px;border:0">Gifts received</h2>${stat('GIFTS',gq,'gift')}${stat('POSE COINS GIFTED TO YOU',gc,'coins')}</div>
+<div class="sxc"><h2>Payout history</h2>${S.stlH.length?S.stlH.map(h=>`<div class="sxr"><i class="fa-solid fa-${h.qualified?'check':'xmark'}"></i><span>${h.views} views<br><small class="m">${h.qualified?'Paid':'Needed '+h.need}</small></span><b>${h.qualified?'+'+fmS(h.stars)+' ⭐':'—'}</b></div>`).join(''):'<p class="m" style="padding:22px 6px">No payouts yet. Your first one appears after a full cycle.</p>'}</div></div>`};
+Object.assign(A,{
+ smon(){S.page='monet';render();loadPoolInfo();loadEarn()},
+ wdraw(){const st=S.earn.stars,ll=S.earn.ll;if(!(st>0||ll>0))return toast('Nothing to withdraw yet');sheet(`<h3>Withdraw</h3><p class="m">You are withdrawing everything you have earned:</p><div class="coins">${fmS(st)} ⭐ · ${(ll||0).toLocaleString()} credit</div><button class="btn" data-a="wdoit">Send withdrawal request</button>`)},
+ async wdoit(){if(!S.fb)return toast('Sign-in is not ready. Try again.');
+  try{const out=await db().runTransaction(async t=>{const er=db().collection('lagoslife_earn').doc(S.uid),es=await t.get(er),e=es.exists?es.data():{},st=e.stars||0,ll=e.ll||0;if(!(st>0||ll>0))return null;
+    t.set(er,{uid:S.uid,stars:0,ll:0},{merge:true});t.set(db().collection('lagoslife_withdrawals').doc(S.uid+'_'+Date.now()),{uid:S.uid,name:S.p.name,stars:st,ll,status:'pending',timestamp:Date.now()});return{st,ll}});
+   closeSheet();if(!out)return toast('Nothing to withdraw yet');S.earn={...S.earn,stars:0,ll:0};render();toast('Withdrawal request sent')}catch(e){toast('Could not send the request')}}});
+setInterval(()=>{const e=$('#pcd');if(e)e.textContent=fmCd((cyc(Date.now())+1)*POSE.cycleMs-Date.now())},1000);
+
+// ---- Sound sheet (tap the sound name on a video) ----
+const FA=new Audio();FA.loop=true;S.tc={};
+async function getTr(id){if(!id)return null;const t=tr(id);if(t)return t;if(S.tc[id])return S.tc[id];try{const d=await db().collection('lagoslife_music').doc(id).get();if(d.exists)return S.tc[id]={...d.data(),id}}catch(e){}return null}
+async function sdet(id){const t=await getTr(id);if(!t)return toast('Sound not found');if(!tr(id))S.tracks.push(t);const vs=S.posts.filter(p=>p.sid===id&&p.src).slice(0,9);
+ sheet(`<div class="sdt">${cvT(t)}<div><h3>${esc(t.title)}</h3><p class="m">${esc(t.artist)} · ${esc(t.genre||'')}</p><p class="m"><b style="color:#fff">${t.uses||0}</b> videos · <b style="color:#fff">${t.streams||0}</b> plays</p></div></div>
+<div class="acts"><button class="wb" data-a="mplay" data-id="${t.id}"><i class="fa-solid fa-play"></i> Play</button><button class="btn" data-a="musesnd" data-id="${t.id}"><i class="fa-solid fa-sliders"></i> Use sound</button></div>
+<p class="m">The artist earns ${POSE.soundShare*100}% of the revenue of every video that uses this sound.</p>${vs.length?`<h3>Videos with this sound</h3>${vs.map(p=>`<div class="song" data-a="sgo" data-id="${p.id}"><div class="cover"><i class="fa-solid fa-play"></i></div><div><b>${esc((p.cap||'Video').slice(0,40))}</b><p class="m">@${esc(p.u)} · ${p.l} likes</p></div></div>`).join('')}`:''}`)}
+
+// ---- Music plays over the video in the feed ----
+let fio,fact=null;
+function trackSound(){fio&&fio.disconnect();fio=new IntersectionObserver(es=>es.forEach(async e=>{if(e.intersectionRatio<.6)return;const id=String(e.target.dataset.id),p=pf(id),v=e.target.querySelector('video');
+  if(p&&p.sid&&v)v.volume=Math.max(0,Math.min(1,((p.x&&p.x.ov!=null)?p.x.ov:50)/100));if(fact===id)return;fact=id;FA.pause();
+  if(!p||!p.sid||S.page!=='foryou')return;const t=await getTr(p.sid);if(fact!==id||!t||!t.url)return;FA.src=t.url;FA.volume=Math.max(0,Math.min(1,((p.x&&p.x.mv!=null)?p.x.mv:100)/100));if(S.sound&&!S.paused)FA.play().catch(()=>{})}),{threshold:[.6]});
+ $$('.post').forEach(x=>fio.observe(x));if(S.page!=='foryou'){FA.pause();fact=null}}
+document.addEventListener('click',()=>setTimeout(()=>{if(S.sound&&fact&&FA.src&&FA.paused&&!S.paused&&S.page==='foryou')FA.play().catch(()=>{})},0),true);
+try{if(typeof Vatar!=='undefined'){Vatar.onPause&&Vatar.onPause(()=>FA.pause());Vatar.onResume&&Vatar.onResume(()=>{if(fact&&S.page==='foryou'&&S.sound)FA.play().catch(()=>{})})}}catch(e){}
+
+// ---- Music in the create/edit page ----
+const PV=new Audio();PV.loop=true;S.cxq='';
+const pvStop=()=>{try{PV.pause()}catch(e){}};
+function pvPlay(){const x=S.cx;if(!S.snd||!S.snd.url||!x)return;if(S.pvId!==S.snd.id){PV.src=S.snd.url;S.pvId=S.snd.id}PV.volume=Math.max(0,Math.min(1,(x.mv==null?100:x.mv)/100));PV.play().catch(()=>{})}
+const cxRows=()=>{const q=(S.cxq||'').toLowerCase(),l=S.tracks.filter(t=>!q||(t.title+' '+t.artist).toLowerCase().includes(q)).slice(0,30);
+ return l.map(t=>`<div class="song" data-a="cxsnd" data-id="${t.id}"><div class="cover"><i class="fa-solid fa-music"></i></div><div><b>${esc(t.title)}</b><p class="m">${esc(t.artist)}</p></div>${S.snd&&S.snd.id===t.id?'<i class="fa-solid fa-check"></i>':''}</div>`).join('')||'<p class="m">No sounds found.</p>'};
+const cxMus=x=>`<div class="tpn"><input type="text" id="cxsn" placeholder="Name your own sound (optional)" maxlength="60"><button class="btn" data-a="cxup"><i class="fa-solid fa-upload"></i> Upload your sound</button><input type="text" id="cxms" placeholder="Search sounds" value="${esc(S.cxq||'')}"><div id="cxml">${cxRows()}</div>${S.snd?`<label>Music volume <span id="cxmvl">${x.mv}</span><input type="range" id="cxmv" min="0" max="100" value="${x.mv}"></label><label>Original sound <span id="cxovl">${x.ov}</span><input type="range" id="cxov" min="0" max="100" value="${x.ov}"></label><button class="mini" data-a="cxsnd" data-id="">Remove sound</button>`:''}<p class="m">Artists earn ${POSE.soundShare*100}% whenever their sound is used.</p></div>`;
+document.addEventListener('input',e=>{const i=e.target.id,x=S.cx;
+ if(i==='cxms'){S.cxq=e.target.value;const l=$('#cxml');if(l){l.innerHTML=cxRows();svgI()}}
+ else if(i==='cxmv'&&x){x.mv=+e.target.value;$('#cxmvl').textContent=x.mv;PV.volume=x.mv/100}
+ else if(i==='cxov'&&x){x.ov=+e.target.value;$('#cxovl').textContent=x.ov;const v=$('#cxv');if(v)v.volume=x.ov/100}});
+const _cxd=cxDraw;cxDraw=function(){_cxd();const x=S.cx,v=$('#cxv');if(!v||!x||(x.f&&x.f.type&&x.f.type.startsWith('audio')))return;v.volume=Math.max(0,Math.min(1,(x.ov==null?50:x.ov)/100));let last=0;
+ v.addEventListener('play',()=>{S.snd&&pvPlay()});v.addEventListener('pause',pvStop);v.addEventListener('timeupdate',()=>{if(v.currentTime<last-.5&&S.snd)PV.currentTime=0;last=v.currentTime});if(!S.snd)pvStop()};
+const _cxb=A.cxback,_cpo=A.post;
+Object.assign(A,{
+ cxsnd(el){S.snd=el.dataset.id?tr(el.dataset.id):null;$('#cxp').innerHTML=cxPanel();svgI();if(S.snd){const v=$('#cxv');if(v){v.currentTime=(S.cx&&S.cx.start)||0;v.play().catch(()=>{})}PV.currentTime=0;pvPlay()}else pvStop()},
+ cxback(el){_cxb(el);const c=$('#cp');if(!c||!c.classList.contains('on'))pvStop()},
+ post(el){pvStop();return _cpo(el)},
+ cxup(){pickFile('audio/*',30,'',async f=>{const nm=(($('#cxsn')||{}).value||'').trim()||f.name.replace(/\.[^.]+$/,'').slice(0,60);toast('Uploading sound...');
+  try{const url=await r2(f,v=>toast('Uploading sound '+Math.round(v*100)+'%')).p,d={title:nm,artist:art().name,genre:art().genre||'Afrobeats',country:art().country||'Nigeria',desc:'',url,uid:S.uid,streams:0,uses:0,timestamp:Date.now()};
+   if(S.fb)d.id=(await db().collection('lagoslife_music').add(d)).id;else d.id='l'+Date.now();S.tracks.unshift(d);S.snd=d;S.cxq='';$('#cxp').innerHTML=cxPanel();svgI();toast('Your sound is added');
+   const v=$('#cxv');if(v){v.currentTime=(S.cx&&S.cx.start)||0;v.play().catch(()=>{})}PV.currentTime=0;pvPlay()}catch(e){toast('Sound upload failed: '+e.message)}})}});
+
+// ---- Ad banners ----
+const adHtml=a=>a.t==='img'?`<div class="adl"><img src="${esc(a.src||'')}"></div><div class="adt"><b>${esc(a.title||'')}</b><small>${esc(a.text||'')}</small></div>`
+ :a.t==='video'?`<div class="adl"><video src="${esc(a.src||'')}" autoplay muted loop playsinline></video></div><div class="adt"><b>${esc(a.title||'')}</b><small>${esc(a.text||'Sponsored')}</small></div>`
+ :a.t==='pose'?`<div class="adl pose"></div><div class="adt"><b>Pose</b><small>Share your moments. Get paid for your views.</small></div>`
+ :`<div class="adl"><i class="fa-solid fa-star"></i></div><div class="adt"><b>Place your ads here</b><small>Reach Pose on Instagram or send us an email</small></div>`;
+S.adt=0;
+const adPick=(seed,tick)=>ADS.items[(seed+tick)%ADS.items.length];
+const adBox=seed=>{const a=adPick(seed,S.adt);return `<div class="adb" data-a="adtap" data-s="${seed}"><span class="adk">AD</span><div class="adc">${adHtml(a)}</div></div>`};
+const hsh=id=>[...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0);
+const AD_PAGES=['buzz','pose','trend','alert','live','profile'];
+function placeAds(){$$('.post').forEach(el=>{if(el.querySelector('.adb'))return;el.classList.add('hasad');el.insertAdjacentHTML('beforeend',adBox(hsh(el.dataset.id)))});
+ let g=$('#adg');if(!g){g=document.createElement('div');g.id='adg';document.body.appendChild(g)}
+ if(AD_PAGES.includes(S.page)){const f=$('footer'),fh=(f&&f.offsetParent!==null)?f.offsetHeight:0;g.style.bottom=(fh+8)+'px';g.style.display='block';if(!g.firstChild)g.innerHTML=adBox(7);$('main').style.paddingBottom='76px'}
+ else{g.style.display='none';$('main').style.paddingBottom=''}
+ svgI()}
+setInterval(()=>{S.adt++;$$('.adb').forEach(b=>{const c=b.querySelector('.adc');if(c){c.innerHTML=adHtml(adPick(+b.dataset.s,S.adt));svgI()}})},ADS.rot*1000);
+Object.assign(A,{adtap(el){const a=adPick(+el.dataset.s,S.adt),c=ADS.contact;
+ if(a.t==='place')return sheet(`<h3>Place your ads here</h3><p>Reach out to Pose on Instagram${c.ig?' ('+esc(c.ig)+')':''} or send us an email${c.mail?' at '+esc(c.mail):''}.</p><p class="m">Your ad (an image, or a 15 to 30 second video) shows on every screen of Pose.</p>`);
+ if(a.t==='pose')return toast('Pose');sheet(`<h3>${esc(a.title||'Sponsored')}</h3><p class="m">${esc(a.text||'')}</p>${a.link?`<p style="word-break:break-all">${esc(a.link)}</p>`:''}`)}});
+const _wtEcon=watch;watch=function(){_wtEcon();placeAds();trackSound()};
+
+(function(){const st=document.createElement('style');st.textContent=`
+.adb{display:flex;align-items:center;background:#15151ccc;border:1px solid #ffffff22;border-radius:16px;padding:8px 12px 8px 8px;color:#fff;position:relative;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer}
+.adb .adc{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.adk{position:absolute;top:-8px;left:12px;background:#fbbf24;color:#000;font:800 9px Roboto,sans-serif;letter-spacing:.1em;padding:2px 7px;border-radius:6px}
+.adl{width:42px;height:42px;border-radius:10px;background:#2a1a4d;display:grid;place-items:center;overflow:hidden;flex:none;color:#fbbf24;font-size:20px}
+.adl img,.adl video{width:100%;height:100%;object-fit:cover}.adl.pose{background:var(--logo) center/contain no-repeat}
+.adt{min-width:0}.adt b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.adt small{display:block;color:#c8c8d0;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.post .adb{position:absolute;left:12px;right:12px;bottom:18px;z-index:3}
+.post.hasad .rail{bottom:calc(clamp(64px,15%,150px) + 70px)}.post.hasad .who{bottom:calc(clamp(58px,13%,140px) + 70px)}.post.hasad .cap{bottom:calc(clamp(40px,8%,100px) + 70px)}.post.hasad .bar{bottom:6px}
+#adg{position:fixed;left:12px;right:12px;z-index:9;display:none}
+.ppc{text-align:center;padding:14px 0 6px}.ppc small{color:#9a9aa3;font-weight:700;letter-spacing:.12em}.ppc b{display:block;font:700 clamp(40px,13vw,56px) 'JetBrains Mono',monospace;color:#a855f7}
+.ppb{display:grid;gap:8px}.ppr{display:flex;justify-content:space-between;font-size:17px}.ppt{height:10px;border-radius:99px;background:#2a2a30;overflow:hidden}.ppt i{display:block;height:100%;background:linear-gradient(90deg,#7c3aed,#ec4899);border-radius:99px}
+.sdt{display:flex;gap:14px;align-items:center}.sdt .cv{width:84px;height:84px;border-radius:16px;flex:none;overflow:hidden}.sdt h3{font-size:22px}
+.mup{display:grid;gap:8px}#cxml{max-height:22vh;overflow:auto;display:grid;gap:8px}
+`;document.head.appendChild(st)})();
+
+// ===== Post analytics (tap one of your own posts on your profile) =====
+Object.assign(IC,{'volume-xmark':'M3 9v6h4l5 4V5L7 9H3zm12.600-.400l1.400-1.400 2 2 2-2 1.400 1.400-2 2 2 2-1.400 1.400-2-2-2 2-1.400-1.400 2-2-2-2z','volume-high':'M3 9v6h4l5 4V5L7 9H3zm13.500 3a4.500 4.500 0 0 0-2.500-4v8a4.500 4.500 0 0 0 2.500-4zM14 3.200v2.100c2.900.9 5 3.600 5 6.700s-2.100 5.800-5 6.700v2.100c4-.9 7-4.500 7-8.800s-3-7.900-7-8.800z',
+ share:'M14 3l8 8-8 8v-5c-6 0-9 2-11 6 0-7 4-11 11-12V3z',retweet:'M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z',
+ calendar:'M7 2h2v2h6V2h2v2h3v18H4V4h3V2zM6 10v10h12V10H6z',clock:'M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-1 5v6l5 3 1-1.700-4-2.300V7h-2z','id-card':'M2 5h20v14H2V5zm3 4v2h5V9H5zm0 4v2h5v-2H5zm9-4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-3 7c0-1.500 1.500-2.500 3-2.500s3 1 3 2.500h-6z'});
+S.sv=new Set(ls.g('sv',[]));S.pm=true;S.pv24=null;
+const pnPct=(v,a)=>a>0?Math.round((v-a)/a*100):0,pnSg=n=>(n>=0?'+':'')+n+'%';
+const pnMed=p=>{const u=safeImg(p.src);if(!u)return '';if(p.k==='photo'||(p.x&&p.x.media==='image'&&p.k==='buzz'))return `<img src="${u}">`;if(p.k==='video')return `<video id="panv" src="${u}" autoplay muted loop playsinline></video>`;return ''};
+PAGES.pan=()=>{const p=pf(String(S.pan));if(!p)return msg('fa-clapperboard','Post not found','This post is no longer available.','<button class="btn" data-p="profile">Back</button>');
+ const x=p.x||{},views=vw(p),likes=p.l,cm=p.c,sh=x.shares||0,sv=x.saves||0,rp=x.reposts||0,mp1=S.posts.filter(mine),
+  avV=mp1.length?mp1.reduce((a,q)=>a+vw(q),0)/mp1.length:0,avL=mp1.length?mp1.reduce((a,q)=>a+q.l,0)/mp1.length:0,pv=pnPct(views,avV),pl=pnPct(likes,avL),
+  rate=n=>(views>0?(n/views*100):0).toFixed(1)+'%',gifts=S.gin.filter(g=>String(g.postId)===String(p.id)),
+  snd=!p.sid?'No':(x.soundUid===S.uid?'Yes · your sound':'Yes · '+(POSE.soundShare*100)+'% to the artist'),
+  when=new Date(x.timestamp||Date.now()).toLocaleDateString('en-GB'),dur=x.dur?fmT(x.dur):'N/A',saved=S.sv.has(String(p.id));
+ const mc=(c,ic,l,n)=>`<div class="pnm"><div class="pnh"><span class="pni ${c}"><i class="fa-solid fa-${ic}"></i></span><small>${l}</small></div><b>${n}</b></div>`;
+ return `<div class="pan"><div class="panbg" style="background:${p.bg}">${pnMed(p)}</div>
+<div class="pant"><span class="panb" data-a="panback"><i class="fa-solid fa-arrow-left"></i> Back</span><span class="pana"><i class="fa-solid fa-chart-line"></i> ANALYTICS</span><span class="panm" data-a="panmute"><i class="fa-solid fa-volume-xmark"></i></span></div>
+<div class="panc"><h1>${esc(p.cap||'Untitled')}</h1>
+<div class="pntv"><div><small><i class="fa-solid fa-eye"></i> TOTAL VIEWS</small><b>${views}</b></div><div class="pnvs"><small>vs your average</small><b class="${pv<0?'dn':''}">${pv<0?'▼':'▲'} ${pnSg(pv)}</b></div></div>
+<div class="pnc">${mc('rd','heart','LIKES',likes)}${mc('pu','comments','COMMENTS',cm)}${mc('bl','share','SHARES',sh)}${mc('or','bookmark','SAVES',sv)}${mc('gr','retweet','REPOSTS',rp)}</div>
+<div class="pnb"><h2><i class="fa-solid fa-chart-line"></i> ENGAGEMENT</h2><div class="pne"><div><span>Engagement</span><b>${rate(likes+sh+sv+rp)}</b></div><div><span>Share Rate</span><b>${rate(sh)}</b></div><div><span>Save Rate</span><b>${rate(sv)}</b></div><div><span>Comment Rate</span><b>${rate(cm)}</b></div></div></div>
+<div class="pnb"><h2><i class="fa-solid fa-list-check"></i> VS YOUR AVERAGE</h2><div class="pna"><div class="${pv<0?'dn':''}"><span>Views</span><b>${pnSg(pv)}</b></div><div class="${pl<0?'dn':''}"><span>Likes</span><b>${pnSg(pl)}</b></div></div><p class="pnx">Average: ${Math.round(avV)} views · ${Math.round(avL)} likes</p></div>
+<div class="pnb gold"><h2><i class="fa-solid fa-gift"></i> GIFTS FROM COMMENTS</h2>${gifts.length?gifts.map(g=>`<div class="pnr"><span>${g.emoji} ${esc(g.name)} ×${g.qty}</span><b>${esc(g.fromName||'')}</b></div>`).join(''):'<p class="pnx pne0">No gifts received on this post yet.</p>'}</div>
+<div class="pnb gold"><h2><i class="fa-solid fa-star"></i> AD REVENUE</h2><div class="pnr"><span><i class="fa-solid fa-eye"></i> Views in Last 24 Hours</span><b id="pv24">${S.pv24==null?'…':S.pv24}</b></div><div class="pnr"><span><i class="fa-solid fa-coins"></i> Revenue Generated</span><b id="prev">${S.pv24==null?'…':fmS(S.pv24*POSE.starPerImpr)+' Pose Star'}</b></div><div class="pnr"><span><i class="fa-solid fa-music"></i> Artist Sound Status</span><b>${snd}</b></div></div>
+<div class="pnb"><h2><i class="fa-solid fa-circle-info"></i> DETAILS</h2><div class="pnr"><span><i class="fa-solid fa-calendar"></i> Published</span><b>${when}</b></div><div class="pnr"><span><i class="fa-solid fa-clock"></i> Duration</span><b>${dur}</b></div><div class="pnr"><span><i class="fa-solid fa-id-card"></i> ID</span><b class="pnid">post_${esc(String(p.id))}</b></div></div>
+<div class="pnbt"><button class="sv" data-a="pansave"><i class="fa-solid fa-bookmark"></i> ${saved?'Saved':'Save'}</button><button class="dl" data-a="pandel"><i class="fa-solid fa-trash"></i> Delete</button></div></div></div>`};
+async function loadPan(id){let n=0;if(S.fb)try{const d=await db().collection('lagoslife_pviews').doc(id).get();if(d.exists){const h=d.data().h||{},hr=Math.floor(Date.now()/3600000);Object.keys(h).forEach(k=>{if(+k>hr-24)n+=h[k]})}}catch(e){}
+ S.pv24=n;if(S.page==='pan'&&String(S.pan)===id){const a=$('#pv24'),b=$('#prev');if(a)a.textContent=n;if(b)b.textContent=fmS(n*POSE.starPerImpr)+' Pose Star'}}
+Object.assign(A,{
+ pan(el){const id=String(el.dataset.id);S.pan=id;S.pm=true;S.pv24=null;FA.pause();S.page='pan';render();loadPan(id)},
+ panback(){FA.pause();S.page='profile';render()},
+ async panmute(){S.pm=!S.pm;const v=$('#panv'),p=pf(String(S.pan)),x=(p&&p.x)||{};if(v){v.muted=S.pm;v.volume=p&&p.sid?Math.max(0,Math.min(1,(x.ov!=null?x.ov:50)/100)):1}
+  const b=$('.panm');if(b){b.innerHTML='<i class="fa-solid fa-volume-'+(S.pm?'xmark':'high')+'"></i>';svgI()}
+  if(S.pm)FA.pause();else if(p&&p.sid){const t=await getTr(p.sid);if(t&&t.url&&!S.pm){FA.src=t.url;FA.volume=Math.max(0,Math.min(1,(x.mv!=null?x.mv:100)/100));FA.play().catch(()=>{})}}},
+ pansave(){const id=String(S.pan),p=pf(id);if(!p)return;const on=!S.sv.has(id);on?S.sv.add(id):S.sv.delete(id);ls.s('sv',[...S.sv]);p.x=p.x||{};p.x.saves=Math.max(0,(p.x.saves||0)+(on?1:-1));
+  if(S.fb)db().collection('lagoslife_posts').doc(id).update({saves:FV().increment(on?1:-1)}).catch(()=>{});toast(on?'Saved':'Removed from saved');render()},
+ pandel(){sheet('<h3>Delete this post?</h3><p class="m">This cannot be undone.</p><div class="row"><button data-a="gclose">Cancel</button><button class="dng" data-a="pandel2">Delete</button></div>')},
+ async pandel2(){const id=String(S.pan),p=pf(id);closeSheet();if(!p||!mine(p))return;
+  try{if(S.fb)await db().collection('lagoslife_posts').doc(id).delete()}catch(e){try{await db().collection('lagoslife_posts').doc(id).update({status:'removed'})}catch(x){return toast('Could not delete this post')}}
+  S.posts=S.posts.filter(q=>String(q.id)!==id);FA.pause();S.page='profile';render();toast('Post deleted')}});
+const _wtPan=watch;watch=function(){_wtPan();const v=$('#panv');if(v)v.muted=S.pm!==false};
+
+(function(){const st=document.createElement('style');st.textContent=`
+.pan{min-height:100%;font-family:Roboto,system-ui,sans-serif;color:#fff}
+.panbg{position:fixed;inset:0;z-index:0;overflow:hidden;background:#0b0820}
+.panbg video,.panbg img{width:100%;height:100%;object-fit:cover;filter:blur(16px) brightness(.8);transform:scale(1.15)}
+.panbg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#00000040 0%,#0a0820bb 45%,#0a0620f2 80%)}
+.pant{position:fixed;left:0;right:0;top:0;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(14px + env(safe-area-inset-top)) 14px 10px}
+.pant>span{display:flex;gap:10px;align-items:center;border-radius:99px;font-weight:700;white-space:nowrap}
+.panb{background:#0a1616e6;border:1px solid #ffffff22;padding:13px 20px;font-size:clamp(16px,5vw,20px)}
+.pana{background:#7c6cff33;border:1px solid #8b7bff66;color:#fff;padding:13px 20px;font-size:clamp(14px,4.6vw,20px);letter-spacing:.06em;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}.pana i{color:#a99bff}
+.panm{width:clamp(48px,14vw,62px);height:clamp(48px,14vw,62px);justify-content:center;background:#0f1a1ae6;border:1px solid #ffffff22;font-size:24px}
+.panc{position:relative;z-index:2;padding:34vh 16px 34px;display:grid;gap:14px}
+.panc h1{font:800 clamp(22px,6.6vw,30px) Roboto,sans-serif;letter-spacing:-.01em;margin-bottom:6px}
+.pntv{display:flex;justify-content:space-between;align-items:flex-end;background:linear-gradient(135deg,#2c2c5a,#17172e);border:1px solid #5a5aa8;border-radius:26px;padding:22px}
+.pntv small{display:flex;gap:10px;align-items:center;color:#a99bff;letter-spacing:.14em;font-weight:600;font-size:clamp(14px,4vw,18px)}.pntv b{display:block;font-size:clamp(44px,13vw,60px);line-height:1.1;margin-top:8px}
+.pnvs{text-align:right}.pnvs small{display:block;color:#b8b8cc;letter-spacing:0;font-weight:500}.pnvs b{font-size:clamp(22px,6.4vw,30px);color:#34d399;margin:8px 0 0}.pnvs b.dn,.pna .dn b{color:#f87171}
+.pnc{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pnm{background:#16162ccc;border:1px solid #2a2a4a;border-radius:24px;padding:20px 18px;display:grid;gap:14px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.pnh{display:flex;align-items:center;gap:12px}.pnh small{color:#c4c4d8;letter-spacing:.1em;font-size:clamp(13px,3.8vw,17px)}
+.pni{width:clamp(38px,11vw,48px);height:clamp(38px,11vw,48px);border-radius:14px;display:grid;place-items:center;font-size:22px;flex:none}
+.pni.rd{background:#3a1622;color:#ff3b6b}.pni.pu{background:#2a2550;color:#a78bfa}.pni.bl{background:#1c2a52;color:#3b82f6}.pni.or{background:#3a2a12;color:#f59e0b}.pni.gr{background:#12352d;color:#10b981}
+.pnm b{font-size:clamp(26px,8vw,34px)}
+.pnb{background:#16162ce6;border:1px solid #2a2a4a;border-radius:26px;padding:22px 18px;display:grid;gap:14px}
+.pnb h2{display:flex;gap:10px;align-items:center;color:#a99bff;font:700 clamp(16px,4.6vw,20px) Roboto,sans-serif;letter-spacing:.1em}.pnb.gold h2{color:#fbbf24}
+.pne{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pne>div{background:#ffffff10;border:1px solid #ffffff14;border-radius:16px;padding:16px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pne span{color:#d4d4e4;font-size:clamp(13px,3.7vw,17px)}.pne b{font-size:clamp(17px,5vw,23px)}
+.pna{display:grid;grid-template-columns:1fr 1fr;gap:14px}.pna>div{background:#0f0f1e;border-left:4px solid #34d399;border-radius:18px 14px 14px 18px;padding:20px 18px;display:grid;gap:14px}.pna .dn{border-color:#f87171}.pna span{color:#c4c4d8;font-size:clamp(15px,4.2vw,18px)}.pna b{font-size:clamp(28px,8.4vw,38px);color:#34d399}
+.pnx{text-align:center;color:#b8b8cc;font-size:clamp(14px,4vw,18px)}.pne0{padding:34px 0;color:#7c7c96}
+.pnr{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid #2a2a40;font-size:clamp(15px,4.4vw,19px)}.pnr:first-of-type{border-top:0}
+.pnr span{display:flex;gap:10px;align-items:center;color:#d8d8e8;min-width:0}.pnr span i{color:#a8a8c0}.pnr b{text-align:right;font-weight:600}.pnid{font-family:'JetBrains Mono',monospace;font-size:14px;max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pnbt{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-top:6px}.pnbt button{border:0;border-radius:22px;padding:clamp(16px,2.6vh,22px);font:700 clamp(17px,5vw,21px) Roboto,sans-serif;color:#fff;display:flex;gap:10px;align-items:center;justify-content:center}
+.pnbt .sv{background:linear-gradient(135deg,#6d28d9,#8b5cf6)}.pnbt .dl{background:linear-gradient(135deg,#b4163a,#e11d48)}
 `;document.head.appendChild(st)})();
 </script></body></html>
