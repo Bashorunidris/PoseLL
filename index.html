@@ -306,7 +306,7 @@ async function api(path,b){
   return{coins:await db().runTransaction(async t=>{const pr=db().collection('lagoslife_purchases').doc(String(b.purchaseId)),ps=await t.get(pr),d=await t.get(WL()),c=d.exists?d.data().coins||0:0;if(ps.exists)return c;
    t.set(pr,{uid:S.uid,productId:b.productId,coins:n,timestamp:Date.now()});t.set(WL(),{coins:c+n,uid:S.uid,name:S.p.name,lastPurchase:String(b.purchaseId)},{merge:true});return c+n})}}
  throw Error('not_found')}
-async function spend(n,why){try{S.coins=(await api('spend',{amount:n,why})).coins;upd();hist(why||'Spent',-n);return true}catch(e){if(e.message==='low'){toast('Not enough ₦. Buy coins to top up.');A.shop()}else toast(e.message==='offline'?'Coins work inside Lagos Life only.':'Something went wrong. Try again.');return false}}
+async function spend(n,why){try{S.coins=(await api('spend',{amount:n,why})).coins;upd();hist(why||'Spent',-n);return true}catch(e){if(e.message==='low'){toast('Not enough ₦ yet. Earn more from views, or boost your balance.');A.shop()}else toast(e.message==='offline'?'Coins work inside Lagos Life only.':'Something went wrong. Try again.');return false}}
 async function claim(p){if(!S.fb){(S.pend=S.pend||[]).push(p);return}try{S.coins=(await api('claim',{purchaseId:p.purchaseId||p.id,productId:p.productId})).coins;upd();hist('Bought '+p.productId,0);ev('purchase',{item_id:p.productId});toast('Coins added')}catch(e){toast('Could not add coins. Reopen the game.')}}
 async function buy(id){try{if(!S.live)return toast('Buying coins works inside Lagos Life only.');{const r=await Vatar.purchase(id);await claim({purchaseId:(r&&(r.purchaseId||r.id||(r.purchase&&r.purchase.id)))||('p'+Date.now()+Math.random().toString(36).slice(2,7)),productId:id})}}catch(e){if(e.code!=='cancelled')toast('Payment not completed')}}
 
@@ -1180,21 +1180,59 @@ const bF=fn=>()=>{const k=S.posts;S.posts=k.filter(p=>!blkHas(p.uid));try{return
 ['foryou','buzz','trend'].forEach(k=>PAGES[k]=bF(PAGES[k]));
 
 // ---- Gifts (Send a Gift sheet) ----
-const GL=[['thumbs','👍','Thumbs Up',15,'Popular'],['heart','❤️','Heart',50,'Popular'],['kiss','💋','Kiss',15,'Popular'],['cheers','🍻','Cheers',15,'Popular'],
- ['bubbles','🫧','Bubbles',15,'New'],['winner','🎉','Winner',50,'New'],['splash','🍅','Splash',50,'New'],['goggles','🕶️','Goggles',200,'New'],
- ['cat','🛸','Space Cat',200,'Special'],['visitor','👽','Visitor',200,'Special'],['match','🏈','Matchup',200,'Special'],['toast','🍷','Toast',200,'Special'],
- ['wig','🧑‍🦱','Wig',200,'Special'],['energy','⚡','Energy',500,'Popular'],['pow','🥊','Pow',1000,'Popular'],['grad','🎓','Congratulation',5000,'Special'],['crown','👑','Crown',10000,'Special'],['diamond','💎','Diamond',20000,'Special']];
+const GL=[["thumbsup","https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHF0d2ZkbmhtZGpnd3V4MmNibWZqcmEwanoxYTBlcnN5bzl4NmRmcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/i99VfFMRAbd1Psrteb/giphy.gif","Thumbs Up",15,"Popular"],
+ ["heart","https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDkzdzJwbWRqbDNlYWFvbWtzdGwyMXVnemFhbDZmenR5NmU5cmp5ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3nvMq28M5NJe4bGr06/giphy.gif","Heart",50,"Popular"],
+ ["kiss","https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2dsNWYzd3NrOXBqYmF2aXE4dmUyODY5Z3B4ZnVjYWF6NXJwZmlmeCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/XFFHwbd9re4PFrVV28/giphy.gif","Kiss",15,""],
+ ["cheers","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2s0NWZmNHFiMDJtNnRzNzJpY3d0andwaGQ4YjZxMjU0eTdwb2t0NSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9ZQ/Y00c0w6xxtLn067SUi/giphy.gif","Cheers",15,""],
+ ["bubbles","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExeXFpMjJlbnBvcXhybjQ1MDAzYzcybTVjcGRkM25vMDQ4ZzY3OWp4OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/xT9IgIRD08lu3XX5D2/giphy.gif","Bubbles",15,""],
+ ["winner","https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXBuajRjNm1wNnNheG9xMzdtbXVjb3pxZzVuODNjNmtwYWRoemU4byZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3o7aD2ml5k1Vf8g8oM/giphy.gif","Winner",50,"Popular"],
+ ["splash","https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExa3Y0bWJzeTlnNDlra21oNHJoYmMxY2drZjlvMmdlZWhvZ2hraTNlaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/dXceGHTAqyuqAZAAzh/giphy.gif","Splash",50,""],
+ ["goggles","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExd21zdnBvZHJwaGY2emd1b3NodnpiMHhodmg4a3p3NHlkNmh0b2drMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/wHrlUQ4qUzEPu6lH0F/giphy.gif","Goggles",200,"New"],
+ ["spacecat","https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOGxrOWs1aWxxYXQzaWwwdWhtMXFyaXBxbjNzNGlhZmUzN242bHhhdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/dWS0YNs10XAoAbhHS0/giphy.gif","Space Cat",200,"New"],
+ ["visitor","https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExcGt2aXQ4MnZna3ZheXpvYWQxNHBrMTUyZ3RvcDQzNG82cnN4b21rMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/qlOso7alCUTiAX7aG5/giphy.gif","Visitor",200,""],
+ ["matchup","https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExYXpuNWYwMHpyOGxzY3drcWs1eG8xaWNzMmlrYW96NW04cHpyM3VmayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/pZwDFWGn5Qcoo4jN6U/giphy.gif","Matchup",200,""],
+ ["toast","https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXhxazJlOHo2M29naTRtZGdudDM5N21uaDBmdnRmMTBtNWI1ZGhxcSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9ZQ/kZil2V0A3W7ksWTuQn/giphy.gif","Toast",200,""],
+ ["wig","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmZlNGpmcjdtZW4xbTRtZmVyZXRoN3FpNTlmcXE3aXNsOThjamIzaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/2gUDkkBCWHc5AyUIYi/giphy.gif","Wig",200,""],
+ ["energy","https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeXUwcDRmMDF4aTZoeDFtM3Fwa3ZpeXJlcjhqc2hoaHhkZGE2NWdlaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/UTLXJBHtqoiP18csEP/giphy.gif","Energy",500,"Popular"],
+ ["pow","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExamtycHk4Nnhva3gwYmdsbXQ0b3h0MWw5azc2eGVkbmEwMGRydW56bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3owyp7ny4lU4db5WSs/giphy.gif","Pow",1000,"New"],
+ ["congrats","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZXAyYTRlOWJ4ZnlvZXFuYTVmZWN6Y3VtOWRqaWg1N2NmYjNmcjk4YSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/IfHRQE9wOCSVVF16qA/giphy.gif","Congratulation",5000,"Popular"],
+ ["faceoff","https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYTJzdXRsZWI4cWY4M2l5NW11Z28xbHF0Nmc3ZG4weHIydHl1dXpkYSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/oUEb7Fk9o4Y34rb94C/giphy.gif","Face Off",5000,""],
+ ["showlove","https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHhqZzFwbjF5d2Q3cmNxdjN4MzcxOW1ybHRjbmtyZjMxMThueWZrZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/gGU3u4pSSk1F5dqWTj/giphy.gif","Show Love",5000,"Popular"],
+ ["twopointer","https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYm42eGR0eXgxNXJsZnY4bWs3ZjNnZDBwaWVzcWp3bHRydXh1cTZ1aiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/53vHv50CsI2ZBkyMCO/giphy.gif","Two Pointer",6000,""],
+ ["baller","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDg2NDU5NzA5czJqNHFpaXlkeThraGhhcDZmMnNzbzkydDBrdW1uYSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/KQITm19UZzMGYRNBpc/giphy.gif","Baller",7000,"Popular"],
+ ["hugofish","https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExejl3Nnh5bXQ3endjcHoxc21kdWg3cnNyODl3enBzcjA4cWFyOWNjcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3WNHBQiZ0ewEXyAie8/giphy.gif","Hugo Fish",7000,""],
+ ["hat","https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3NqNWx2cXhlajFheDVsZjYwMDdodndlN2RzeGpvemUzZmlwNTBnaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/M5EdY0nX6kShHdVG3J/giphy.gif","Hat",10000,"Special"],
+ ["military","https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExanh0cG83MjZ6YTF4djhhNGYyMmRlYmJlYzJ2anF0MmowaXhlZ214cyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/HL6atEC0FTza78wCLu/giphy.gif","Military",10000,"Special"],
+ ["gta","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXdtMDlwbmZlc3llaDhkaHVpd2N3dTdmdmJ3MjJraWhiazQ5YnpwbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/PllMPq6UD5v5wtVPGZ/giphy.gif","GTA",10000,"Popular"],
+ ["redturtle","https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3BmMzJrNm14cWVieGxqOXp4d3c3NTUxMTd6MWw4ZGdvNmYyYnc1dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/xThtatg3gef6Mxtx9C/giphy.gif","Red Turtles",10000,"Popular"],
+ ["silver","https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnZ3a2ZwaHd0a282bXI0bDEzeWgwenJqdTB3MHJiYTk1OHdxYXExYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/YWMYIoTQfI5t2chkSZ/giphy.gif","Silver",20000,"Special"],
+ ["baggy","https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDYxajdhbmRyNDg5OW5wdHJrcWVuY2c2M3pvMXQwbTl5cGRxbTN3aiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/D8ANaAuXwrL2h7j121/giphy.gif","Baggy",20000,""],
+ ["hugocrab","https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExaW53cGF0NWMxbXZycWg3bXU0emkyaWlnaHNiNHJhcmhyOGltdXp1ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/VaRPzJt2JN7JSADxeO/giphy.gif","Hugo Crab",25000,""],
+ ["blueturtle","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXJ0eHBjZHd4bTAwZ3RxNWRlNjV1c3diengyNGdzY2lkdGJuc3Z6YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/l0NgQrE8D1xMtaDpm/giphy.gif","Blue Turtles",40000,"Popular"],
+ ["anthem","https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXRiYWtvZW92ajhjM2NqNGh5Yjc4aGJzOGZqbTByM3hlZWxubW92byZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3IUZ6PDXlVcmjl0hQT/giphy.gif","Anthem",50000,"New"],
+ ["spending","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExejR6ODBmb3h4dGUxcjI3Ym81aGgxazZuamRna2duanpjNTB5NzN0ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/2Nw04Wv0XyqJKOIKOx/giphy.gif","Spending",50000,"Special"],
+ ["masha","https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHliMjE0bjRuMHVxZG40NWpveWVjeHkxMTNpZ2U0MDA5eWgxemVhdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/qfLVkAWJ1hlAfxdNEQ/giphy.gif","Masha",50000,"New"],
+ ["dancebear","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjE5NnEwdmh1cWgwdmRtb21uOGI2bTJrZzFlM2tmcnlueHdqbm5ldCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/e0vAqhhYCdwa8yt4Me/giphy.gif","Dance Bear",50000,""],
+ ["bird","https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbjhodnZyb2o4YXp1a2w5bTJmOHpicGR1aXI2NmJhOGNyY2psd3E1byZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/xUA7aN9pkDyCAvTqCI/giphy.gif","Bird",80000,""],
+ ["lavsh","https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMW9xZzBreTNxcGo3ajc4amFxZWh3eGZ3eG1iYXkwZzF2ZTF6MTZkbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3d4Ict80VKePAxVJTN/giphy.gif","Lavsh",100000,"New"],
+ ["tushi","https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWxlNHY1NzF6ZGtxa3M4NTN2dDZwamY1eHg0eGhpZ25xemUzd3A2eiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/Z2saGBPiHpUkJUCuT9/giphy.gif","Tushi",100000,""],
+ ["hugolavshfish","https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2l0amM5Nnh4emR0aWVrN3Rtcnd0ZGN6NGo4aWtib3gya3N1MHozMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/M4MFNQnyUhAh42kUIv/giphy.gif","Hugo Lavsh Fish",150000,"Special"],
+ ["royalty","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmVxdWFvbG5rdGV6dWZ4aHh6ZWk1MGlqcDBpdnF5ODU4Nmc4bHlvdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/1pnye1n5EWWHTu93Ly/giphy.gif","Royalty",200000,"Special"],
+ ["benz","https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnIzczk4ejBjdnN0cjJqeDF0Z2RxaGk2cHRuaXpwcTBsMnl1cjd2bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/uZzvdIC6Q5RzkGAZWH/giphy.gif","Benz Ways",500000,"Special"],
+ ["hugolavsh","https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExeXgzNDh6bm41MzFtbXdyaHg2b3llcHJjcG84ODRnM2x0aGM2d3dhMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9dg/9q9cH3s1pfV9VT7NYO/giphy.gif","Hugo Lavsh",1000000,"Special"],
+ ["goat","https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXdhOTJodWhjNWRvMXExOGZvMG45dGZranZpeWE3OXI3ZnFqMzE5bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/PbGzW5b2kTGYEmakmr/giphy.gif","G.O.A.T",1500000,"Special"],
+ ["eagle","https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGJxdmxmYzVjYmg0OHl1ZW1oMzNoZzMxdnJ0bngzaGNmbDFsMHVxbyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/UQ1EEYdz598GeAb5RC/giphy.gif","Eagle",3000000,"Special"]];
 const gTotal=()=>GL.reduce((a,g)=>a+(S.gq[g[0]]||0)*g[3],0);
 const gHtml=()=>{const t=gTotal();return `<div class="gbar"></div><div class="gh"><b><i class="fa-solid fa-gift"></i> Send a Gift</b><span class="gc" data-a="gbuy"><i class="fa-solid fa-coins"></i> ₦<span class="cn">${(S.coins||0).toLocaleString()}</span></span><span class="gcl" data-a="gclose"><i class="fa-solid fa-xmark"></i></span></div>
 <div class="gt">${['All Gifts','Popular','New','Special'].map(c=>`<b class="${c===S.gc?'on':''}" data-a="gcat" data-c="${c}">${c}</b>`).join('')}</div>
-<div class="gg">${GL.filter(g=>S.gc==='All Gifts'||g[4]===S.gc).map(g=>`<div class="gi"><div class="gp">${g[1]}</div><b>${g[2]}</b><small>₦${g[3].toLocaleString()}</small><div class="gs"><button data-a="gdec" data-g="${g[0]}">−</button><span>${S.gq[g[0]]||0}</span><button data-a="ginc" data-g="${g[0]}">+</button></div></div>`).join('')}</div>
+<div class="gg">${GL.filter(g=>S.gc==='All Gifts'||g[4]===S.gc).map(g=>`<div class="gi"><div class="gp">${/^http/.test(g[1])?`<img loading="lazy" src="${g[1]}" alt="">`:g[1]}</div><b>${g[2]}</b><small>₦${g[3].toLocaleString()}</small><div class="gs"><button data-a="gdec" data-g="${g[0]}">−</button><span>${S.gq[g[0]]||0}</span><button data-a="ginc" data-g="${g[0]}">+</button></div></div>`).join('')}</div>
 <div class="gf"><div><small>Total${t?` · creator gets ₦${Math.round(t*NAIRA.giftShare).toLocaleString()}`:''}</small><b>₦${t.toLocaleString()}</b></div><button class="${t?'on':''}" data-a="gsend">${t?'Send gift':'+ Add'}</button></div>`};
 const gDraw=()=>{const o=$('.gg'),y=o?o.scrollTop:0;sheet(gHtml());$('#sh>div').classList.add('gx');const g=$('.gg');if(g)g.scrollTop=y};
 Object.assign(A,{
  gift(el){const p=el&&el.closest&&el.closest('[data-id]')?pf(pid(el)):null;if(!p||!p.uid)return toast('Open a post to send a gift');if(mine(p))return toast("You can't send a gift to yourself");S.gt={uid:p.uid,name:p.u,postId:String(p.id)};S.gq={};S.gc='All Gifts';gDraw()},
  gclose(){closeSheet()},gcat(el){S.gc=el.dataset.c;gDraw()},
  ginc(el){const k=el.dataset.g;S.gq[k]=Math.min(99,(S.gq[k]||0)+1);gDraw()},gdec(el){const k=el.dataset.g;S.gq[k]=Math.max(0,(S.gq[k]||0)-1);gDraw()},
- async gsend(){const t=gTotal();if(!t)return toast('Pick a gift first');if(!S.gt)return;if(S.coins<t){closeSheet();toast('Not enough ₦. Buy coins to top up.');return A.shop()}
+ async gsend(){const t=gTotal();if(!t)return toast('Pick a gift first');if(!S.gt)return;if(S.coins<t){closeSheet();toast('Not enough ₦ yet. Earn more from views, or boost your balance.');return A.shop()}
   if(!(await spend(t,'Gift to '+S.gt.name)))return;const it=GL.filter(g=>S.gq[g[0]]>0);let bad=0;
   if(S.fb)for(const g of it){try{await db().collection('lagoslife_gifts').add({to:S.gt.uid,toName:S.gt.name,from:S.uid,fromName:S.p.name,gift:g[0],emoji:g[1],name:g[2],qty:S.gq[g[0]],price:g[3],total:S.gq[g[0]]*g[3],postId:S.gt.postId,timestamp:Date.now()})}catch(e){bad++}}
   closeSheet();S.gq={};toast(bad?'Gift sent, but delivery had a problem':'Gift sent '+it.map(g=>g[1]).join(' '));ev('gift_sent',{value:t})}});
@@ -1526,7 +1564,7 @@ Object.assign(IC,{gem:'M6 3h12l4 6-10 12L2 9l4-6zm1.500 2L5 9h14l-2.500-4h-9z'})
 .wlc{display:grid;gap:12px}.wlc p{display:flex;gap:12px;align-items:flex-start;line-height:1.45}.wlc p i{color:#fbbf24;margin-top:3px;flex:none}`;document.head.appendChild(s)})();
 const dayK=()=>new Date().toISOString().slice(0,10);
 // header ₦ balance chip (tap to buy coins)
-(function(){const hd=$('header'),sr=hd&&$('.srch');if(!hd||!sr)return;const c=document.createElement('div');c.className='nbc';c.dataset.a='shop';c.innerHTML='₦<b id="nbv">0</b><i class="fa-solid fa-plus"></i>';hd.insertBefore(c,sr);svgI()})();
+(function(){const hd=$('header'),sr=hd&&$('.srch');if(!hd||!sr)return;const c=document.createElement('div');c.className='nbc';c.dataset.a='wallet';c.innerHTML='₦<b id="nbv">0</b>';hd.insertBefore(c,sr);svgI()})();
 setInterval(()=>{const e=$('#nbv');if(e)e.textContent=(S.coins||0).toLocaleString()},800);
 // wallet: everyone starts with ₦500
 const _api=api;
@@ -1568,9 +1606,28 @@ PAGES.famous=()=>{const f=S.fm,L=f.L&&f.L[f.tab],k=f.tab==='fame'?'earned':'coin
  const idx=L?L.findIndex(x=>x.uid===S.uid):-1;
  return `<div class="fmh"><h2><i class="fa-solid fa-crown"></i> Famous</h2><p class="m">Play money only. No cash value.</p></div>
 <div class="chips"><b class="${f.tab==='fame'?'on':''}" data-a="fmt" data-t="fame">Most Famous</b><b class="${f.tab==='rich'?'on':''}" data-a="fmt" data-t="rich">Richest</b></div>
-<div class="fyou"><div><small>YOUR RANK</small><b>${idx>=0?'#'+(idx+1):'Not ranked yet'}</b></div><div><small>${f.tab==='fame'?'EARNED':'BALANCE'}</small><b>₦${(f.tab==='fame'?(S.earnN||0):(S.coins||0)).toLocaleString()}</b></div><button class="btn" data-a="shop">Buy coins to climb</button></div>
+<div class="fyou"><div><small>YOUR RANK</small><b>${idx>=0?'#'+(idx+1):'Not ranked yet'}</b></div><div><small>${f.tab==='fame'?'EARNED':'BALANCE'}</small><b>₦${(f.tab==='fame'?(S.earnN||0):(S.coins||0)).toLocaleString()}</b></div><button class="btn" data-a="shop">Boost to climb the ranking</button></div>
 <div class="fl3">${!L?'<p class="m">Loading...</p>':L.length?L.map((x,i)=>`<div class="frow ${x.uid===S.uid?'me':''}"><span class="fr r${i<3?i+1:0}">${i<3?'<i class="fa-solid fa-crown"></i>':i+1}</span><span class="spa sm">${esc((x.name||'?')[0]).toUpperCase()}</span><b>${esc(x.name)}</b><span class="fv">₦${x[k].toLocaleString()}</span></div>`).join(''):'<p class="m">Nobody here yet. Be the first!</p>'}</div>`};
 const _s9b=A.search;
 Object.assign(A,{fmt(el){S.fm.tab=el.dataset.t;render()},gbuy(){closeSheet();A.shop()},search(){if(['trend','famous'].includes(S.page))return;_s9b()}});
 const _w9b=watch;watch=function(){_w9b();$('#app').classList.toggle('nosrch',['trend','famous'].includes(S.page))};
+
+// ===== Two-row header, wallet balance vs earnings, motivating wording =====
+(function(){const s=document.createElement('style');s.textContent=`
+header{flex-wrap:wrap;row-gap:2px}
+header .tabs{order:3;flex:1 1 100%;justify-content:space-around;gap:0;overflow-x:auto;padding:2px 0 0;border-bottom:1px solid #15151a}
+header .tabs b{padding:8px 4px 8px;font-size:clamp(14px,4.3vw,17px)}
+.nbc{margin-left:auto}
+.gx .gp img{width:100%;height:100%;object-fit:contain;border-radius:12px}`;document.head.appendChild(s)})();
+(function(){const c=$('.nbc');if(c){c.dataset.a='wallet';c.innerHTML='₦<b id="nbv">0</b>'}})();
+PAGES.wallet=()=>{const b=S.coins||0,e=S.earnN||0,id=String((S.p&&S.p.id)||S.uid||'guest'),h=S.hide;
+ return `<div class="wx"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="profile"></i><b><i class="fa-solid fa-wallet"></i> My Wallet</b><span style="width:22px"></span></div>
+<div class="wcard"><div class="wid">ID &nbsp;<b>${esc(id.slice(0,16))}</b></div>
+<div class="wbl">BALANCE <span class="eye" data-a="weye"><i class="fa-solid fa-eye"></i></span></div>
+<div class="wamt">${h?'••••':'₦'+b.toLocaleString()}</div>
+<div class="wpill"><span class="pc2">₦</span><b>In-app play money · no cash value</b></div>
+<div class="wbtn"><button class="tu" data-a="shop"><i class="fa-solid fa-fire"></i> Boost balance</button><button class="hs" data-a="whist"><i class="fa-solid fa-clock"></i> History</button></div></div>
+<div class="wc2"><small><i class="fa-solid fa-star"></i> EARNED (VIEWS + GIFTS)</small><b>${h?'••••':'₦'+e.toLocaleString()}</b><p>Balance is what you can spend. Earned is everything your videos and gifts have made you so far.</p></div>
+<div class="wc2"><small><i class="fa-solid fa-fire"></i> GROW YOUR ₦</small><p>Earn ₦500 for every 100 views, up to ₦5,000 a day.<br>Receive gifts and keep 70% of the price.<br>Post often and climb the Famous ranking.</p></div>
+<div class="wtl"><button data-p="famous"><i class="fa-solid fa-crown"></i>Famous</button><button data-a="whist"><i class="fa-solid fa-clock"></i>History</button></div></div>`};
 </script></body></html>
