@@ -233,7 +233,7 @@ select{width:fit-content;max-width:100%;background:var(--c);color:#fff;border:1p
 <div id="boot"><div class="ring"><span><i class="fa-solid fa-camera"></i></span></div><b>POSE</b></div>
 <div id="app">
 <header><div class="av" data-a="profile" id="me"></div>
-<div class="tabs"><b data-p="foryou">For You</b><b data-p="buzz">Buzz</b><b data-p="pose">Pose</b><b data-p="trend">Trend</b></div>
+<div class="tabs"><b data-p="foryou">For You</b><b data-p="buzz">Buzz</b><b data-p="pose">Pose</b><b data-p="trend">Trend</b><b data-p="famous">Famous</b></div>
 <div class="srch" data-a="search"><i class="fa-solid fa-magnifying-glass"></i></div></header>
 <main></main>
 <footer>
@@ -288,25 +288,25 @@ const db=()=>firebase.firestore(),FV=()=>firebase.firestore.FieldValue;
 const ev=(n,p)=>{try{S.an&&S.an.logEvent(n,p)}catch(e){}};
 let tt;const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(tt);tt=setTimeout(()=>e.style.display='none',Math.max(2400,String(t).length*80))};
 const sheet=h=>{$('#sh>div').className='';$('#sh>div').innerHTML=h;$('#sh').classList.add('on');svgI()},closeSheet=()=>{$('#sh').classList.remove('on');$('#sh>div').innerHTML=''};
-const upd=()=>$$('.cn').forEach(e=>e.textContent=S.coins);
+const upd=()=>$$('.cn').forEach(e=>e.textContent=(S.coins||0).toLocaleString());
 const bgOf=id=>`linear-gradient(160deg,hsl(${[...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0)%360} 55% 28%),#0a0a0c)`;
 const mp=(id,d)=>({id,uid:d.userId,u:d.name||'Player',k:d.type,src:d.url,cap:d.caption||'',l:d.likes||0,snd:d.soundName||'',sid:d.soundId||'',x:d,bg:bgOf(id)});
 const mine=p=>p.uid&&p.uid===S.uid;
 
 // Lagos Life server (wallet, Firebase token, purchase checks). Outside Lagos Life a local demo wallet is used.
-const PACKS_N={coins_starter:4,coins_basic:20,coins_popular:63,coins_value:126,coins_mega:504};
+const PACKS_N={coins_starter:5000,coins_basic:30000,coins_popular:65000,coins_value:170000,coins_mega:360000};
 const WL=()=>db().collection('lagoslife_wallets').doc(S.uid);
 // Coin wallet lives in Firestore (no server file). NOTE: purchases are trusted from the Vatar checkout result on the device.
 async function api(path,b){
  if(!S.fb)throw Error('offline');
  if(path==='wallet'){const d=await WL().get();return{coins:d.exists?d.data().coins||0:0}}
  if(path==='spend'){const a=Math.floor(+b.amount);if(!(a>0))throw Error('low');
-  return{coins:await db().runTransaction(async t=>{const d=await t.get(WL()),c=d.exists?d.data().coins||0:0;if(c<a)throw Error('low');t.set(WL(),{coins:c-a,uid:S.uid},{merge:true});return c-a})}}
+  return{coins:await db().runTransaction(async t=>{const d=await t.get(WL()),c=d.exists?d.data().coins||0:0;if(c<a)throw Error('low');t.set(WL(),{coins:c-a,uid:S.uid,name:S.p.name},{merge:true});return c-a})}}
  if(path==='claim'){const n=PACKS_N[b.productId];if(!n)throw Error('unknown_product');
   return{coins:await db().runTransaction(async t=>{const pr=db().collection('lagoslife_purchases').doc(String(b.purchaseId)),ps=await t.get(pr),d=await t.get(WL()),c=d.exists?d.data().coins||0:0;if(ps.exists)return c;
-   t.set(pr,{uid:S.uid,productId:b.productId,coins:n,timestamp:Date.now()});t.set(WL(),{coins:c+n,uid:S.uid,lastPurchase:String(b.purchaseId)},{merge:true});return c+n})}}
+   t.set(pr,{uid:S.uid,productId:b.productId,coins:n,timestamp:Date.now()});t.set(WL(),{coins:c+n,uid:S.uid,name:S.p.name,lastPurchase:String(b.purchaseId)},{merge:true});return c+n})}}
  throw Error('not_found')}
-async function spend(n,why){try{S.coins=(await api('spend',{amount:n,why})).coins;upd();hist(why||'Spent',-n);return true}catch(e){if(e.message==='low'){toast('Not enough coins');A.shop()}else toast(e.message==='offline'?'Coins work inside Lagos Life only.':'Something went wrong. Try again.');return false}}
+async function spend(n,why){try{S.coins=(await api('spend',{amount:n,why})).coins;upd();hist(why||'Spent',-n);return true}catch(e){if(e.message==='low'){toast('Not enough ₦. Buy coins to top up.');A.shop()}else toast(e.message==='offline'?'Coins work inside Lagos Life only.':'Something went wrong. Try again.');return false}}
 async function claim(p){if(!S.fb){(S.pend=S.pend||[]).push(p);return}try{S.coins=(await api('claim',{purchaseId:p.purchaseId||p.id,productId:p.productId})).coins;upd();hist('Bought '+p.productId,0);ev('purchase',{item_id:p.productId});toast('Coins added')}catch(e){toast('Could not add coins. Reopen the game.')}}
 async function buy(id){try{if(!S.live)return toast('Buying coins works inside Lagos Life only.');{const r=await Vatar.purchase(id);await claim({purchaseId:(r&&(r.purchaseId||r.id||(r.purchase&&r.purchase.id)))||('p'+Date.now()+Math.random().toString(36).slice(2,7)),productId:id})}}catch(e){if(e.code!=='cancelled')toast('Payment not completed')}}
 
@@ -356,7 +356,7 @@ const livePg=()=>S.lv?`<div class="lv"><div style="display:flex;gap:10px;align-i
 const musicPg=()=>{const c=S.cur||0,pl=i=>S.playing===i?'pause':'play';return `<div class="chips" style="padding:0">${['All','Pop','Hip Hop','Rock','Electronic'].map((x,i)=>`<b class="${i?'':'on'}">${x}</b>`).join('')}</div>
 <div class="mus" style="padding:0"><div class="feat"><div class="disc ${S.playing===c?'spin':''}"></div><div><small class="m">Featured today</small><h2>${SONGS[c][0]}</h2><p class="m">${SONGS[c][1]} · ${SONGS[c][2]}</p><div style="display:flex;gap:8px;margin-top:10px"><button class="btn" data-a="play" data-i="${c}"><i class="fa-solid fa-${pl(c)}"></i></button><button class="mini" data-a="usesound">Use sound</button></div></div></div>
 <h3>Trending now</h3>${SONGS.map((s,i)=>`<div class="song" data-a="play" data-i="${i}"><div class="cover"><i class="fa-solid fa-music"></i></div><div><b>${s[0]}</b><p class="m">${s[1]}</p></div><i class="fa-solid fa-${pl(i)}"></i></div>`).join('')}</div>`};
-const profilePg=()=>{const m=S.posts.filter(mine);return `<div class="pf"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="foryou"></i><span class="coins" style="padding:6px 14px;font-size:16px"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span></span></div>
+const profilePg=()=>{const m=S.posts.filter(mine);return `<div class="pf"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="foryou"></i><span class="coins" style="padding:6px 14px;font-size:16px"><i class="fa-solid fa-coins"></i> ₦<span class="cn">${(S.coins||0).toLocaleString()}</span></span></div>
 <div class="pid"><div class="pa" style="${S.p.avatar?`background-image:url(${esc(S.p.avatar)})`:''}"></div><div><h1>${esc(S.p.name).toUpperCase()}</h1><p style="color:var(--p2);font-size:17px">@${esc(S.p.name)}</p><p class="m">Creator on Pose</p></div></div>
 <div class="stats"><div><b>${m.length}</b><small>POSTS</small></div><div><b>${S.fol.size}</b><small>FOLLOWING</small></div><div><b>${m.reduce((a,p)=>a+p.l,0)}</b><small>LIKES</small></div></div>
 <div class="mc2"><button class="coral2"><i class="fa-solid fa-clapperboard"></i> My Channel</button><button class="wal" data-a="wallet"><i class="fa-solid fa-wallet"></i></button></div>
@@ -373,8 +373,8 @@ let io;function watch(){io&&io.disconnect();const ps=$$('.post'),last=ps[ps.leng
  $$('video').forEach(v=>v.muted=!S.sound);ps.forEach(p=>io.observe(p))}
 
 // Sheets
-const shop=()=>sheet(`<h3>Buy coins</h3><div class="coins"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span> coins</div><div class="row">${PACKS.map(p=>`<button data-a="buy" data-id="${p[0]}"><b>${p[1]}</b><br><small>${p[2]}</small></button>`).join('')}</div><p class="m">Coins unlock paid videos and send gifts. They cannot be cashed out.</p>`);
-const gifts=()=>sheet(`<h3>Send a gift</h3><div class="coins"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span></div><div class="row">${GIFTS.map((g,i)=>`<button data-a="sendgift" data-i="${i}"><i class="fa-solid ${g[0]}"></i><br><small>${g[1]} · ${g[2]}</small></button>`).join('')}</div>`);
+const shop=()=>sheet(`<h3>Buy coins</h3><div class="coins"><i class="fa-solid fa-coins"></i> ₦<span class="cn">${(S.coins||0).toLocaleString()}</span></div><div class="row">${PACKS.map(p=>`<button data-a="buy" data-id="${p[0]}"><b>${p[1]}</b><br><small>${p[2]}</small></button>`).join('')}</div><p class="m">Coins unlock paid videos and send gifts. They cannot be cashed out.</p>`);
+const gifts=()=>sheet(`<h3>Send a gift</h3><div class="coins"><i class="fa-solid fa-coins"></i> ₦<span class="cn">${(S.coins||0).toLocaleString()}</span></div><div class="row">${GIFTS.map((g,i)=>`<button data-a="sendgift" data-i="${i}"><i class="fa-solid ${g[0]}"></i><br><small>${g[1]} · ${g[2]}</small></button>`).join('')}</div>`);
 const create=()=>sheet(`<h3>Create</h3><div class="row"><button data-a="pick" data-k="video"><i class="fa-solid fa-video"></i><br>Video</button><button data-a="pick" data-k="photo"><i class="fa-solid fa-image"></i><br>Photo</button><button data-a="pick" data-k="buzz"><i class="fa-solid fa-pen"></i><br>Buzz</button></div><p class="m">No explicit content. Posts that break the rules are removed.</p>`);
 const composer=(k,f)=>{S.file=f;sheet(`<h3>${k==='buzz'?'New Buzz':'Add a caption'}</h3>${f?`<p class="m">${esc(f.name)}</p>`:''}<textarea id="cap" rows="3" maxlength="300" placeholder="${k==='buzz'?'What is on your mind?':'Caption'}"></textarea><button class="btn" data-a="post" data-k="${k}">Post</button>`)};
 const pid=el=>String(el.closest('[data-id]').dataset.id),pf=id=>S.posts.find(x=>String(x.id)===id);
@@ -455,7 +455,7 @@ PAGES.music=()=>`<div class="mus2">${mHead()}<div class="mbody">${MV[S.mv]()}</d
 
 // Pose channel: real videos, paid ones unlock with coins
 const vids=()=>S.posts.filter(p=>p.k==='video'&&p.src);
-const mov=p=>{const un=S.unlocked.has(String(p.id))||mine(p)||!p.price;return `<div data-a="mopen" data-id="${p.id}"><div class="mp" style="background:${p.bg}"><span class="mb">MOVIE</span>${un?'':'<i class="fa-solid fa-lock lk2"></i>'}</div><div class="mr"><div class="mc"><i class="fa-solid fa-user"></i></div><div><b>${esc((p.cap||'Untitled').slice(0,40))}</b><p class="m">${esc(p.u)}</p><p class="m">${un?(p.price?'Unlocked':'Free'):'<i class="fa-solid fa-coins"></i> '+p.price+' coins'}</p></div></div></div>`};
+const mov=p=>{const un=S.unlocked.has(String(p.id))||mine(p)||!p.price;return `<div data-a="mopen" data-id="${p.id}"><div class="mp" style="background:${p.bg}"><span class="mb">MOVIE</span>${un?'':'<i class="fa-solid fa-lock lk2"></i>'}</div><div class="mr"><div class="mc"><i class="fa-solid fa-user"></i></div><div><b>${esc((p.cap||'Untitled').slice(0,40))}</b><p class="m">${esc(p.u)}</p><p class="m">${un?(p.price?'Unlocked':'Free'):'₦'+p.price}</p></div></div></div>`};
 PAGES.pose=()=>{const v=vids(),top=[...v].sort((a,b)=>b.l-a.l)[0],f=v.filter(p=>S.pc==='All'||(S.pc==='Free'&&!p.price)||(S.pc==='Premium'&&p.price)||(S.pc==='Mine'&&mine(p)));
  return `<div class="ph"><b>POSE<span>CHANNELS</span></b><i class="fa-solid fa-bars"></i><b class="bl"><i class="fa-solid fa-fire"></i> BLINK</b></div><div data-a="mwl" style="padding:8px 16px;font-size:17px"><i class="fa-solid fa-bookmark" style="color:var(--p)"></i> Watch Later (${S.wl.size})</div>`
  +(top?`<div class="hr" style="background:${top.bg}"><span class="top">TOP 1</span><div class="hb"><button class="wb" data-a="mopen" data-id="${top.id}"><i class="fa-solid fa-play"></i> Play</button><button class="gb" data-a="minfo" data-id="${top.id}"><i class="fa-solid fa-circle-info"></i> More Info</button><button class="gb" data-a="mlater" data-id="${top.id}"><i class="fa-solid fa-plus"></i> Watch Later</button></div></div>`:msg('fa-clapperboard','No videos yet','Post a video and set a coin price to sell it here.','<button class="btn" data-a="create">Create</button>'))
@@ -463,7 +463,7 @@ PAGES.pose=()=>{const v=vids(),top=[...v].sort((a,b)=>b.l-a.l)[0],f=v.filter(p=>
 // Live: real-time chat rooms (Wave costs coins)
 const chatH=()=>(S.msgs||[]).map(m=>`<p><b>${esc(m.name)}</b> ${esc(m.text)}</p>`).join('')||'<p class="m">No messages yet. Say hi.</p>';
 PAGES.live=()=>S.rm?`<div class="lv"><div class="lvh2"><span class="tag">LIVE</span><b>${S.rm==='wave'?'Wave':'Normal Live'}</b><button class="mini" data-a="lend">Leave</button></div><div class="chat" id="ch">${chatH()}</div><div class="lvb"><input type="text" id="lm" placeholder="Say something" maxlength="200"><button class="btn" data-a="lsend"><i class="fa-solid fa-paper-plane"></i></button></div></div>`
-:`<div class="lh"><i class="fa-solid fa-tower-broadcast"></i><h2>Live</h2><p class="m" style="margin-top:8px">Chat with other players in real time.</p></div><div class="lc"><div class="w"><b><i class="fa-solid fa-water"></i> Wave</b><p class="m">Exclusive chat room. 20 coins to join for this visit.</p><button class="btn" data-a="ljoin" data-r="wave">Join · 20 coins</button></div><div class="n"><b><i class="fa-solid fa-signal"></i> Normal Live</b><p class="m">Free chat room for everyone.</p><button class="btn" data-a="ljoin" data-r="normal">Join free</button></div></div>`;
+:`<div class="lh"><i class="fa-solid fa-tower-broadcast"></i><h2>Live</h2><p class="m" style="margin-top:8px">Chat with other players in real time.</p></div><div class="lc"><div class="w"><b><i class="fa-solid fa-water"></i> Wave</b><p class="m">Exclusive chat room. ₦200 to join for this visit.</p><button class="btn" data-a="ljoin" data-r="wave">Join · ₦200</button></div><div class="n"><b><i class="fa-solid fa-signal"></i> Normal Live</b><p class="m">Free chat room for everyone.</p><button class="btn" data-a="ljoin" data-r="normal">Join free</button></div></div>`;
 // Profile
 PAGES.profile=()=>{const m=S.posts.filter(mine),L=S.pt==='Liked'?S.posts.filter(p=>S.liked.has(String(p.id))):m.filter(p=>S.pt==='Feed'?p.k==='video':S.pt==='Photos'?p.k==='photo':p.k==='buzz');
  return `<div class="pf"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="foryou"></i><span style="display:flex;gap:12px;align-items:center"><i class="fa-solid fa-gear" data-a="settings"></i><b class="coins" style="padding:6px 14px;font-size:16px" data-a="drafts"><i class="fa-solid fa-bookmark"></i> Drafts</b></span></div>
@@ -504,17 +504,17 @@ Object.assign(A,{
  mpc(el){S.pc=el.dataset.c;render()},ptab(el){S.pt=el.dataset.c;render()},mychan(){S.pc='Mine';S.page='pose';render()},
  async mopen(el){const id=String(el.dataset.id),p=pf(id);if(!p)return;if(p.price&&!S.unlocked.has(id)&&!mine(p)){if(!await spend(p.price,'Unlocked a video'))return;S.unlocked.add(id);ls.s('unl',[...S.unlocked]);render()}
   sheet(`<h3>${esc(p.cap||'Video')}</h3><video src="${esc(p.src)}" controls playsinline autoplay style="width:100%;border-radius:12px;max-height:60vh"></video><p class="m">by ${esc(p.u)}</p>`)},
- minfo(el){const p=pf(String(el.dataset.id));if(p)sheet(`<h3>${esc(p.cap||'Video')}</h3><p class="m">by ${esc(p.u)} · ${p.l} likes · ${p.c} comments</p><p>${p.price?p.price+' coins to unlock':'Free to watch'}</p>`)},
+ minfo(el){const p=pf(String(el.dataset.id));if(p)sheet(`<h3>${esc(p.cap||'Video')}</h3><p class="m">by ${esc(p.u)} · ${p.l} likes · ${p.c} comments</p><p>${p.price?'₦'+p.price+' to unlock':'Free to watch'}</p>`)},
  mlater(el){const id=String(el.dataset.id);S.wl.has(id)?S.wl.delete(id):S.wl.add(id);ls.s('wl',[...S.wl]);toast(S.wl.has(id)?'Added to Watch Later':'Removed from Watch Later');render()},
  mwl(){const l=vids().filter(p=>S.wl.has(String(p.id)));sheet(`<h3>Watch Later</h3>${rows(l.map(p=>`<div class="song" data-a="mopen" data-id="${p.id}"><div class="cover"><i class="fa-solid fa-play"></i></div><div><b>${esc((p.cap||'Video').slice(0,40))}</b><p class="m">${esc(p.u)}</p></div></div>`).join('')||'')}`)},
- async ljoin(el){const r=el.dataset.r;if(r==='wave'&&!S.waveOK){if(!await spend(20,'Joined Wave'))return;S.waveOK=true}
+ async ljoin(el){const r=el.dataset.r;if(r==='wave'&&!S.waveOK){if(!await spend(200,'Joined Wave'))return;S.waveOK=true}
   if(!S.fb)return toast('Sign-in is not ready. Try again.');S.rm=r;S.msgs=[];S.unsub&&S.unsub();
   S.unsub=db().collection('lagoslife_live').doc(r).collection('messages').orderBy('timestamp','desc').limit(40).onSnapshot(s=>{S.msgs=s.docs.map(d=>d.data()).reverse();const c=$('#ch');if(c&&S.rm){c.innerHTML=chatH();c.scrollTop=c.scrollHeight}},()=>toast('Chat unavailable'));render()},
  lend(){S.unsub&&S.unsub();S.unsub=null;S.rm=null;render()},
  async lsend(){const i=$('#lm'),v=i.value.trim();if(!v||!S.rm)return;i.value='';try{await db().collection('lagoslife_live').doc(S.rm).collection('messages').add({name:S.p.name,text:v,uid:S.uid,timestamp:Date.now()})}catch(e){toast('Could not send')}},
  search(){sheet('<h3>Search</h3><input type="text" id="sq" placeholder="Search posts, creators, sounds"><div id="sr" style="display:grid;gap:10px"></div>')},
  sgo(el){const id=el.dataset.id;closeSheet();if(el.dataset.m){S.page='music';S.mv='browse';render();return mplay(id)}const p=pf(String(id));S.page=!p?'foryou':p.k==='buzz'?'buzz':'foryou';render();setTimeout(()=>{document.querySelector('[data-id="'+id+'"]')?.scrollIntoView()},50)},
- shop(){sheet(`<h3>Buy coins</h3><div class="coins"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span> coins</div><div class="row">${PACKS.map(p=>`<button data-a="buy" data-id="${p[0]}"><b>${p[1]}</b><br><small>${p[2]}</small></button>`).join('')}</div><p class="m">Coins unlock paid videos, open Wave and send gifts. They cannot be cashed out.</p><h3>History</h3>${S.hist.slice(0,8).map(h=>`<p>${esc(h[0])} <b>${h[1]||''}</b> <small class="m">${new Date(h[2]).toLocaleDateString()}</small></p>`).join('')||'<p class="m">No activity yet.</p>'}`)},
+ shop(){sheet(`<h3>Buy coins</h3><div class="coins"><i class="fa-solid fa-coins"></i> ₦<span class="cn">${(S.coins||0).toLocaleString()}</span></div><div class="row">${PACKS.map(p=>`<button data-a="buy" data-id="${p[0]}"><b>${p[1]}</b><br><small>${p[2]}</small></button>`).join('')}</div><p class="m">Coins unlock paid videos, open Wave and send gifts. They cannot be cashed out.</p><h3>History</h3>${S.hist.slice(0,8).map(h=>`<p>${esc(h[0])} <b>${h[1]||''}</b> <small class="m">${new Date(h[2]).toLocaleDateString()}</small></p>`).join('')||'<p class="m">No activity yet.</p>'}`)},
  settings(){sheet(`<h3>Settings</h3><label class="m">Display name</label><input type="text" id="sn" value="${esc(S.p.name)}" maxlength="30"><button class="btn" data-a="sname">Save name</button><h3>Community rules</h3><p class="m">No explicit content, hate, harassment or scams. Posts that break these rules are removed and repeat offenders lose access.</p><button class="mini" data-a="drafts">My drafts (${S.drafts.length})</button>${OWN_LOGIN?'<button class="mini dng" data-a="logout">Sign out</button>':''}`)},
  sname(){const n=$('#sn').value.trim();if(!n)return;S.p.name=n;ls.s('nm2',n);ls.s('nm',n);closeSheet();render();toast('Name saved')},
  draft(el){const c=$('#cap').value.trim();if(!c)return toast('Write a caption first');S.drafts.unshift({k:el.dataset.k,c});ls.s('dr',S.drafts);closeSheet();toast('Draft saved')},
@@ -551,15 +551,15 @@ function showLogin(){return new Promise(res=>{const a=firebase.auth(),o=document
  draw();document.body.appendChild(o)})}
 
 // ===== Coin shop (styled like Pose Shop). Real purchases only, through Vatar checkout. =====
-const PK=[{id:'coins_starter',n:'Starter',b:4},{id:'coins_basic',n:'Basic',b:20},{id:'coins_popular',n:'Popular',b:60,pop:1},{id:'coins_value',n:'Value',b:120},{id:'coins_mega',n:'Mega',b:480}];
-const pkc=p=>{const bo=Math.floor(p.b*(p.b<60?.02:.05));return{...p,bonus:bo,total:p.b+bo,fee:Math.round(p.b*25*.04),price:Math.round(p.b*25*1.04)}};
+const PK=[{id:'coins_starter',n:'Starter',b:5,t:5,price:100},{id:'coins_basic',n:'Basic',b:25,t:30,price:500},{id:'coins_popular',n:'Popular',b:50,t:65,price:1000,pop:1},{id:'coins_value',n:'Value',b:125,t:170,price:2500},{id:'coins_mega',n:'Mega',b:250,t:360,price:5000}];
+const pkc=p=>({...p,total:p.t,bonus:p.t-p.b,fee:0});
 const NG=n=>'\u20A6'+n.toLocaleString();
 PAGES.shop=()=>{const L=PK.map(pkc),po=L.find(x=>x.pop);
  return `<div class="sp"><div class="spn"><i class="fa-solid fa-arrow-left rb" data-p="foryou"></i><span class="spb"><b class="mono2 cn">${S.coins}</b> <i class="fa-solid fa-coins"></i></span></div>
 <div class="sph"><span class="spbadge"><span class="ldot"></span> OFFICIAL COIN STORE</span><h1>POSE<br><em>COINS</em></h1><p class="m">Watch what you love. Support who you love.</p>
 <div class="spr"><div class="spr1"><span>POPULAR PACK, RIGHT NOW</span><span class="tg">NIGERIA</span></div><div class="spp mono2">${NG(po.price)}</div><div class="m">${po.total} coins total <b style="color:var(--gold)">(${po.b} + ${po.bonus} bonus)</b></div></div></div>
 <div class="spm"><p class="spl">POSE SHOP</p><h2>BUY <em>POSE COINS</em></h2><p class="m">Prices in Naira. Coins never expire and cannot be cashed out.</p>
-<div class="spk">${L.map(x=>`<div class="pkc ${x.pop?'pop':''}" data-a="buy" data-id="${x.id}">${x.pop?'<span class="ptag">MOST POPULAR</span>':''}<small>${x.n.toUpperCase()}</small><div class="pc mono2">${x.total}<span> coins</span></div><div class="pb2">${x.bonus?'+'+x.bonus+' bonus coins':''}</div><hr><div class="pr2 mono2">${NG(x.price)}</div><div class="pfn">${x.total} coins in total</div><button class="pbtn">Buy Now</button></div>`).join('')}</div>
+<div class="spk">${L.map(x=>`<div class="pkc ${x.pop?'pop':''}" data-a="buy" data-id="${x.id}">${x.pop?'<span class="ptag">MOST POPULAR</span>':''}<small>${x.n.toUpperCase()}</small><div class="pc mono2">₦${(x.total*1000).toLocaleString()}<span> play money</span></div><div class="pb2">${x.bonus?'+'+x.bonus+' bonus coins':''}</div><hr><div class="pr2 mono2">${NG(x.price)}</div><div class="pfn">${x.total} coins = ₦${(x.total*1000).toLocaleString()}</div><button class="pbtn">Buy Now</button></div>`).join('')}</div>
 <div class="wg"><div><i class="fa-solid fa-play"></i><h3>Unlock Premium Videos</h3><p>Exclusive videos from your favourite creators.</p></div><div><i class="fa-solid fa-coins"></i><h3>Coins Never Expire</h3><p>Buy today, spend whenever.</p></div><div><i class="fa-solid fa-heart"></i><h3>Support Creators</h3><p>Send gifts and tips to the people you love.</p></div><div><i class="fa-solid fa-star"></i><h3>Fair Pricing</h3><p>Bigger packs come with bonus coins.</p></div></div>
 <div class="hw"><div><b>01</b><h3>Choose a Pack</h3><p>See the total coins before you pay.</p></div><div><b>02</b><h3>Pay in Lagos Life</h3><p>Lagos Life's secure checkout handles the payment.</p></div><div><b>03</b><h3>Enjoy</h3><p>Coins land in your wallet as soon as payment confirms.</p></div></div>
 <h3>History</h3>${S.hist.slice(0,10).map(h=>`<p>${esc(h[0])} <b>${h[1]||''}</b> <small class="m">${new Date(h[2]).toLocaleDateString()}</small></p>`).join('')||'<p class="m">No activity yet.</p>'}</div></div>`};
@@ -587,7 +587,7 @@ async function loadPose(){
  if(['pose','chan'].includes(S.page))render()}
 const unl=m=>!m.price||m.uid===S.uid||S.unl.has(m.id);
 const thumb=m=>m.thumbUrl?`url(${esc(m.thumbUrl)}) center/cover`:bgOf(m.id);
-const mvc=m=>`<div data-a="mopen" data-id="${m.id}"><div class="mp" style="background:${thumb(m)}"><span class="mb">${esc((m.cat||'Movie').toUpperCase())}</span>${unl(m)?'':'<i class="fa-solid fa-lock lk2"></i>'}</div><div class="mr"><div class="mc"><i class="fa-solid fa-user"></i></div><div><b>${esc(m.title).slice(0,40)}</b><p class="m">${esc(m.channel||'')}</p><p class="m">${unl(m)?(m.price?'Unlocked':'Free'):'<i class="fa-solid fa-coins"></i> '+m.price+' coins'} · ${m.views||0} views</p></div></div></div>`;
+const mvc=m=>`<div data-a="mopen" data-id="${m.id}"><div class="mp" style="background:${thumb(m)}"><span class="mb">${esc((m.cat||'Movie').toUpperCase())}</span>${unl(m)?'':'<i class="fa-solid fa-lock lk2"></i>'}</div><div class="mr"><div class="mc"><i class="fa-solid fa-user"></i></div><div><b>${esc(m.title).slice(0,40)}</b><p class="m">${esc(m.channel||'')}</p><p class="m">${unl(m)?(m.price?'Unlocked':'Free'):'₦'+m.price} · ${m.views||0} views</p></div></div></div>`;
 PAGES.pose=()=>{const v=S.movies,top=[...v].sort((a,b)=>(b.views||0)-(a.views||0))[0],f=v.filter(m=>S.pc==='All'||(S.pc==='Free'&&!m.price)||(S.pc==='Premium'&&m.price)||(S.pc==='Mine'&&m.uid===S.uid)||m.cat===S.pc);
  return `<div class="ph"><b>POSE<span>CHANNELS</span></b><i class="fa-solid fa-bars" data-a="mychan"></i><b class="bl" data-a="mychan"><i class="fa-solid fa-clapperboard"></i> MY CHANNEL</b></div><div data-a="mwl" style="padding:8px 16px;font-size:17px"><i class="fa-solid fa-bookmark" style="color:var(--p)"></i> Watch Later (${S.wl.size})</div>`
  +(top?`<div class="hr" style="background:linear-gradient(#0005,#000b),${thumb(top)}"><span class="top">TOP 1</span><div class="hb"><button class="wb" data-a="mopen" data-id="${top.id}"><i class="fa-solid fa-play"></i> Play</button><button class="gb" data-a="minfo" data-id="${top.id}"><i class="fa-solid fa-circle-info"></i> More Info</button><button class="gb" data-a="mlater" data-id="${top.id}"><i class="fa-solid fa-plus"></i> Watch Later</button></div></div>`:msg('fa-clapperboard','No movies yet','Create a channel and upload the first movie.','<button class="btn" data-a="mychan">Create channel</button>'))
@@ -595,7 +595,7 @@ PAGES.pose=()=>{const v=S.movies,top=[...v].sort((a,b)=>(b.views||0)-(a.views||0
 PAGES.chan=()=>{const c=S.chan,m=S.movies.filter(x=>x.uid===S.uid),vw=m.reduce((a,x)=>a+(x.views||0),0),un=m.reduce((a,x)=>a+(x.unlocks||0),0);
  if(!c)return `<div class="pf"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="pose"></i><b>Create your channel</b><span></span></div><div class="mbody"><div class="pcd"><label>Channel name *</label><input type="text" id="chn" maxlength="40" placeholder="e.g. Lagos Cinema"><label>Category</label><select id="chc">${CATS.map(x=>`<option>${x}</option>`).join('')}</select><label>Description</label><textarea id="chd" rows="3" maxlength="200" placeholder="What is your channel about?"></textarea><button class="btn" data-a="chsave">Create channel</button></div><p class="m">Upload movies up to 250 MB. Set a coin price or make them free.</p></div></div>`;
  return `<div class="pf"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="pose"></i><b>${esc(c.name)}</b><span class="vc">${esc(c.cat)}</span></div><div class="mbody">${stat('MOVIES',m.length,'video')}${stat('VIEWS',vw,'eye')}${stat('UNLOCKS',un,'coins')}<button class="btn" data-a="mvform"><i class="fa-solid fa-upload"></i> Upload movie</button>`
- +m.map(x=>`<div class="pcd"><b style="font-size:18px">${esc(x.title)}</b><p class="m">${esc(x.cat)} · ${x.price?x.price+' coins':'Free'}</p><div class="tg3"><div><small>VIEWS</small><b>${x.views||0}</b></div><div><small>UNLOCKS</small><b>${x.unlocks||0}</b></div></div><div class="acts"><button class="mini" data-a="mopen" data-id="${x.id}"><i class="fa-solid fa-play"></i> Play</button><button class="mini dng" data-a="mvdel" data-id="${x.id}"><i class="fa-solid fa-trash"></i></button></div></div>`).join('')+`</div></div>`};
+ +m.map(x=>`<div class="pcd"><b style="font-size:18px">${esc(x.title)}</b><p class="m">${esc(x.cat)} · ${x.price?'₦'+x.price:'Free'}</p><div class="tg3"><div><small>VIEWS</small><b>${x.views||0}</b></div><div><small>UNLOCKS</small><b>${x.unlocks||0}</b></div></div><div class="acts"><button class="mini" data-a="mopen" data-id="${x.id}"><i class="fa-solid fa-play"></i> Play</button><button class="mini dng" data-a="mvdel" data-id="${x.id}"><i class="fa-solid fa-trash"></i></button></div></div>`).join('')+`</div></div>`};
 const pickFile=(acc,max,label,cb)=>{const f=$('#f');f.accept=acc;f.onchange=()=>{const x=f.files[0];if(!x)return;if(x.size>max*MB)return toast('Maximum is '+max+' MB');cb(x)};f.value='';f.click()};
 Object.assign(A,{
  create(){sheet(`<h3>Create</h3><div class="row"><button data-a="pick" data-k="video"><i class="fa-solid fa-video"></i><br>Video</button><button data-a="pick" data-k="photo"><i class="fa-solid fa-image"></i><br>Photo</button><button data-a="pick" data-k="buzz"><i class="fa-solid fa-pen"></i><br>Buzz</button><button data-a="mychan"><i class="fa-solid fa-clapperboard"></i><br>Movie</button></div><p class="m">No explicit content. Posts that break the rules are removed.</p>`)},
@@ -604,7 +604,7 @@ Object.assign(A,{
  async chsave(){const n=$('#chn').value.trim();if(!n)return toast('Add a channel name');if(!S.fb)return toast('Sign-in is not ready. Try again.');
   const d={name:n,cat:$('#chc').value,desc:$('#chd').value.trim(),uid:S.uid,owner:S.p.name,timestamp:Date.now()};
   try{await db().collection('lagoslife_channels').doc(S.uid).set(d);S.chan=d;render();toast('Channel created')}catch(e){toast('Could not create channel: '+(e.code||e.message))}},
- mvform(){S.mvf=null;S.mvt=null;sheet(`<h3>Upload movie</h3><input type="text" id="mt" placeholder="Title *" maxlength="80"><textarea id="md" rows="2" maxlength="300" placeholder="Description"></textarea><select id="mc2">${CATS.map(x=>`<option>${x}</option>`).join('')}</select><input type="text" id="mpr" inputmode="numeric" <div class="row"><button data-a="mvthumb"><i class="fa-solid fa-image"></i><br><span id="mtn">Thumbnail</span></button><button data-a="mvfile"><i class="fa-solid fa-video"></i><br><span id="mvn">Movie file</span></button></div><p class="m">Movie: up to 250 MB. Thumbnail: up to 5 MB.</p><button class="btn" data-a="mvsave">Publish</button>`)},
+ mvform(){S.mvf=null;S.mvt=null;sheet(`<h3>Upload movie</h3><input type="text" id="mt" placeholder="Title *" maxlength="80"><textarea id="md" rows="2" maxlength="300" placeholder="Description"></textarea><select id="mc2">${CATS.map(x=>`<option>${x}</option>`).join('')}</select><input type="text" id="mpr" inputmode="numeric" placeholder="Price in ₦ (0 = free)"><div class="row"><button data-a="mvthumb"><i class="fa-solid fa-image"></i><br><span id="mtn">Thumbnail</span></button><button data-a="mvfile"><i class="fa-solid fa-video"></i><br><span id="mvn">Movie file</span></button></div><p class="m">Movie: up to 250 MB. Thumbnail: up to 5 MB.</p><button class="btn" data-a="mvsave">Publish</button>`)},
  mvthumb(){pickFile('image/*',5,'',x=>{S.mvt=x;$('#mtn').textContent=x.name.slice(0,18)})},
  mvfile(){pickFile('video/*',250,'',x=>{S.mvf=x;$('#mvn').textContent=x.name.slice(0,16)+' ('+Math.round(x.size/MB)+' MB)'})},
  async mvsave(){const t=$('#mt').value.trim(),f=S.mvf;if(!t||!f)return toast('Add a title and a movie file');if(!S.fb||!S.chan)return toast('Create your channel first');
@@ -621,7 +621,7 @@ Object.assign(A,{
    if(S.fb){db().collection('lagoslife_unlocks').doc(S.uid+'_'+id).set({uid:S.uid,movieId:id,timestamp:Date.now()}).catch(()=>{});db().collection('lagoslife_movies').doc(id).update({unlocks:FV().increment(1)}).catch(()=>{})}render()}
   if(S.fb)db().collection('lagoslife_movies').doc(id).update({views:FV().increment(1)}).catch(()=>{});m.views=(m.views||0)+1;
   sheet(`<h3>${esc(m.title)}</h3><video src="${esc(m.videoUrl)}" ${m.thumbUrl?`poster="${esc(m.thumbUrl)}"`:''} controls playsinline autoplay style="width:100%;border-radius:12px;max-height:60vh"></video><p class="m">${esc(m.channel||'')} · ${esc(m.cat||'')}</p><p>${esc(m.desc||'')}</p>`)},
- minfo(el){const m=S.movies.find(x=>x.id===el.dataset.id);if(m)sheet(`<h3>${esc(m.title)}</h3><p class="m">${esc(m.channel||'')} · ${esc(m.cat||'')} · ${m.views||0} views</p><p>${esc(m.desc||'')}</p><p>${m.price?m.price+' coins to unlock':'Free to watch'}</p>`)},
+ minfo(el){const m=S.movies.find(x=>x.id===el.dataset.id);if(m)sheet(`<h3>${esc(m.title)}</h3><p class="m">${esc(m.channel||'')} · ${esc(m.cat||'')} · ${m.views||0} views</p><p>${esc(m.desc||'')}</p><p>${m.price?'₦'+m.price+' to unlock':'Free to watch'}</p>`)},
  mlater(el){const id=el.dataset.id;S.wl.has(id)?S.wl.delete(id):S.wl.add(id);ls.s('wl',[...S.wl]);toast(S.wl.has(id)?'Added to Watch Later':'Removed from Watch Later');render()},
  mwl(){const l=S.movies.filter(m=>S.wl.has(m.id));sheet(`<h3>Watch Later</h3>${l.map(m=>`<div class="song" data-a="mopen" data-id="${m.id}"><div class="cover"><i class="fa-solid fa-play"></i></div><div><b>${esc(m.title).slice(0,40)}</b><p class="m">${esc(m.channel||'')}</p></div></div>`).join('')||'<p class="m">Nothing saved yet.</p>'}`)},
  // Music upload goes to R2 too
@@ -649,7 +649,7 @@ const slots=()=>{const d=new Date();return S.movies.filter(m=>{const t=new Date(
 S.fans=0;S.fl=[];S.ct='home';
 async function loadFans(){if(!S.uid)return;try{const r=await db().collection('lagoslife_follows').where('to','==',S.uid).get();S.fl=r.docs.map(d=>d.data()).sort((a,b)=>b.timestamp-a.timestamp);S.fans=r.size}catch(e){}if(S.page==='chan')render()}
 const cHead=()=>`<div class="cdh"><span class="lg lgo"></span><span class="cdt">Pose<br>Channel</span><span class="cdb" data-a="chinbox"><i class="fa-solid fa-inbox"></i> Inbox</span><span class="cdb" data-a="chset"><i class="fa-solid fa-gear"></i> Settings</span><span class="cdb pr3" data-p="pose"><i class="fa-solid fa-arrow-left"></i> Go back</span></div>`;
-const mvCard=x=>`<div class="cdc"><b style="font-size:18px">${esc(x.title)}</b><p class="m">${esc(x.cat)} · ${x.price?x.price+' coins':'Free'}</p><div class="tg3"><div><small>VIEWS</small><b>${x.views||0}</b></div><div><small>UNLOCKS</small><b>${x.unlocks||0}</b></div></div><div class="acts"><button class="mini" data-a="mopen" data-id="${x.id}"><i class="fa-solid fa-play"></i> Play</button><button class="mini dng" data-a="mvdel" data-id="${x.id}"><i class="fa-solid fa-trash"></i></button></div></div>`;
+const mvCard=x=>`<div class="cdc"><b style="font-size:18px">${esc(x.title)}</b><p class="m">${esc(x.cat)} · ${x.price?'₦'+x.price:'Free'}</p><div class="tg3"><div><small>VIEWS</small><b>${x.views||0}</b></div><div><small>UNLOCKS</small><b>${x.unlocks||0}</b></div></div><div class="acts"><button class="mini" data-a="mopen" data-id="${x.id}"><i class="fa-solid fa-play"></i> Play</button><button class="mini dng" data-a="mvdel" data-id="${x.id}"><i class="fa-solid fa-trash"></i></button></div></div>`;
 PAGES.chan=()=>{const c=S.chan,m=S.movies.filter(x=>x.uid===S.uid),vw=m.reduce((a,x)=>a+(x.views||0),0),un=m.reduce((a,x)=>a+(x.unlocks||0),0),lk=S.posts.filter(mine).reduce((a,p)=>a+p.l,0),sl=slots(),t=S.ct;
  if(!c)return `<div class="cd">${cHead()}<div class="cdl"><h2>Create your channel</h2><label>Channel name *</label><input type="text" id="chn" maxlength="40" placeholder="e.g. Lagos Cinema"><label>Category</label><select id="chc">${CATS.map(x=>`<option>${x}</option>`).join('')}</select><label>Description</label><textarea id="chd" rows="3" maxlength="200" placeholder="What is your channel about?"></textarea><button class="btn" data-a="chsave">Create channel</button><p class="m">Upload movies up to 250 MB. Set a coin price or make them free.</p></div></div>`;
  const tabs=`<div class="cdn">${[['home','house','Home'],['studio','video','Studio'],['rewards','coins','Rewards'],['elig','list-check','Eligibility']].map(x=>`<span class="${t===x[0]?'on':''}" data-a="ctab" data-c="${x[0]}"><i class="fa-solid fa-${x[1]}"></i> ${x[2]}</span>`).join('')}</div>`;
@@ -943,8 +943,8 @@ PAGES.wallet=()=>{const c=S.coins,id=String((S.p&&S.p.id)||S.uid||'guest'),mv=S.
  return `<div class="wx"><div class="gold"><i class="fa-solid fa-arrow-left" data-p="profile"></i><b><i class="fa-solid fa-wallet"></i> My Wallet</b><span style="width:22px"></span></div>
 <div class="wcard"><div class="wid">ID &nbsp;<b>${esc(id.slice(0,16))}</b></div>
 <div class="wbl">TOTAL BALANCE <span class="eye" data-a="weye"><i class="fa-solid fa-eye"></i></span></div>
-<div class="wamt">${S.hide?'••••':c}<small> coins</small></div>
-<div class="wpill"><span class="pc2">P</span><b>${S.hide?'••':c} Pose Coin</b></div>
+<div class="wamt">${S.hide?'••••':'₦'+(c||0).toLocaleString()}<small> play money</small></div>
+<div class="wpill"><span class="pc2">P</span><b>Play money · no cash value</b></div>
 <div class="wbtn"><button class="tu" data-a="shop"><i class="fa-solid fa-plus"></i> Top Up</button><button class="hs" data-a="whist"><i class="fa-solid fa-clock"></i> History</button></div></div>
 <div class="wc2"><small><i class="fa-solid fa-star"></i> YOUR ACTIVITY</small><b>${mv.length} posts</b><p>${lk} likes · ${cm} comments on your posts</p></div>
 <div class="wc2"><small><i class="fa-solid fa-coins"></i> HOW COINS WORK</small><p>Coins unlock paid videos and movies, open Wave chat rooms and send gifts. Coins never expire and cannot be cashed out.</p></div>
@@ -1046,7 +1046,7 @@ const spSnd=t=>`<div class="sps2"><div class="cover"><i class="fa-solid fa-music
 const spBU=u=>`<div class="spr2"><span class="cam2"><i class="fa-solid fa-camera"></i></span><div><b>${esc(u.name)}</b><p class="m">${u.e} engagements</p></div></div>`;
 const spBP=p=>`<div class="spr2" data-a="spgo" data-id="${p.id}"><span class="cam2"><i class="fa-solid fa-camera"></i></span><div><b>${esc(p.u)}</b><p>${esc((p.cap||'').slice(0,90))}</p><p class="eng"><i class="fa-solid fa-fire"></i> ${p.l+p.c} engagement${p.l+p.c===1?'':'s'}</p></div></div>`;
 const spCh=c=>`<div class="spr2" data-a="spq" data-q="${esc(c.name)}" data-t="Videos"><span class="cam2"><i class="fa-solid fa-camera"></i></span><div><b>${esc(c.name)}</b><p class="m">Channel</p></div></div>`;
-const spMov=m=>`<div class="smv" data-a="spmov" data-id="${m.id}"><div class="smt" style="background:${thumb(m)}"></div><div class="smb"><b>${esc(m.title||'Untitled')}</b><p class="m">${esc(m.channel||'')} · ${esc((m.cat||'').toLowerCase())}</p>${m.price&&!unl(m)?`<span class="cc"><i class="fa-solid fa-coins"></i> ${m.price} Pose Coin</span>`:''}</div></div>`;
+const spMov=m=>`<div class="smv" data-a="spmov" data-id="${m.id}"><div class="smt" style="background:${thumb(m)}"></div><div class="smb"><b>${esc(m.title||'Untitled')}</b><p class="m">${esc(m.channel||'')} · ${esc((m.cat||'').toLowerCase())}</p>${m.price&&!unl(m)?`<span class="cc"><i class="fa-solid fa-coins"></i> ₦${m.price}</span>`:''}</div></div>`;
 const none=t=>`<p class="m pad">${t}</p>`;
 function spBody(){const s=S.sp,q=s.q.trim(),m=s.m,t=s.tab;
  if(m==='pose'){const ms=S.movies.filter(x=>spMatch(q,x.title,x.channel,x.cat,x.desc)),by=cs=>ms.filter(x=>cs.includes(x.cat)),ch=(S.chs||[]).filter(c=>spMatch(q,c.name));
@@ -1180,27 +1180,27 @@ const bF=fn=>()=>{const k=S.posts;S.posts=k.filter(p=>!blkHas(p.uid));try{return
 ['foryou','buzz','trend'].forEach(k=>PAGES[k]=bF(PAGES[k]));
 
 // ---- Gifts (Send a Gift sheet) ----
-const GL=[['thumbs','👍','Thumbs Up',1,'Popular'],['heart','❤️','Heart',5,'Popular'],['kiss','💋','Kiss',1,'Popular'],['cheers','🍻','Cheers',1,'Popular'],
- ['bubbles','🫧','Bubbles',1,'New'],['winner','🎉','Winner',5,'New'],['splash','🍅','Splash',5,'New'],['goggles','🕶️','Goggles',10,'New'],
- ['cat','🛸','Space Cat',10,'Special'],['visitor','👽','Visitor',10,'Special'],['match','🏈','Matchup',10,'Special'],['toast','🍷','Toast',10,'Special'],
- ['wig','🧑‍🦱','Wig',10,'Special'],['energy','⚡','Energy',18,'Popular'],['pow','🥊','Pow',20,'Popular'],['grad','🎓','Congratulation',50,'Special']];
+const GL=[['thumbs','👍','Thumbs Up',15,'Popular'],['heart','❤️','Heart',50,'Popular'],['kiss','💋','Kiss',15,'Popular'],['cheers','🍻','Cheers',15,'Popular'],
+ ['bubbles','🫧','Bubbles',15,'New'],['winner','🎉','Winner',50,'New'],['splash','🍅','Splash',50,'New'],['goggles','🕶️','Goggles',200,'New'],
+ ['cat','🛸','Space Cat',200,'Special'],['visitor','👽','Visitor',200,'Special'],['match','🏈','Matchup',200,'Special'],['toast','🍷','Toast',200,'Special'],
+ ['wig','🧑‍🦱','Wig',200,'Special'],['energy','⚡','Energy',500,'Popular'],['pow','🥊','Pow',1000,'Popular'],['grad','🎓','Congratulation',5000,'Special'],['crown','👑','Crown',10000,'Special'],['diamond','💎','Diamond',20000,'Special']];
 const gTotal=()=>GL.reduce((a,g)=>a+(S.gq[g[0]]||0)*g[3],0);
-const gHtml=()=>{const t=gTotal();return `<div class="gbar"></div><div class="gh"><b><i class="fa-solid fa-gift"></i> Send a Gift</b><span class="gc"><i class="fa-solid fa-coins"></i> <span class="cn">${S.coins}</span></span><span class="gcl" data-a="gclose"><i class="fa-solid fa-xmark"></i></span></div>
+const gHtml=()=>{const t=gTotal();return `<div class="gbar"></div><div class="gh"><b><i class="fa-solid fa-gift"></i> Send a Gift</b><span class="gc" data-a="gbuy"><i class="fa-solid fa-coins"></i> ₦<span class="cn">${(S.coins||0).toLocaleString()}</span></span><span class="gcl" data-a="gclose"><i class="fa-solid fa-xmark"></i></span></div>
 <div class="gt">${['All Gifts','Popular','New','Special'].map(c=>`<b class="${c===S.gc?'on':''}" data-a="gcat" data-c="${c}">${c}</b>`).join('')}</div>
-<div class="gg">${GL.filter(g=>S.gc==='All Gifts'||g[4]===S.gc).map(g=>`<div class="gi"><div class="gp">${g[1]}</div><b>${g[2]}</b><small><i class="fa-solid fa-coins"></i> ${g[3]} Pose</small><div class="gs"><button data-a="gdec" data-g="${g[0]}">−</button><span>${S.gq[g[0]]||0}</span><button data-a="ginc" data-g="${g[0]}">+</button></div></div>`).join('')}</div>
-<div class="gf"><div><small>Total${t?` · they get ${(t*POSE.llPerCoin).toLocaleString()} credit`:''}</small><b><i class="fa-solid fa-coins"></i> ${t} Pose Coins</b></div><button class="${t?'on':''}" data-a="gsend">${t?'Send gift':'+ Add'}</button></div>`};
+<div class="gg">${GL.filter(g=>S.gc==='All Gifts'||g[4]===S.gc).map(g=>`<div class="gi"><div class="gp">${g[1]}</div><b>${g[2]}</b><small>₦${g[3].toLocaleString()}</small><div class="gs"><button data-a="gdec" data-g="${g[0]}">−</button><span>${S.gq[g[0]]||0}</span><button data-a="ginc" data-g="${g[0]}">+</button></div></div>`).join('')}</div>
+<div class="gf"><div><small>Total${t?` · creator gets ₦${Math.round(t*NAIRA.giftShare).toLocaleString()}`:''}</small><b>₦${t.toLocaleString()}</b></div><button class="${t?'on':''}" data-a="gsend">${t?'Send gift':'+ Add'}</button></div>`};
 const gDraw=()=>{const o=$('.gg'),y=o?o.scrollTop:0;sheet(gHtml());$('#sh>div').classList.add('gx');const g=$('.gg');if(g)g.scrollTop=y};
 Object.assign(A,{
  gift(el){const p=el&&el.closest&&el.closest('[data-id]')?pf(pid(el)):null;if(!p||!p.uid)return toast('Open a post to send a gift');if(mine(p))return toast("You can't send a gift to yourself");S.gt={uid:p.uid,name:p.u,postId:String(p.id)};S.gq={};S.gc='All Gifts';gDraw()},
  gclose(){closeSheet()},gcat(el){S.gc=el.dataset.c;gDraw()},
  ginc(el){const k=el.dataset.g;S.gq[k]=Math.min(99,(S.gq[k]||0)+1);gDraw()},gdec(el){const k=el.dataset.g;S.gq[k]=Math.max(0,(S.gq[k]||0)-1);gDraw()},
- async gsend(){const t=gTotal();if(!t)return toast('Pick a gift first');if(!S.gt)return;if(S.coins<t){closeSheet();toast('Not enough coins');return A.shop()}
+ async gsend(){const t=gTotal();if(!t)return toast('Pick a gift first');if(!S.gt)return;if(S.coins<t){closeSheet();toast('Not enough ₦. Buy coins to top up.');return A.shop()}
   if(!(await spend(t,'Gift to '+S.gt.name)))return;const it=GL.filter(g=>S.gq[g[0]]>0);let bad=0;
   if(S.fb)for(const g of it){try{await db().collection('lagoslife_gifts').add({to:S.gt.uid,toName:S.gt.name,from:S.uid,fromName:S.p.name,gift:g[0],emoji:g[1],name:g[2],qty:S.gq[g[0]],price:g[3],total:S.gq[g[0]]*g[3],postId:S.gt.postId,timestamp:Date.now()})}catch(e){bad++}}
   closeSheet();S.gq={};toast(bad?'Gift sent, but delivery had a problem':'Gift sent '+it.map(g=>g[1]).join(' '));ev('gift_sent',{value:t})}});
 PAGES.alert=()=>{const a=S.posts.filter(mine).filter(p=>p.l||p.c),g=S.gin.slice(0,20);
  return `<div class="ah"><i class="fa-solid fa-arrow-left rb" data-p="foryou"></i><h2>Activity</h2><i class="rb"></i></div>`+
- (g.length||a.length?g.map(x=>`<div class="ai"><div class="ap" style="font-size:26px">${x.emoji}</div><div><b>${esc(x.fromName)} sent you ${x.qty}× ${esc(x.name)}</b><p class="m">${x.total} Pose · ${new Date(x.timestamp).toLocaleDateString()}</p></div></div>`).join('')+a.map(p=>`<div class="ai"><div class="ap"><i class="fa-solid fa-heart" style="color:var(--acc)"></i></div><div><b>${esc((p.cap||'Your post').slice(0,40))}</b><p class="m">${p.l} likes · ${p.c} comments</p></div></div>`).join(''):msg('fa-bell','No alerts yet','Likes, comments and gifts on your posts show up here.'))};
+ (g.length||a.length?g.map(x=>`<div class="ai"><div class="ap" style="font-size:26px">${x.emoji}</div><div><b>${esc(x.fromName)} sent you ${x.qty}× ${esc(x.name)}</b><p class="m">₦${x.total} · ${new Date(x.timestamp).toLocaleDateString()}</p></div></div>`).join('')+a.map(p=>`<div class="ai"><div class="ap"><i class="fa-solid fa-heart" style="color:var(--acc)"></i></div><div><b>${esc((p.cap||'Your post').slice(0,40))}</b><p class="m">${p.l} likes · ${p.c} comments</p></div></div>`).join(''):msg('fa-bell','No alerts yet','Likes, comments and gifts on your posts show up here.'))};
 
 // ---- ∞ verified badge + profile pictures on feed, and view counting ----
 function decorate(){$$('.post,.bz').forEach(el=>{if(el.dataset.dc)return;const p=pf(String(el.dataset.id));if(!p)return;el.dataset.dc=1;
@@ -1510,4 +1510,67 @@ const _wtPan=watch;watch=function(){_wtPan();const v=$('#panv');if(v)v.muted=S.p
 (function(){const st=document.createElement('style');st.textContent='#app.nosrch .srch{display:none}';document.head.appendChild(st)})();
 const _s9=A.search;A.search=function(){if(S.page==='trend')return;_s9()};
 const _w9=watch;watch=function(){_w9();$('#app').classList.toggle('nosrch',S.page==='trend')};
+
+// ===== Play-naira economy: ₦500 start, ₦500 per 100 views, 70% gifts, cheap coin packs, Famous tab =====
+const NAIRA={start:500,perCoin:1000,viewPay:500,viewPer:100,dayCap:5000,giftShare:0.7};
+Object.assign(IC,{gem:'M6 3h12l4 6-10 12L2 9l4-6zm1.500 2L5 9h14l-2.500-4h-9z'});
+(function(){const s=document.createElement('style');s.textContent=`
+.tabs{overflow-x:auto;scrollbar-width:none;min-width:0}.tabs::-webkit-scrollbar{display:none}.tabs b{flex:none}
+.nbc{display:flex;align-items:center;gap:4px;background:#2b2108;border:1px solid #6b5210;color:#fbbf24;border-radius:99px;padding:6px 10px;font-weight:800;font-size:clamp(11px,3.2vw,13px);white-space:nowrap;flex:none}.nbc i{font-size:11px;background:#fbbf24;color:#2b2108;border-radius:50%;width:16px;height:16px;display:grid;place-items:center}
+#app.nosrch .srch{display:none}
+.fmh{padding:16px}.fmh h2{display:flex;gap:10px;align-items:center;font-size:clamp(22px,7vw,30px)}.fmh h2 i{color:#fbbf24}
+.fyou{margin:0 16px 14px;background:linear-gradient(135deg,#2b2108,#1a0b3d);border:1px solid #6b5210;border-radius:22px;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center}.fyou small{color:#c9b36b;letter-spacing:.1em;font-weight:700}.fyou b{display:block;font-size:clamp(20px,6vw,28px);color:#fff}.fyou .btn{grid-column:1/3}
+.fl3{padding:0 16px 24px;display:grid;gap:10px}.frow{display:flex;align-items:center;gap:12px;background:#0f0b18;border:1px solid #1f1536;border-radius:18px;padding:12px 14px}.frow.me{border-color:#8b5cf6;background:#150d2b}
+.frow b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fv{color:#fbbf24;font-weight:800}.fr{width:34px;text-align:center;font-weight:800;color:#999}.fr.r1{color:#fbbf24}.fr.r2{color:#d1d5db}.fr.r3{color:#d97706}
+.spa.sm{width:clamp(38px,11vw,48px);height:clamp(38px,11vw,48px);font-size:20px}
+.wlc{display:grid;gap:12px}.wlc p{display:flex;gap:12px;align-items:flex-start;line-height:1.45}.wlc p i{color:#fbbf24;margin-top:3px;flex:none}`;document.head.appendChild(s)})();
+const dayK=()=>new Date().toISOString().slice(0,10);
+// header ₦ balance chip (tap to buy coins)
+(function(){const hd=$('header'),sr=hd&&$('.srch');if(!hd||!sr)return;const c=document.createElement('div');c.className='nbc';c.dataset.a='shop';c.innerHTML='₦<b id="nbv">0</b><i class="fa-solid fa-plus"></i>';hd.insertBefore(c,sr);svgI()})();
+setInterval(()=>{const e=$('#nbv');if(e)e.textContent=(S.coins||0).toLocaleString()},800);
+// wallet: everyone starts with ₦500
+const _api=api;
+api=async function(path,b){
+ if(path==='wallet'){if(!S.fb)throw Error('offline');const r=await WL().get();
+  if(!r.exists){await WL().set({coins:NAIRA.start,earned:0,uid:S.uid,name:S.p.name,ts:Date.now()});S.newbie=true;S.earnN=0;return{coins:NAIRA.start}}
+  const d=r.data();S.earnN=d.earned||0;if(d.name!==S.p.name)WL().set({name:S.p.name},{merge:true}).catch(()=>{});return{coins:d.coins||0}}
+ return _api(path,b)};
+// gifts received are paid into the ₦ balance (70% of the gift price)
+async function claimGifts(){if(!S.fb||S.gcb)return;S.gcb=1;let got=0;
+ try{const r=await db().collection('lagoslife_gifts').where('to','==',S.uid).limit(200).get();S.gin=r.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>b.timestamp-a.timestamp);const done=new Set(ls.g('gcl2',[]));
+  for(const g of S.gin){if(done.has(g.id))continue;
+   try{await db().runTransaction(async t=>{const cr=db().collection('lagoslife_gclaim').doc(g.id),cs=await t.get(cr),ws=await t.get(WL());
+     if(!cs.exists){const n=Math.round((g.total||0)*NAIRA.giftShare),w=ws.exists?ws.data():{};t.set(cr,{uid:S.uid,gift:g.id,naira:n,timestamp:Date.now()});t.set(WL(),{coins:(w.coins||0)+n,earned:(w.earned||0)+n,uid:S.uid,name:S.p.name},{merge:true});got+=n}});done.add(g.id)}catch(e){break}}
+  ls.s('gcl2',[...done].slice(-1000))}catch(e){}
+ S.gcb=0;if(got){S.coins+=got;S.earnN=(S.earnN||0)+got;upd();toast('Gifts: +₦'+got.toLocaleString())}}
+// views: ₦500 per 100 views, paid straight away, up to ₦5,000 a day
+const _cv=countView;
+countView=function(id){const p=pf(id),ok=p&&!mine(p)&&!S.seen.has(id)&&!S.paused&&!document.hidden&&S.fb&&p.uid;_cv(id);if(ok)db().collection('lagoslife_vc').doc(p.uid).set({n:FV().increment(1)},{merge:true}).catch(()=>{})};
+async function viewPay(){if(!S.fb||S.vpb)return;S.vpb=1;let pay=0;
+ try{await db().runTransaction(async t=>{const vr=db().collection('lagoslife_vc').doc(S.uid),vs=await t.get(vr),ws=await t.get(WL());if(!vs.exists)return;
+  const v=vs.data(),ch=Math.floor(((v.n||0)-(v.paid||0))/NAIRA.viewPer);if(ch<1)return;
+  const d=dayK(),used=v.day===d?(v.dpaid||0):0,room=Math.max(0,Math.floor((NAIRA.dayCap-used)/NAIRA.viewPay));pay=Math.min(ch,room)*NAIRA.viewPay;
+  t.set(vr,{paid:(v.paid||0)+ch*NAIRA.viewPer,day:d,dpaid:used+pay},{merge:true});
+  if(pay>0){const w=ws.exists?ws.data():{};t.set(WL(),{coins:(w.coins||0)+pay,earned:(w.earned||0)+pay,uid:S.uid,name:S.p.name},{merge:true})}})}catch(e){pay=0}
+ S.vpb=0;if(pay>0){S.coins+=pay;S.earnN=(S.earnN||0)+pay;upd();toast('Views: +₦'+pay.toLocaleString())}}
+setInterval(viewPay,120000);setTimeout(viewPay,6000);
+async function settle(){} // the old Pose Pool (Stars) payout is switched off
+// welcome sheet, first visit to the profile
+const _prof=A.profile;
+A.profile=function(){_prof();if(!ls.g('welc2',0)){ls.s('welc2',1);setTimeout(()=>sheet(`<h3>Welcome to Pose</h3><div class="wlc"><p><i class="fa-solid fa-coins"></i><span><b>₦500 is in your balance</b> to start. Use it for gifts and paid videos.</span></p><p><i class="fa-solid fa-eye"></i><span><b>Earn ₦500 for every 100 views</b> your videos get (up to ₦5,000 a day).</span></p><p><i class="fa-solid fa-gift"></i><span><b>Gifts you receive:</b> you keep 70% of the price.</span></p><p><i class="fa-solid fa-plus"></i><span><b>Buy coins</b> to boost your balance: ₦100 gets 5 coins = ₦5,000.</span></p><p><i class="fa-solid fa-crown"></i><span>Climb the <b>Famous</b> ranking.</span></p><p class="m">Play money only. It has no cash value.</p><button class="btn" data-a="cclose">Got it</button></div>`),350)}};
+// Famous tab
+S.fm={tab:'fame',L:null,busy:0,t:0};
+async function loadFamous(){if(!S.fb||S.fm.busy)return;S.fm.busy=1;
+ try{const [a,b]=await Promise.all([db().collection('lagoslife_wallets').orderBy('earned','desc').limit(30).get(),db().collection('lagoslife_wallets').orderBy('coins','desc').limit(30).get()]);
+  const m=d=>({uid:d.id,name:d.data().name||'Player',earned:d.data().earned||0,coins:d.data().coins||0});S.fm.L={fame:a.docs.map(m).filter(x=>x.earned>0),rich:b.docs.map(m)}}catch(e){S.fm.L={fame:[],rich:[]}}
+ S.fm.busy=0;if(S.page==='famous')render()}
+PAGES.famous=()=>{const f=S.fm,L=f.L&&f.L[f.tab],k=f.tab==='fame'?'earned':'coins';if(Date.now()-f.t>60000){f.t=Date.now();loadFamous()}
+ const idx=L?L.findIndex(x=>x.uid===S.uid):-1;
+ return `<div class="fmh"><h2><i class="fa-solid fa-crown"></i> Famous</h2><p class="m">Play money only. No cash value.</p></div>
+<div class="chips"><b class="${f.tab==='fame'?'on':''}" data-a="fmt" data-t="fame">Most Famous</b><b class="${f.tab==='rich'?'on':''}" data-a="fmt" data-t="rich">Richest</b></div>
+<div class="fyou"><div><small>YOUR RANK</small><b>${idx>=0?'#'+(idx+1):'Not ranked yet'}</b></div><div><small>${f.tab==='fame'?'EARNED':'BALANCE'}</small><b>₦${(f.tab==='fame'?(S.earnN||0):(S.coins||0)).toLocaleString()}</b></div><button class="btn" data-a="shop">Buy coins to climb</button></div>
+<div class="fl3">${!L?'<p class="m">Loading...</p>':L.length?L.map((x,i)=>`<div class="frow ${x.uid===S.uid?'me':''}"><span class="fr r${i<3?i+1:0}">${i<3?'<i class="fa-solid fa-crown"></i>':i+1}</span><span class="spa sm">${esc((x.name||'?')[0]).toUpperCase()}</span><b>${esc(x.name)}</b><span class="fv">₦${x[k].toLocaleString()}</span></div>`).join(''):'<p class="m">Nobody here yet. Be the first!</p>'}</div>`};
+const _s9b=A.search;
+Object.assign(A,{fmt(el){S.fm.tab=el.dataset.t;render()},gbuy(){closeSheet();A.shop()},search(){if(['trend','famous'].includes(S.page))return;_s9b()}});
+const _w9b=watch;watch=function(){_w9b();$('#app').classList.toggle('nosrch',['trend','famous'].includes(S.page))};
 </script></body></html>
